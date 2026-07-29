@@ -44,28 +44,30 @@ Desenvolver um aplicativo web/mobile intuitivo, focado na visualização rápida
 ### 4.1 Módulo de Cadastro e Armazenamento
 - **[RF-001] Cadastro Completo de Documentos**:
   - Título/Nome do documento (obrigatório)
-  - Categoria/Tipo (ex: Fiscal, Trabalhista, Licença, Contrato, Seguros, Frota)
+  - Categoria/Tipo (ex: Fiscal, Trabalhista, Licença, Contrato, Seguros, Frota) - *Campo obrigatório*
   - Entidade/Órgão Emissor (ex: Receita Federal, Prefeitura, Bombeiros, Banco X)
   - Data de Emissão e Data de Vencimento
-  - Responsável/Setor (ex: RH, Financeiro, Jurídico, Operações)
-  - Arquivo Anexo (PDF, PNG, JPG)
+  - Antecedência do Alerta (dias customizáveis por documento, ex: 60, 30, 15 ou 7 dias)
+  - Responsável pelo Documento (nome e e-mail para recebimento dos alertas)
+  - Arquivo Anexo (PDF, PNG, JPG - **Limite máximo de 10 MB por arquivo**)
   - Observações e Instruções para Renovação
 - **[RF-002] Categorias e Tags Personalizadas**: Capacidade de criar e editar categorias e tags dinâmicas.
 - **[RF-003] Histórico de Renovações e Versões**: Ao renovar um documento, a nova versão assume o status vigente e a versão anterior fica mantida no histórico auditável.
+- **[RF-010] Exclusão Permanente de Documentos**: Permitir que administradores excluam permanentemente cadastros realizados por engano (Hard Delete).
 
 ### 4.2 Módulo de Visualização e Dashboard
 - **[RF-004] Painel Visual por Matriz de Cores**:
   - 🔴 **Vencido**: Data de vencimento ultrapassada.
-  - 🟡 **Alerta Crítico**: Vence nos próximos 15 dias.
-  - 🟠 **Atenção**: Vence entre 16 e 30 dias.
-  - 🟢 **Regular / Em Dia**: Vencimento com mais de 30 dias de margem.
+  - 🟡 **Alerta Crítico**: Vencimento próximo (dentro do prazo de antecedência configurado).
+  - 🔵 **Em Renovação**: Sinalizador indicando que a renovação já foi protocolada/solicitada.
+  - 🟢 **Regular / Em Dia**: Vencimento distante e regular.
   - ⚪ **Indeterminado / Sem Vencimento**: Documentos de validade permanente (ex: Contrato Social).
 - **[RF-005] Visão de Calendário**: Calendário mensal/semanal destacando os vencimentos programados por dia.
-- **[RF-006] Busca Avançada e Filtros**: Filtrar por palavra-chave, categoria, setor responsável, faixa de data de vencimento e status visual.
+- **[RF-006] Busca Avançada e Filtros**: Filtrar por palavra-chave, categoria, responsável, faixa de data de vencimento e status visual.
 
 ### 4.3 Módulo de Notificações e Alertas
-- **[RF-007] Notificações Programadas por E-mail**: Disparo automático de alertas com antecedência configurável (ex: 60, 30, 15, 7 e 1 dia antes do vencimento).
-- **[RF-008] Digest Semanal/Diário**: E-mail com resumo dos documentos que exigem ação na semana para a equipe administrativa.
+- **[RF-007] Notificações Programadas por E-mail**: Disparo automático de e-mails para o e-mail do **Responsável pelo documento**, respeitando a antecedência de alerta configurada no cadastro.
+- **[RF-008] Digest Semanal/Diário**: E-mail consolidado com resumo dos documentos que exigem ação na semana para a equipe administrativa.
 
 ### 4.4 Módulo de Exportação e Relatórios
 - **[RF-009] Exportação de Relatórios**: Permitir exportar listagens de documentos vencidos ou a vencer em PDF e Excel (XLSX).
@@ -84,21 +86,24 @@ Desenvolver um aplicativo web/mobile intuitivo, focado na visualização rápida
 ## 6. Regras de Negócio (RN)
 
 - **[RN-001] Troca Automática de Status**: O status visual do documento deve ser recalculado automaticamente a cada mudança de dia à meia-noite.
-- **[RN-002] Imutabilidade do Histórico**: Documentos substituídos por uma nova renovação não podem ser excluídos, apenas arquivados no histórico.
-- **[RN-003] Alerta Obrigatório**: Todo documento com data de vencimento preenchida obrigatoriamente gera alertas para ao menos um responsável cadastrado.
+- **[RN-002] Imutabilidade do Histórico de Renovações**: Documentos substituídos por uma nova renovação não podem ser excluídos, apenas arquivados no histórico.
+- **[RN-003] Alerta Obrigatório**: Todo documento com data de vencimento preenchida obrigatoriamente vincula o e-mail do responsável para envio dos alertas.
+- **[RN-004] Destinatário do Alerta**: O e-mail de notificação de vencimento é enviado diretamente para o e-mail do usuário/responsável cadastrado no documento.
+- **[RN-005] Escopo Único de Empresa (Single-Tenant no MVP)**: O MVP atenderá a uma única estrutura organizacional/empresa (suporte a múltiplas empresas/filiais post-MVP).
 
 ---
 
 ## 7. Escopo do MVP (Produto Mínimo Viável)
 
 Para garantir uma entrega rápida e funcional, o MVP contemplará:
-1. **Cadastro e Upload de Documentos com anexos**.
-2. **Dashboard Visual com Cores de Status** (🔴 Vencido, 🟡 Crítico, 🟠 Atenção, 🟢 Em dia).
-3. **Filtros e Busca Básica** por Nome, Categoria e Status.
-4. **Notificações Automáticas por E-mail**.
-5. **Autenticação Básica com Perfis de Usuário** (Administrador e Operacional).
+1. **Cadastro e Upload de Documentos** (PDF/PNG/JPG até 10MB) com vinculo de Tipo/Categoria.
+2. **Dashboard Visual com Cores de Status** (🔴 Vencido, 🟡 Crítico, 🔵 Em Renovação, 🟢 Em dia).
+3. **Antecedência de Alerta Customizável por Documento**.
+4. **Notificações Automáticas por E-mail** enviadas para o Responsável.
+5. **Histórico de Renovações e Exclusão Permanente (Hard Delete)**.
+6. **Autenticação Básica com Perfis de Usuário** sem restrição por departamento no MVP.
 
-*Recursos futuros post-MVP*: Notificações via WhatsApp, OCR para leitura automática de PDF, relatórios avançados em PDF e integração via API com órgãos emissores.
+*Recursos futuros post-MVP*: Suporte a múltiplas empresas/filiais (Multi-tenant), Notificações via WhatsApp, OCR para leitura automática de PDF e integração via API com órgãos emissores.
 
 ---
 
@@ -106,13 +111,19 @@ Para garantir uma entrega rápida e funcional, o MVP contemplará:
 
 | Questão / Aspecto | Decisão Consolidada | Impacto no Sistema |
 | :--- | :--- | :--- |
-| **1. Tipos de Documentos** | Suporte genérico a **qualquer tipo de documento** (Contratos, Certidões, Licenças, Apólices, Contratos de Trabalho, etc.). | O campo "Tipo / Categoria" é obrigatório no cadastro do documento e alimentará os filtros do Dashboard. |
-| **2. Canal de Notificação** | **Exclusivamente E-mail** para a versão MVP. | Foco na estabilidade e entregabilidade de e-mails automáticos. WhatsApp diferido para post-MVP. |
-| **3. Restrição por Setor** | **Sem restrição por setor no MVP**. | Todos os usuários da empresa cadastrados terão acesso geral para consultar e gerenciar o acervo documental. |
-| **4. Histórico de Renovações** | **Sim, histórico mantido**. | Quando um documento é renovado (ex: nova certidão emitida), a versão antiga é arquivada automaticamente como histórico e vinculada ao novo documento. |
+| **1. Tipos de Documentos** | Suporte genérico a **qualquer tipo de documento** (Contratos, Certidões, Licenças, Apólices, etc.). | Campo "Tipo / Categoria" obrigatório no cadastro. |
+| **2. Canal de Notificação** | **Exclusivamente E-mail** para a versão MVP. | Foco na entregabilidade de e-mails automáticos. WhatsApp post-MVP. |
+| **3. Restrição por Setor** | **Sem restrição por setor no MVP**. | Todos os usuários cadastrados têm acesso ao repositório geral. |
+| **4. Histórico de Renovações** | **Sim, histórico mantido**. | Arquivamento automático da versão antiga ao registrar nova renovação. |
+| **5. Destinatário dos Alertas** | **E-mail do Responsável pelo documento** (Opção A). | Alertas direcionados para a pessoa focada naquele documento. |
+| **6. Status "Em Renovação"** | **Sim, status 🔵 Em Renovação adicionado**. | Permite indicar protocolo em andamento e evitar cobranças duplicadas. |
+| **7. Antecedência de Alertas** | **Customizada por documento**. | Cada documento pode ter sua própria janela de dias para aviso prévio. |
+| **8. Limite de Upload** | **10 MB por arquivo** (PDF, PNG, JPG). | Validação no frontend e backend durante o upload. |
+| **9. Estrutura de Empresa** | **Empresa Única no MVP**. | Modelo simples Single-Tenant no MVP (Multi-empresa post-MVP). |
+| **10. Exclusão de Cadastros** | **Exclusão permanente (Hard Delete)**. | Administradores podem excluir permanentemente erros de digitação/cadastro. |
 
 ---
 
 ## 9. Próximos Passos
-Com as definições de negócios concluídas, a **Fase 1 (Análise e Levantamento de Requisitos)** está consolidada no PRD.
+Com as definições de negócios e especificações operacionais concluídas, a **Fase 1 (Análise e Levantamento de Requisitos)** está 100% consolidada no PRD.
 Aguardando autorização para iniciar a **Fase 2: Design e Arquitetura do Sistema** (Definição da stack tecnológica, modelagem de banco de dados e prototipagem de telas/fluxos).
