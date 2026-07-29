@@ -22,3 +22,10 @@ out/
 # System files
 .DS_Store
 Thumbs.db
+
+<!-- AIHAUS:START -->
+/.aihaus-download/
+.aihaus/state/
+.aihaus/runtime/
+.aihaus/backups/
+<!-- AIHAUS:END -->
