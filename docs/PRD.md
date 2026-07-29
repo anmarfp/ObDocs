@@ -102,9 +102,17 @@ Para garantir uma entrega rápida e funcional, o MVP contemplará:
 
 ---
 
-## 8. Questões em Validação com os Stakeholders
+## 8. Definições Consolidadas com os Stakeholders (Fase 1 - Concluída)
 
-*(Será atualizado à medida que o usuário fornecer direcionamentos durante a Fase 1)*
-1. **Tipos de Documentos Principais**: Em definição.
-2. **Canais de Alerta Adicionais**: Avaliando necessidade de WhatsApp no MVP.
-3. **Privacidade por Setor**: Definir se haverá segregação de acesso por departamento ou se o acesso será amplo para a equipe administrativa.
+| Questão / Aspecto | Decisão Consolidada | Impacto no Sistema |
+| :--- | :--- | :--- |
+| **1. Tipos de Documentos** | Suporte genérico a **qualquer tipo de documento** (Contratos, Certidões, Licenças, Apólices, Contratos de Trabalho, etc.). | O campo "Tipo / Categoria" é obrigatório no cadastro do documento e alimentará os filtros do Dashboard. |
+| **2. Canal de Notificação** | **Exclusivamente E-mail** para a versão MVP. | Foco na estabilidade e entregabilidade de e-mails automáticos. WhatsApp diferido para post-MVP. |
+| **3. Restrição por Setor** | **Sem restrição por setor no MVP**. | Todos os usuários da empresa cadastrados terão acesso geral para consultar e gerenciar o acervo documental. |
+| **4. Histórico de Renovações** | **Sim, histórico mantido**. | Quando um documento é renovado (ex: nova certidão emitida), a versão antiga é arquivada automaticamente como histórico e vinculada ao novo documento. |
+
+---
+
+## 9. Próximos Passos
+Com as definições de negócios concluídas, a **Fase 1 (Análise e Levantamento de Requisitos)** está consolidada no PRD.
+Aguardando autorização para iniciar a **Fase 2: Design e Arquitetura do Sistema** (Definição da stack tecnológica, modelagem de banco de dados e prototipagem de telas/fluxos).
