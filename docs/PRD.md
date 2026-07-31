@@ -82,6 +82,12 @@ Desenvolver um aplicativo web/mobile intuitivo, focado na visualização rápida
   - Ao visualizar o documento, disponibilizar uma aba/painel de Auditoria.
   - Registrar quem visualizou/editou, data/hora exata e o **histórico detalhado de quais alterações foram feitas** (valor anterior vs novo valor).
 
+### 4.5 Módulo de Gestão de Usuários e Autenticação
+- **[RF-014] Cadastro e Gestão de Usuários com Roles (RBAC)**:
+  - Formulário para cadastro e gestão de usuários com nome, e-mail, senha e atribuição de papel (`Administrador` ou `Operacional`).
+  - Painel exclusivo para Administradores listarem, editarem roles, inativarem e redefinirem senhas de usuários.
+  - Controle de Acesso Baseado em Papéis que aplica restrições automáticas de navegação e ações conforme a role do usuário logado.
+
 ---
 
 ## 5. Requisitos Não-Funcionais (RNF)
@@ -106,14 +112,15 @@ Desenvolver um aplicativo web/mobile intuitivo, focado na visualização rápida
 - **[RN-006] Visibilidade Restrita de Arquivados**: Documentos em status "Arquivado" (Soft Delete) são ocultados para usuários Operacionais e exibidos apenas para perfil Administrador.
 - **[RN-007] Eventos em Tempo Real no Google Agenda**: A criação ou alteração de data de vencimento de um documento agenda/atualiza automaticamente o evento no Google Agenda do administrador.
 - **[RN-008] Registro Obrigatório de Audit Log**: Qualquer alteração em campos de um documento deve registrar o ID do usuário, data/hora e o diff de valores alterados.
+- **[RN-009] Restrição de Gestão de Usuários**: Apenas usuários com a role `Administrador` possuem permissão para acessar o módulo de cadastro, alteração de perfil e inativação de usuários.
 
 ---
 
 ## 7. Escopo do MVP (Produto Mínimo Viável)
 
 Para garantir uma entrega rápida e funcional, o MVP contemplará:
-1. **Perfis de Acesso (2 níveis)**: Administrador e Operacional.
-2. **Cadastro Completo com Data de Vencimento e Anexo** (PDF/PNG/JPG até 10MB).
+1. **Cadastro e Gestão de Usuários com Roles (Administrador e Operacional)** (RF-014).
+2. **Cadastro Completo de Documentos com Data de Vencimento e Anexo** (PDF/PNG/JPG até 10MB).
 3. **Dashboard Visual com Cores de Status** (🔴 Vencido, 🟡 Crítico, 🔵 Em Renovação, 🟢 Em dia).
 4. **Configuração de Notificação por Empresa** (Notificar Administradores vs Notificar Responsável).
 5. **Integração e Sincronização com Google Agenda** (RF-005).
@@ -141,6 +148,7 @@ Para garantir uma entrega rápida e funcional, o MVP contemplará:
 | **11. Google Agenda** | **Integração automática no RF-005**. | Ao cadastrar/alterar vencimento, gera evento na Google Agenda do Admin e permite sincronização na tela de calendário. |
 | **12. Trilha de Auditoria** | **Sistema de Audit Log detalhado**. | Exibe quem editou, quando editou e o histórico exato de campos alterados (de/para). |
 | **13. Exclusão permanente** | **Hard Delete disponível para Admins**. | Administradores podem excluir permanentemente cadastros inseridos por engano. |
+| **14. Gestão de Usuários e Roles** | **Módulo de Gestão de Usuários (RF-014)**. | Cadastro de usuários com atribuição de papéis (Admin / Operacional) restrito a Administradores. |
 
 ---
 

@@ -88,6 +88,18 @@ Markdown is authoritative; indexes only retrieve it.
 
 - Given a document edit action When saved Then an immutable audit log entry is generated detailing changed fields.
 
+### BR-008 — Gestão Restrita de Usuários e Roles (RBAC)
+
+- **status:** accepted
+- **domain:** user-management
+- **statement:** Apenas usuários autenticados com a role Administrador possuem permissão para cadastrar, editar perfis, atribuir roles (Administrador ou Operacional) e inativar usuários.
+- **source:** docs/PRD.md (RN-009, RF-014)
+- **rationale:** Garantir o controle de acesso e governança sobre quem gerencia usuários e permissões do sistema.
+- **last-reviewed:** v0.2.0
+- **links:** implements: [RF-014], relates: [], decided-by: []
+
+- Given a user management action When an Operational user attempts execution Then access is denied with a permission error.
+
 ## Conflicts and gaps
 
 None identified.
