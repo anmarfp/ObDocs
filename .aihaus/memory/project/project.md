@@ -2,11 +2,11 @@
 
 ## Etapa atual do ciclo de desenvolvimento
 
-- **Etapa:** 1.1 — Análise e Levantamento de Requisitos (Fase de Definição).
-- **Status:** em validação; ainda não autorizada a transição para a etapa 2.2.
-- **Próxima transição:** concluir a validação dos requisitos, do escopo do MVP e das decisões dos stakeholders; então iniciar Design e Arquitetura do Sistema.
+- **Etapa:** 2.0 — Design, Arquitetura e Prototipagem da UI.
+- **Status:** em andamento (autorizada transição para a Etapa 2 pelo stakeholder).
+- **Próxima transição:** finalizar o protótipo funcional/interativo da UI do DocsOb com base nos requisitos e MVP consolidados.
 - **Regra de acompanhamento:** ao iniciar ou concluir uma etapa, atualizar esta seção no mesmo trabalho. Esta é a fonte única da etapa atual do projeto.
-- **source:** definição do stakeholder em 2026-08-02; docs/PRD.md (Fase 1 e seção 9).
+- **source:** autorização do stakeholder em 2026-08-07; docs/PRD.md (Fase 2).
 
 ## Purpose
 DocsOb é um sistema de gestão e acompanhamento proativo de datas de vencimento de documentos (certidões, contratos, licenças, apólices de seguro, etc.) para evitar multas e riscos operacionais.
