@@ -104,3 +104,22 @@ Conformidade e segurança operacional para auditorias administrativas.
 
 ### Reversal or migration
 Nenhuma. O log é acumulativo e imutável.
+
+## ADR-006 — Arquitetura Desacoplada REST/SPA e Estratégia de Prototipagem da UI
+
+**Status:** accepted
+**Date:** 2026-08-07
+**Milestone:** Fase 2 - Design e Arquitetura
+**Amends:** none
+
+Related rules: BR-001, BR-002, BR-003, BR-004, BR-005, BR-006, BR-007, BR-008
+
+### Context
+Início da Fase 2 para definir a arquitetura técnica, o modelo de dados (ERD) e preparar a prototipagem de UI do DocsOb.
+
+### Decision
+Adoção de arquitetura desacoplada (Frontend SPA Web + Backend RESTful API + Banco Relacional PostgreSQL com ORM Prisma + Storage S3/Supabase + Google Calendar API). Para o protótipo de UI, construir uma SPA Web interativa com design system rico (Vanilla CSS, Glassmorphism, Dark Mode, micro-animações) simulando 100% das regras de negócio (troca de papel Admin/Operacional, matriz de cores, calendário, auditoria e configurações). (Source: docs/ARCHITECTURE.md)
+
+### Consequences
+Permite validação funcional e visual completa pelos usuários e stakeholders antes de concluir o desenvolvimento do backend de produção.
+
