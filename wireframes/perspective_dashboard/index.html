@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DocsOb - Dashboard & Data-Dense Admin Wireframe</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="app-shell">
+
+    <!-- 1. TOP HEADER -->
+    <header class="top-header">
+      <div class="header-left">
+        <button class="sidebar-toggle-btn" id="sidebarToggleBtn" title="Alternar Menu">☰</button>
+        <a href="index.html" class="brand-logo">
+          <div class="brand-icon">DO</div>
+          <div class="brand-info">
+            <span class="brand-title">DocsOb</span>
+            <span class="brand-subtitle">Gestão de Vencimento de Documentos</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="header-center">
+        <!-- Google Sync Status Card -->
+        <div class="google-sync-card">
+          <svg class="google-icon-svg" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+          </svg>
+          <div class="sync-status-indicator">
+            <span class="sync-dot"></span>
+            <span>Google Agenda: Sincronizado</span>
+          </div>
+          <span class="sync-timestamp">(Há 5 min)</span>
+          <button class="btn-sync-now" onclick="triggerGoogleSync()">🔄 Sincronizar</button>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <button class="notifications-btn" title="Notificações Pendentes">
+          🔔 <span class="notification-badge">4</span>
+        </button>
+        <div class="user-profile-widget" id="userProfileBtn">
+          <div class="user-avatar">MS</div>
+          <div class="user-details">
+            <span class="user-name">Marco Silva</span>
+            <span class="user-role-badge">ADMINISTRADOR</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="body-container">
+
+      <!-- 2. EXPANDABLE SIDEBAR -->
+      <aside class="sidebar" id="appSidebar">
+        <div class="sidebar-menu">
+          <div class="menu-label">Navegação Principal</div>
+          <a href="index.html" class="nav-item active"><span class="nav-icon">📊</span><span class="nav-text">Dashboard</span></a>
+          <a href="documentos.html" class="nav-item"><span class="nav-icon">📄</span><span class="nav-text">Documentos</span></a>
+          <a href="calendario.html" class="nav-item"><span class="nav-icon">📅</span><span class="nav-text">Agenda & Google Sync</span></a>
+          <a href="auditoria.html" class="nav-item"><span class="nav-icon">🛡️</span><span class="nav-text">Trilha de Auditoria</span></a>
+          <div class="menu-label">Administração</div>
+          <a href="configuracoes.html#usuarios" class="nav-item"><span class="nav-icon">👥</span><span class="nav-text">Usuários & Papéis</span></a>
+          <a href="configuracoes.html" class="nav-item"><span class="nav-icon">⚙️</span><span class="nav-text">Configurações Empresa</span></a>
+        </div>
+        <div class="sidebar-footer">
+          <div class="company-mode-card">
+            <div class="company-mode-header"><span>🏢 Regra Ativa de Alertas</span></div>
+            <div class="company-mode-status">● Notificar Todos os Admins</div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- 3. MAIN CONTENT -->
+      <main class="main-content">
+        <div class="page-header">
+          <div class="page-title-group">
+            <h1>Painel de Gestão de Documentos</h1>
+            <p>Visão executiva em tempo real e monitoramento da matriz de vencimentos</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-secondary" onclick="exportReport()">📥 Exportar Relatório</button>
+            <button class="btn btn-primary" onclick="openNewDocModal()">➕ Cadastrar Documento</button>
+          </div>
+        </div>
+
+        <!-- 4. CARDS DE MATRIZ DE STATUS -->
+        <section class="status-matrix-grid">
+          <div class="status-card vencido" onclick="filterByStatus('Vencido')">
+            <div class="card-header-row">
+              <div class="card-title-group"><span class="status-dot dot-red"></span><span class="card-label">Vencido</span></div>
+              <span class="card-pill-tag pill-red">Ação Imediata</span>
+            </div>
+            <div class="card-count-val">4</div>
+            <div class="card-subtext"><span>Data ultrapassada</span><span class="card-action-link">Filtrar →</span></div>
+          </div>
+
+          <div class="status-card critico" onclick="filterByStatus('Critico')">
+            <div class="card-header-row">
+              <div class="card-title-group"><span class="status-dot dot-yellow"></span><span class="card-label">Alerta Crítico</span></div>
+              <span class="card-pill-tag pill-yellow">Próximo Venc.</span>
+            </div>
+            <div class="card-count-val">7</div>
+            <div class="card-subtext"><span>Dentro da antecedência</span><span class="card-action-link">Filtrar →</span></div>
+          </div>
+
+          <div class="status-card renovacao" onclick="filterByStatus('Renovacao')">
+            <div class="card-header-row">
+              <div class="card-title-group"><span class="status-dot dot-blue"></span><span class="card-label">Em Renovação</span></div>
+              <span class="card-pill-tag pill-blue">Protocolado</span>
+            </div>
+            <div class="card-count-val">3</div>
+            <div class="card-subtext"><span>Aguardando emissão</span><span class="card-action-link">Filtrar →</span></div>
+          </div>
+
+          <div class="status-card regular" onclick="filterByStatus('Regular')">
+            <div class="card-header-row">
+              <div class="card-title-group"><span class="status-dot dot-green"></span><span class="card-label">Regular / Em Dia</span></div>
+              <span class="card-pill-tag pill-green">Vigente</span>
+            </div>
+            <div class="card-count-val">42</div>
+            <div class="card-subtext"><span>Vencimento distante</span><span class="card-action-link">Filtrar →</span></div>
+          </div>
+
+          <div class="status-card indeterminado" onclick="filterByStatus('Indeterminado')">
+            <div class="card-header-row">
+              <div class="card-title-group"><span class="status-dot dot-gray"></span><span class="card-label">Indeterminado</span></div>
+              <span class="card-pill-tag pill-gray">Permanente</span>
+            </div>
+            <div class="card-count-val">8</div>
+            <div class="card-subtext"><span>Sem vencimento</span><span class="card-action-link">Filtrar →</span></div>
+          </div>
+        </section>
+
+        <!-- 5. FAST FILTERS BAR -->
+        <section class="filter-card-bar">
+          <div class="filter-inputs-group">
+            <div class="search-box-wrapper">
+              <span class="search-icon">🔍</span>
+              <input type="text" class="search-input" id="tableSearchInput" placeholder="Buscar por título, órgão emissor..." onkeyup="filterTable()">
+            </div>
+            <select class="select-filter" id="categoryFilter" onchange="filterTable()">
+              <option value="">Todas as Categorias</option>
+              <option value="Fiscal">Fiscal</option>
+              <option value="Trabalhista">Trabalhista</option>
+              <option value="Licença">Licença / Alvará</option>
+              <option value="Contrato">Contrato</option>
+              <option value="Seguros">Seguros & Apólices</option>
+              <option value="Frota">Frota & Veículos</option>
+            </select>
+            <select class="select-filter" id="statusFilter" onchange="filterTable()">
+              <option value="">Todos os Status</option>
+              <option value="Vencido">🔴 Vencido</option>
+              <option value="Critico">🟡 Alerta Crítico</option>
+              <option value="Renovacao">🔵 Em Renovação</option>
+              <option value="Regular">🟢 Regular</option>
+              <option value="Indeterminado">⚪ Indeterminado</option>
+            </select>
+            <label class="checkbox-filter-label" title="Exibe documentos arquivados via Soft Delete">
+              <input type="checkbox" id="includeArchivedCheckbox" onchange="toggleArchivedDocs()">
+              <span>👁️ Incluir Arquivados</span>
+              <span class="admin-only-tag">ADMIN</span>
+            </label>
+          </div>
+          <div class="filter-actions-right">
+            <button class="btn-clear-filters" onclick="resetFilters()">Limpar Filtros</button>
+          </div>
+        </section>
+
+        <!-- 6. DOCUMENT DATA TABLE -->
+        <section class="table-card">
+          <div class="table-header-info">
+            <div class="table-title">
+              <span>📋 Listagem Geral de Documentos</span>
+              <span class="records-counter" id="recordsCounter">(Exibindo 5 de 64 registros)</span>
+            </div>
+            <div class="table-actions">
+              <button class="btn btn-secondary btn-icon-only" title="Atualizar Tabela" onclick="location.reload()">🔄</button>
+            </div>
+          </div>
+
+          <div class="table-wrapper">
+            <table class="data-dense-table" id="docsTable">
+              <thead>
+                <tr>
+                  <th style="width: 40px;"><input type="checkbox"></th>
+                  <th>Status</th>
+                  <th>Documento / Emissor</th>
+                  <th>Categoria</th>
+                  <th>Vencimento</th>
+                  <th>Antecedência</th>
+                  <th>Responsável</th>
+                  <th>Anexo</th>
+                  <th style="text-align: right;">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr data-status="Vencido" data-category="Fiscal">
+                  <td><input type="checkbox"></td>
+                  <td><span class="status-badge vencido"><span class="status-dot dot-red"></span> Vencido</span></td>
+                  <td>
+                    <div class="doc-name-cell">
+                      <a href="#" class="doc-title" onclick="openAuditModal('CND Federal')">CND Federal - SRFB / PGFN</a>
+                      <span class="doc-issuer">Receita Federal do Brasil</span>
+                    </div>
+                  </td>
+                  <td><span class="category-tag">Fiscal</span></td>
+                  <td>
+                    <div class="due-date-cell">
+                      <span class="due-date" style="color: #dc2626;">01/08/2026</span>
+                      <span class="due-days">(Vencido há 8 dias)</span>
+                    </div>
+                  </td>
+                  <td>30 dias</td>
+                  <td><span class="responsible-cell">Notificar Admins</span></td>
+                  <td><a href="#" class="attachment-pill">📎 CND_Ref.pdf</a></td>
+                  <td style="text-align: right;">
+                    <div class="table-actions-cell" style="justify-content: flex-end;">
+                      <button class="action-btn btn-audit" title="Ver Audit Log (RF-013)" onclick="openAuditModal('CND Federal')">🛡️</button>
+                      <button class="action-btn" title="Protocolar Renovação (🔵)" onclick="updateStatusToRenovacao(this)">🔄</button>
+                      <button class="action-btn" title="Editar Documento" onclick="openEditDocModal('CND Federal')">✏️</button>
+                      <button class="action-btn" title="Arquivar (Soft Delete)" onclick="archiveRow(this)">📥</button>
+                      <button class="action-btn btn-delete" title="Excluir (Hard Delete)" onclick="deleteRow(this)">🗑️</button>
+                    </div>
+                  </td>
+                </tr>
+
+                <tr data-status="Critico" data-category="Licença">
+                  <td><input type="checkbox"></td>
+                  <td><span class="status-badge critico"><span class="status-dot dot-yellow"></span> Alerta Crítico</span></td>
+                  <td>
+                    <div class="doc-name-cell">
+                      <a href="#" class="doc-title" onclick="openAuditModal('Alvará de Funcionamento 2026')">Alvará de Funcionamento 2026</a>
+                      <span class="doc-issuer">Prefeitura Municipal de SP</span>
+                    </div>
+                  </td>
+                  <td><span class="category-tag">Licença</span></td>
+                  <td>
+                    <div class="due-date-cell">
+                      <span class="due-date" style="color: #d97706;">20/08/2026</span>
+                      <span class="due-days">(Faltam 11 dias)</span>
+                    </div>
+                  </td>
+                  <td>30 dias</td>
+                  <td><span class="responsible-cell">Notificar Admins</span></td>
+                  <td><a href="#" class="attachment-pill">📎 Alvara2026.pdf</a></td>
+                  <td style="text-align: right;">
+                    <div class="table-actions-cell" style="justify-content: flex-end;">
+                      <button class="action-btn btn-audit" title="Ver Audit Log (RF-013)" onclick="openAuditModal('Alvará de Funcionamento')">🛡️</button>
+                      <button class="action-btn" title="Protocolar Renovação (🔵)" onclick="updateStatusToRenovacao(this)">🔄</button>
+                      <button class="action-btn" title="Editar Documento" onclick="openEditDocModal('Alvará de Funcionamento')">✏️</button>
+                      <button class="action-btn" title="Arquivar (Soft Delete)" onclick="archiveRow(this)">📥</button>
+                      <button class="action-btn btn-delete" title="Excluir (Hard Delete)" onclick="deleteRow(this)">🗑️</button>
+                    </div>
+                  </td>
+                </tr>
+
+                <tr data-status="Renovacao" data-category="Licença">
+                  <td><input type="checkbox"></td>
+                  <td><span class="status-badge renovacao"><span class="status-dot dot-blue"></span> Em Renovação</span></td>
+                  <td>
+                    <div class="doc-name-cell">
+                      <a href="#" class="doc-title" onclick="openAuditModal('AVCB Bombeiros')">AVCB - Licença de Bombeiros</a>
+                      <span class="doc-issuer">Corpo de Bombeiros SP</span>
+                    </div>
+                  </td>
+                  <td><span class="category-tag">Licença</span></td>
+                  <td>
+                    <div class="due-date-cell">
+                      <span class="due-date">15/08/2026</span>
+                      <span class="due-days">(Prot. #884920)</span>
+                    </div>
+                  </td>
+                  <td>60 dias</td>
+                  <td><span class="responsible-cell">Notificar Admins</span></td>
+                  <td><a href="#" class="attachment-pill">📎 Prot_AVCB.pdf</a></td>
+                  <td style="text-align: right;">
+                    <div class="table-actions-cell" style="justify-content: flex-end;">
+                      <button class="action-btn btn-audit" title="Ver Audit Log (RF-013)" onclick="openAuditModal('AVCB Bombeiros')">🛡️</button>
+                      <button class="action-btn" title="Protocolar Renovação (🔵)" onclick="updateStatusToRenovacao(this)">🔄</button>
+                      <button class="action-btn" title="Editar Documento" onclick="openEditDocModal('AVCB Bombeiros')">✏️</button>
+                      <button class="action-btn" title="Arquivar (Soft Delete)" onclick="archiveRow(this)">📥</button>
+                      <button class="action-btn btn-delete" title="Excluir (Hard Delete)" onclick="deleteRow(this)">🗑️</button>
+                    </div>
+                  </td>
+                </tr>
+
+                <tr data-status="Regular" data-category="Trabalhista">
+                  <td><input type="checkbox"></td>
+                  <td><span class="status-badge regular"><span class="status-dot dot-green"></span> Regular</span></td>
+                  <td>
+                    <div class="doc-name-cell">
+                      <a href="#" class="doc-title" onclick="openAuditModal('CRF do FGTS')">CRF do FGTS</a>
+                      <span class="doc-issuer">Caixa Econômica Federal</span>
+                    </div>
+                  </td>
+                  <td><span class="category-tag">Trabalhista</span></td>
+                  <td>
+                    <div class="due-date-cell">
+                      <span class="due-date" style="color: #166534;">15/10/2026</span>
+                      <span class="due-days">(Faltam 67 dias)</span>
+                    </div>
+                  </td>
+                  <td>15 dias</td>
+                  <td><span class="responsible-cell">Notificar Admins</span></td>
+                  <td><a href="#" class="attachment-pill">📎 CRF_FGTS.pdf</a></td>
+                  <td style="text-align: right;">
+                    <div class="table-actions-cell" style="justify-content: flex-end;">
+                      <button class="action-btn btn-audit" title="Ver Audit Log (RF-013)" onclick="openAuditModal('CRF do FGTS')">🛡️</button>
+                      <button class="action-btn" title="Protocolar Renovação (🔵)" onclick="updateStatusToRenovacao(this)">🔄</button>
+                      <button class="action-btn" title="Editar Documento" onclick="openEditDocModal('CRF do FGTS')">✏️</button>
+                      <button class="action-btn" title="Arquivar (Soft Delete)" onclick="archiveRow(this)">📥</button>
+                      <button class="action-btn btn-delete" title="Excluir (Hard Delete)" onclick="deleteRow(this)">🗑️</button>
+                    </div>
+                  </td>
+                </tr>
+
+                <tr data-status="Indeterminado" data-category="Contrato">
+                  <td><input type="checkbox"></td>
+                  <td><span class="status-badge indeterminado"><span class="status-dot dot-gray"></span> Indeterminado</span></td>
+                  <td>
+                    <div class="doc-name-cell">
+                      <a href="#" class="doc-title" onclick="openAuditModal('Contrato Social Consolidado')">Contrato Social Consolidado</a>
+                      <span class="doc-issuer">Junta Comercial (JUCESP)</span>
+                    </div>
+                  </td>
+                  <td><span class="category-tag">Contrato</span></td>
+                  <td>
+                    <div class="due-date-cell">
+                      <span class="due-date" style="color: #64748b;">—</span>
+                      <span class="due-days">(Permanente)</span>
+                    </div>
+                  </td>
+                  <td>—</td>
+                  <td><span class="responsible-cell">Notificar Admins</span></td>
+                  <td><a href="#" class="attachment-pill">📎 Contrato_Social.pdf</a></td>
+                  <td style="text-align: right;">
+                    <div class="table-actions-cell" style="justify-content: flex-end;">
+                      <button class="action-btn btn-audit" title="Ver Audit Log (RF-013)" onclick="openAuditModal('Contrato Social')">🛡️</button>
+                      <button class="action-btn" title="Protocolar Renovação (🔵)" onclick="updateStatusToRenovacao(this)">🔄</button>
+                      <button class="action-btn" title="Editar Documento" onclick="openEditDocModal('Contrato Social')">✏️</button>
+                      <button class="action-btn" title="Arquivar (Soft Delete)" onclick="archiveRow(this)">📥</button>
+                      <button class="action-btn btn-delete" title="Excluir (Hard Delete)" onclick="deleteRow(this)">🗑️</button>
+                    </div>
+                  </td>
+                </tr>
+
+                <tr data-status="Regular" data-category="Seguros" class="archived-row" id="archivedSampleRow" style="display: none;">
+                  <td><input type="checkbox"></td>
+                  <td><span class="status-badge indeterminado"><span class="status-dot dot-gray"></span> Arquivado</span></td>
+                  <td>
+                    <div class="doc-name-cell">
+                      <a href="#" class="doc-title">Apólice de Seguro Frota 2024 (Antiga)</a>
+                      <span class="doc-issuer">Porto Seguro</span>
+                    </div>
+                  </td>
+                  <td><span class="category-tag">Seguros</span></td>
+                  <td>
+                    <div class="due-date-cell">
+                      <span class="due-date" style="color: #64748b;">10/01/2025</span>
+                      <span class="due-days">(Versão Anterior)</span>
+                    </div>
+                  </td>
+                  <td>30 dias</td>
+                  <td><span class="responsible-cell">Notificar Admins</span></td>
+                  <td><a href="#" class="attachment-pill">📎 Apolice2024.pdf</a></td>
+                  <td style="text-align: right;">
+                    <div class="table-actions-cell" style="justify-content: flex-end;">
+                      <button class="action-btn btn-audit" title="Ver Audit Log (RF-013)" onclick="openAuditModal('Apólice 2024')">🛡️</button>
+                      <button class="action-btn" title="Desarquivar" onclick="unarchiveRow(this)">📤</button>
+                      <button class="action-btn btn-delete" title="Excluir (Hard Delete)" onclick="deleteRow(this)">🗑️</button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="table-footer">
+            <span>Página 1 de 10 — Total de 64 documentos</span>
+            <div class="pagination-controls">
+              <button class="page-btn" disabled>Anterior</button>
+              <button class="page-btn active">1</button>
+              <button class="page-btn">2</button>
+              <button class="page-btn">3</button>
+              <button class="page-btn">Próxima</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- 7. SEÇÃO DE AUDIT LOG (RF-013) -->
+        <section class="audit-log-card" id="auditLogSection">
+          <div class="section-title-bar">
+            <div class="section-title">
+              <span>🛡️ Trilha de Auditoria Imutável (Audit Log - RF-013)</span>
+              <span class="badge" style="background-color: #dbeafe; color: #1e40af;">Histórico de Alterações</span>
+            </div>
+            <span style="font-size: 12px; color: var(--text-muted);">Registros gravados com timestamp e diff exato de campos</span>
+          </div>
+
+          <div class="audit-timeline">
+            <div class="timeline-item">
+              <div class="timeline-header">
+                <span class="timeline-user"><span>Marco Silva</span><span class="timeline-role">ADMINISTRADOR</span></span>
+                <span class="timeline-time">Hoje às 14:32:09 (2026-08-09)</span>
+              </div>
+              <div class="timeline-action">Atualização de Status de Renovação: <strong>AVCB - Licença de Bombeiros</strong></div>
+              <div class="diff-box">
+                <div><strong>Campo:</strong> Status Visual</div>
+                <div><span class="diff-old">De: 🟡 Alerta Crítico</span> ➡️ <span class="diff-new">Para: 🔵 Em Renovação</span></div>
+                <div><strong>Protocolo:</strong> #884920</div>
+              </div>
+            </div>
+
+            <div class="timeline-item">
+              <div class="timeline-header">
+                <span class="timeline-user"><span>Ana Paula Souza</span><span class="timeline-role">OPERACIONAL</span></span>
+                <span class="timeline-time">Ontem às 09:15:44 (2026-08-08)</span>
+              </div>
+              <div class="timeline-action">Inclusão de novo comprovante anexo em: <strong>CND Federal - SRFB / PGFN</strong></div>
+              <div class="diff-box">
+                <div><strong>Campo:</strong> Arquivo Anexo</div>
+                <div><span class="diff-old">De: (Sem arquivo)</span> ➡️ <span class="diff-new">Para: CND_Ref.pdf (2.4 MB)</span></div>
+              </div>
+            </div>
+
+            <div class="timeline-item">
+              <div class="timeline-header">
+                <span class="timeline-user"><span>Sistema DocsOb</span><span class="timeline-role">SISTEMA / RN-001</span></span>
+                <span class="timeline-time">01/08/2026 às 00:00:01</span>
+              </div>
+              <div class="timeline-action">Recálculo diário automático de status por data de vencimento (RN-001)</div>
+              <div class="diff-box">
+                <div><strong>Documento:</strong> CND Federal - SRFB / PGFN</div>
+                <div><span class="diff-old">De: 🟡 Alerta Crítico</span> ➡️ <span class="diff-new">Para: 🔴 Vencido</span></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- 8. MODAL DE FORMULÁRIO COM ANEXO -->
+  <div class="modal-backdrop" id="docFormModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modalTitleText">Cadastrar Novo Documento</h3>
+        <button class="modal-close-btn" onclick="closeDocModal()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="company-rule-notice">
+          <span class="rule-icon">ℹ️</span>
+          <div>
+            <strong>Modo da Empresa Ativo: "Notificar Todos os Administradores" (RF-012)</strong><br>
+            Os e-mails de alerta serão enviados para todos os administradores cadastrados. O campo "Responsável Específico" é opcional.
+          </div>
+        </div>
+
+        <form id="docForm" onsubmit="handleFormSubmit(event)">
+          <div class="form-grid-2col">
+            <div class="form-group full-width">
+              <label class="form-label">Título / Nome do Documento <span class="required-star">*</span></label>
+              <input type="text" class="form-control" id="formTitle" placeholder="Ex: CND Federal, Licença Sanitária..." required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Categoria / Tipo <span class="required-star">*</span></label>
+              <select class="form-control" id="formCategory" required>
+                <option value="">Selecione uma categoria...</option>
+                <option value="Fiscal">Fiscal</option>
+                <option value="Trabalhista">Trabalhista</option>
+                <option value="Licença">Licença / Alvará</option>
+                <option value="Contrato">Contrato</option>
+                <option value="Seguros">Seguros & Apólices</option>
+                <option value="Frota">Frota & Veículos</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Entidade / Órgão Emissor</label>
+              <input type="text" class="form-control" id="formIssuer" placeholder="Ex: Receita Federal, Prefeitura...">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Data de Emissão <span class="required-star">*</span></label>
+              <input type="date" class="form-control" id="formIssueDate" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Data de Vencimento <span class="required-star">*</span></label>
+              <input type="date" class="form-control" id="formDueDate" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Antecedência do Alerta (Dias) <span class="required-star">*</span></label>
+              <select class="form-control" id="formAlertDays" required>
+                <option value="60">60 Dias Antes</option>
+                <option value="30" selected>30 Dias Antes (Padrão)</option>
+                <option value="15">15 Dias Antes</option>
+                <option value="7">7 Dias Antes</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Responsável pelo Documento (Opcional)</label>
+              <input type="email" class="form-control" id="formResponsibleEmail" placeholder="nome@empresa.com.br">
+            </div>
+
+            <div class="form-group full-width">
+              <label class="form-label">Observações e Instruções para Renovação</label>
+              <textarea class="form-control" id="formNotes" rows="3" placeholder="Insira dados de protocolo ou observações..."></textarea>
+            </div>
+
+            <div class="form-group full-width">
+              <label class="form-label">Arquivo Anexo <span class="required-star">*</span> (PDF, PNG, JPG - Máx 10 MB)</label>
+              <div class="dropzone-container" onclick="document.getElementById('fileInput').click()">
+                <div class="upload-cloud-icon">☁️</div>
+                <div class="upload-title">Clique para selecionar ou arraste o arquivo aqui</div>
+                <div class="upload-subtitle">PDF, PNG ou JPG (Limite: 10 MB)</div>
+                <input type="file" id="fileInput" style="display: none;" accept=".pdf,.png,.jpg,.jpeg" onchange="handleFileSelect(event)">
+              </div>
+
+              <div class="file-attached-preview" id="fileAttachedPreview" style="display: none;">
+                <div class="file-info"><span>📄</span><span id="attachedFileName">certidao_exemplo.pdf (2.4 MB)</span></div>
+                <button type="button" style="background:none; border:none; color:#ef4444; cursor:pointer;" onclick="removeFile()">Remover</button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeDocModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="document.getElementById('docForm').requestSubmit()">💾 Salvar Documento</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
+    const appSidebar = document.getElementById('appSidebar');
+    sidebarToggleBtn.addEventListener('click', () => {
+      appSidebar.classList.toggle('collapsed');
+    });
+
+    function openNewDocModal() {
+      document.getElementById('modalTitleText').innerText = 'Cadastrar Novo Documento';
+      document.getElementById('docForm').reset();
+      document.getElementById('fileAttachedPreview').style.display = 'none';
+      document.getElementById('docFormModal').classList.add('active');
+    }
+
+    function openEditDocModal(docName) {
+      document.getElementById('modalTitleText').innerText = 'Editar Documento: ' + docName;
+      document.getElementById('formTitle').value = docName;
+      document.getElementById('formCategory').value = 'Licença';
+      document.getElementById('formIssuer').value = 'Órgão Emissor Exemplo';
+      document.getElementById('fileAttachedPreview').style.display = 'flex';
+      document.getElementById('attachedFileName').innerText = docName.toLowerCase().replace(/ /g, '_') + '.pdf (1.8 MB)';
+      document.getElementById('docFormModal').classList.add('active');
+    }
+
+    function closeDocModal() {
+      document.getElementById('docFormModal').classList.remove('active');
+    }
+
+    function handleFileSelect(event) {
+      const file = event.target.files[0];
+      if (file) {
+        if (file.size > 10 * 1024 * 1024) {
+          alert('Erro: O arquivo excede o limite máximo permitido de 10 MB!');
+          return;
+        }
+        document.getElementById('attachedFileName').innerText = file.name + ' (' + (file.size / (1024 * 1024)).toFixed(2) + ' MB)';
+        document.getElementById('fileAttachedPreview').style.display = 'flex';
+      }
+    }
+
+    function removeFile() {
+      document.getElementById('fileInput').value = '';
+      document.getElementById('fileAttachedPreview').style.display = 'none';
+    }
+
+    function handleFormSubmit(e) {
+      e.preventDefault();
+      alert('Documento salvo com sucesso! O evento foi gerado na Google Agenda.');
+      closeDocModal();
+    }
+
+    function triggerGoogleSync() {
+      alert('Sincronização com o Google Agenda executada com sucesso! Eventos atualizados.');
+    }
+
+    function exportReport() {
+      alert('Gerando relatório consolidado de documentos em formato PDF / XLSX...');
+    }
+
+    function openAuditModal(docName) {
+      const auditSection = document.getElementById('auditLogSection');
+      auditSection.scrollIntoView({ behavior: 'smooth' });
+      auditSection.style.outline = '2px solid #2563eb';
+      setTimeout(() => { auditSection.style.outline = 'none'; }, 2000);
+    }
+
+    function filterTable() {
+      const searchVal = document.getElementById('tableSearchInput').value.toLowerCase();
+      const catVal = document.getElementById('categoryFilter').value;
+      const statusVal = document.getElementById('statusFilter').value;
+
+      const rows = document.querySelectorAll('#docsTable tbody tr');
+      let visibleCount = 0;
+
+      rows.forEach(row => {
+        if (row.classList.contains('archived-row') && !document.getElementById('includeArchivedCheckbox').checked) {
+          row.style.display = 'none';
+          return;
+        }
+        const text = row.innerText.toLowerCase();
+        const rowCategory = row.getAttribute('data-category');
+        const rowStatus = row.getAttribute('data-status');
+
+        const matchSearch = text.includes(searchVal);
+        const matchCat = catVal === '' || rowCategory === catVal;
+        const matchStatus = statusVal === '' || rowStatus === statusVal;
+
+        if (matchSearch && matchCat && matchStatus) {
+          row.style.display = '';
+          visibleCount++;
+        } else {
+          row.style.display = 'none';
+        }
+      });
+      document.getElementById('recordsCounter').innerText = `(Exibindo ${visibleCount} registros)`;
+    }
+
+    function filterByStatus(statusName) {
+      document.getElementById('statusFilter').value = statusName;
+      filterTable();
+    }
+
+    function resetFilters() {
+      document.getElementById('tableSearchInput').value = '';
+      document.getElementById('categoryFilter').value = '';
+      document.getElementById('statusFilter').value = '';
+      document.getElementById('includeArchivedCheckbox').checked = false;
+      filterTable();
+    }
+
+    function toggleArchivedDocs() {
+      const isChecked = document.getElementById('includeArchivedCheckbox').checked;
+      const archivedSampleRow = document.getElementById('archivedSampleRow');
+      if (archivedSampleRow) {
+        archivedSampleRow.style.display = isChecked ? '' : 'none';
+      }
+      filterTable();
+    }
+
+    function updateStatusToRenovacao(btn) {
+      const tr = btn.closest('tr');
+      tr.setAttribute('data-status', 'Renovacao');
+      const badgeCell = tr.children[1];
+      badgeCell.innerHTML = '<span class="status-badge renovacao"><span class="status-dot dot-blue"></span> Em Renovação</span>';
+      alert('Status do documento alterado para "Em Renovação" (🔵)! Audit log atualizado.');
+    }
+
+    function archiveRow(btn) {
+      if (confirm('Deseja arquivar este documento (Soft Delete)? Ele ficará oculto para usuários operacionais e visível apenas para Administradores.')) {
+        const tr = btn.closest('tr');
+        tr.classList.add('archived-row');
+        tr.style.display = 'none';
+        alert('Documento arquivado com sucesso!');
+      }
+    }
+
+    function unarchiveRow(btn) {
+      const tr = btn.closest('tr');
+      tr.classList.remove('archived-row');
+      alert('Documento desarquivado e restaurado à listagem principal!');
+    }
+
+    function deleteRow(btn) {
+      if (confirm('ATENÇÃO: Deseja realmente excluir permanentemente este documento (Hard Delete)? Esta ação não poderá ser desfeita.')) {
+        const tr = btn.closest('tr');
+        tr.remove();
+        alert('Documento excluído permanentemente.');
+        filterTable();
+      }
+    }
+  </script>
+</body>
+</html>

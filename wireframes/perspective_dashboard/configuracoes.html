@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DocsOb - Configurações Empresa & Usuários RBAC</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="app-shell">
+
+    <!-- 1. TOP HEADER -->
+    <header class="top-header">
+      <div class="header-left">
+        <button class="sidebar-toggle-btn" id="sidebarToggleBtn" title="Alternar Menu">☰</button>
+        <a href="index.html" class="brand-logo">
+          <div class="brand-icon">DO</div>
+          <div class="brand-info">
+            <span class="brand-title">DocsOb</span>
+            <span class="brand-subtitle">Gestão de Vencimento de Documentos</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="header-center">
+        <!-- Google Sync Status Card -->
+        <div class="google-sync-card">
+          <svg class="google-icon-svg" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+          </svg>
+          <div class="sync-status-indicator">
+            <span class="sync-dot"></span>
+            <span>Google Agenda: Sincronizado</span>
+          </div>
+          <span class="sync-timestamp">(Há 5 min)</span>
+          <button class="btn-sync-now" onclick="triggerGoogleSync()">🔄 Sincronizar</button>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <button class="notifications-btn" title="Notificações Pendentes">
+          🔔 <span class="notification-badge">4</span>
+        </button>
+        <div class="user-profile-widget" id="userProfileBtn">
+          <div class="user-avatar">MS</div>
+          <div class="user-details">
+            <span class="user-name">Marco Silva</span>
+            <span class="user-role-badge">ADMINISTRADOR</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="body-container">
+
+      <!-- 2. EXPANDABLE SIDEBAR -->
+      <aside class="sidebar" id="appSidebar">
+        <div class="sidebar-menu">
+          <div class="menu-label">Navegação Principal</div>
+          <a href="index.html" class="nav-item"><span class="nav-icon">📊</span><span class="nav-text">Dashboard</span></a>
+          <a href="documentos.html" class="nav-item"><span class="nav-icon">📄</span><span class="nav-text">Documentos</span></a>
+          <a href="calendario.html" class="nav-item"><span class="nav-icon">📅</span><span class="nav-text">Agenda & Google Sync</span></a>
+          <a href="auditoria.html" class="nav-item"><span class="nav-icon">🛡️</span><span class="nav-text">Trilha de Auditoria</span></a>
+          <div class="menu-label">Administração</div>
+          <a href="configuracoes.html#usuarios" class="nav-item" onclick="activateTab('usuariosTab', document.getElementById('tabItemUsers'))"><span class="nav-icon">👥</span><span class="nav-text">Usuários & Papéis</span></a>
+          <a href="configuracoes.html" class="nav-item active" onclick="activateTab('regrasTab', document.getElementById('tabItemRules'))"><span class="nav-icon">⚙️</span><span class="nav-text">Configurações Empresa</span></a>
+        </div>
+        <div class="sidebar-footer">
+          <div class="company-mode-card">
+            <div class="company-mode-header"><span>🏢 Regra Ativa de Alertas</span></div>
+            <div class="company-mode-status" id="sidebarActiveRuleText">● Notificar Todos os Admins</div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- 3. MAIN CONTENT -->
+      <main class="main-content">
+        <div class="page-header">
+          <div class="page-title-group">
+            <h1>Configurações da Empresa & Gestão de Usuários</h1>
+            <p>Parâmetros globais de envio de alertas de vencimento (RN-004), gestão de papéis RBAC e integração Google Agenda</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-secondary" onclick="openNewUserModal()">➕ Novo Usuário</button>
+            <button class="btn btn-primary" onclick="saveGlobalSettings()">💾 Salvar Configurações</button>
+          </div>
+        </div>
+
+        <!-- 4. NAVIGATION TABS -->
+        <div class="nav-tabs">
+          <div class="tab-item active" id="tabItemRules" onclick="activateTab('regrasTab', this)">
+            <span>🏢 Regras Globais de Alerta (RN-004)</span>
+          </div>
+          <div class="tab-item" id="tabItemUsers" onclick="activateTab('usuariosTab', this)">
+            <span>👥 Gestão de Usuários & RBAC</span>
+          </div>
+          <div class="tab-item" id="tabItemGoogle" onclick="activateTab('googleTab', this)">
+            <span>🌐 Integração Google Agenda</span>
+          </div>
+          <div class="tab-item" id="tabItemSecurity" onclick="activateTab('securityTab', this)">
+            <span>🔒 Segurança & Retenção Log</span>
+          </div>
+        </div>
+
+        <!-- TAB 1: REGRAS GLOBAIS DE ALERTA (RN-004) -->
+        <div class="tab-content-panel active" id="regrasTab">
+          
+          <div class="settings-card">
+            <div class="settings-card-header">
+              <h2 class="settings-card-title">
+                <span>🏢 Regra Global de Envio de Alertas por E-mail (RN-004)</span>
+                <span class="badge-rn004">RN-004 VIGENTE</span>
+              </h2>
+              <p class="settings-card-subtitle">
+                Escolha a política de distribuição e envio automático de e-mails de notificação de antecedência e alertas críticos de vencimento na organização.
+              </p>
+            </div>
+
+            <!-- Radio Option Cards -->
+            <div class="radio-card-group">
+              
+              <!-- Option 1: Broadcast (Selected) -->
+              <label class="radio-card selected" id="radioCardBroadcast">
+                <input type="radio" name="globalAlertRule" value="broadcast" checked onchange="selectRuleCard('radioCardBroadcast', '● Notificar Todos os Admins')">
+                <div class="radio-card-body">
+                  <h4>
+                    <span>Regra 1: Broadcast Geral (Notificar Todos os Administradores)</span>
+                    <span class="badge" style="background:#2563eb; color:white;">RECOMENDADO</span>
+                  </h4>
+                  <p>
+                    Todas as notificações automáticas de antecedência de vencimento e alertas críticos serão enviadas em cópia para <strong>TODOS os usuários com perfil ADMINISTRADOR</strong> cadastrados no sistema DocsOb. Garante acompanhamento executivo centralizado.
+                  </p>
+                </div>
+              </label>
+
+              <!-- Option 2: Responsible Only -->
+              <label class="radio-card" id="radioCardResponsible">
+                <input type="radio" name="globalAlertRule" value="responsible" onchange="selectRuleCard('radioCardResponsible', '● Notificar Usuário Responsável')">
+                <div class="radio-card-body">
+                  <h4>
+                    <span>Regra 2: Direcionado ao Usuário Responsável</span>
+                  </h4>
+                  <p>
+                    Os e-mails de alerta são direcionados estritamente para o <strong>Usuário Responsável atribuído ao documento</strong>. Caso o documento vença sem resolução após 3 dias, o sistema escalona automaticamente um alerta de escalonamento para os Administradores.
+                  </p>
+                </div>
+              </label>
+
+              <!-- Option 3: Hybrid / CC Manager -->
+              <label class="radio-card" id="radioCardHybrid">
+                <input type="radio" name="globalAlertRule" value="hybrid" onchange="selectRuleCard('radioCardHybrid', '● Regra Híbrida Setorial')">
+                <div class="radio-card-body">
+                  <h4>
+                    <span>Regra 3: Regra Híbrida Setorial (Responsável + Cópia Gerência)</span>
+                  </h4>
+                  <p>
+                    Envia a notificação primária para o Usuário Responsável e inclui em cópia (CC) os gerentes ou coordenadores cadastrados no respectivo departamento (Fiscal, Jurídico, RH, Compliance).
+                  </p>
+                </div>
+              </label>
+
+            </div>
+
+            <!-- Antecedence Thresholds -->
+            <div class="settings-card-header" style="margin-top: 24px;">
+              <h3 class="settings-card-title" style="font-size: 14px;">⏱️ Parâmetros de Antecedência e Frequência de Notificação</h3>
+            </div>
+
+            <div class="form-grid-2col" style="margin-top: 16px;">
+              
+              <div class="form-group">
+                <label class="form-label">Antecedência Padrão para Alerta Amarelo (Dias)</label>
+                <input type="number" class="form-control" id="inputDefaultYellowAlert" value="30" min="1" max="180">
+                <span style="font-size: 11px; color: var(--text-muted);">Dias antes do vencimento para disparar o primeiro aviso.</span>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Antecedência Urgente para Alerta Laranja (Dias)</label>
+                <input type="number" class="form-control" id="inputDefaultOrangeAlert" value="15" min="1" max="60">
+                <span style="font-size: 11px; color: var(--text-muted);">Dias antes do vencimento para intensificar alertas diários.</span>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Horário de Envio do E-mail Digest Diário</label>
+                <select class="form-control" id="selectDigestTime">
+                  <option value="07:00">07:00 AM (Início do Expediente)</option>
+                  <option value="08:00" selected>08:00 AM (Padrão Corporativo)</option>
+                  <option value="09:00">09:00 AM</option>
+                  <option value="17:00">05:00 PM (Encerramento do Dia)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Remetente Customizado SMTP de Disparo</label>
+                <input type="email" class="form-control" value="alertas@empresa.com.br">
+              </div>
+
+              <div class="form-group full-width" style="margin-top: 8px;">
+                <label class="toggle-switch-label">
+                  <input type="checkbox" class="toggle-switch-input" checked>
+                  <span class="toggle-switch-slider"></span>
+                  <span style="font-size: 13px; font-weight: 600;">Enviar Resumo Executivo Semanal por E-mail (Toda segunda-feira às 07:00 AM)</span>
+                </label>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+        <!-- TAB 2: GESTÃO DE USUÁRIOS & RBAC -->
+        <div class="tab-content-panel" id="usuariosTab">
+          
+          <!-- RBAC Matrix Legend Cards -->
+          <div class="rbac-grid-summary">
+            
+            <div class="rbac-role-card admin-card">
+              <div class="rbac-role-header">
+                <span class="rbac-role-title" style="color: #6b21a8;">👑 Papel ADMINISTRADOR</span>
+                <span class="rbac-badge-admin">ACESSO TOTAL</span>
+              </div>
+              <p style="font-size: 12px; color: var(--text-muted); line-height: 1.4; margin-bottom: 8px;">
+                Permissão total de leitura, criação, edição e exclusão. Pode configurar regras globais (RN-004), gerenciar usuários, visualizar documentos arquivados (soft delete) e executar hard delete.
+              </p>
+              <div style="font-size: 11px; font-weight: 700; color: #6b21a8;">1 Usuário Ativo</div>
+            </div>
+
+            <div class="rbac-role-card operacional-card">
+              <div class="rbac-role-header">
+                <span class="rbac-role-title" style="color: #0369a1;">👤 Papel OPERACIONAL</span>
+                <span class="rbac-badge-op">ACESSO RESTRITO</span>
+              </div>
+              <p style="font-size: 12px; color: var(--text-muted); line-height: 1.4; margin-bottom: 8px;">
+                Visualiza e cadastra documentos, realiza uploads de minutas/anexos, altera status para <em>"Em Renovação" (🔵)</em>. Não tem acesso a documentos arquivados ou excluídos nem a configurações da empresa.
+              </p>
+              <div style="font-size: 11px; font-weight: 700; color: #0369a1;">4 Usuários Ativos</div>
+            </div>
+
+          </div>
+
+          <!-- User Table Card -->
+          <section class="table-card">
+            <div class="table-header-info">
+              <div class="table-title">
+                <span>👥 Usuários Cadastrados no DocsOb</span>
+                <span class="records-counter">(5 usuários ativos / 1 inativo)</span>
+              </div>
+              <div class="table-actions">
+                <button class="btn btn-primary" onclick="openNewUserModal()">➕ Adicionar Usuário</button>
+              </div>
+            </div>
+
+            <div class="table-wrapper">
+              <table class="data-dense-table" id="usersTable">
+                <thead>
+                  <tr>
+                    <th>Usuário</th>
+                    <th>Cargo / Departamento</th>
+                    <th>Papel RBAC</th>
+                    <th>Status</th>
+                    <th>Último Acesso</th>
+                    <th style="text-align: right;">Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  
+                  <tr>
+                    <td>
+                      <div class="user-profile-widget" style="padding: 0;">
+                        <div class="user-avatar" style="background: linear-gradient(135deg, #7c3aed, #4c1d95);">MS</div>
+                        <div class="user-details">
+                          <span class="user-name">Marco Silva</span>
+                          <span style="font-size: 11px; color: var(--text-muted);">marco.silva@empresa.com.br</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td><strong>Diretor Operacional / Compliance</strong><br><span style="font-size: 11px; color: var(--text-muted);">Diretoria</span></td>
+                    <td><span class="rbac-badge-admin">ADMINISTRADOR</span></td>
+                    <td><span class="user-status-active">● Ativo</span></td>
+                    <td style="font-size: 12px;">Hoje às 16:04 (IP: 192.168.1.45)</td>
+                    <td style="text-align: right;">
+                      <button class="action-btn" title="Editar Usuário" onclick="openEditUserModal('Marco Silva', 'marco.silva@empresa.com.br', 'ADMINISTRADOR')">✏️</button>
+                      <button class="action-btn" title="Redefinir Senha" onclick="alert('Link de redefinição de senha enviado para marco.silva@empresa.com.br.')">🔑 Senha</button>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>
+                      <div class="user-profile-widget" style="padding: 0;">
+                        <div class="user-avatar" style="background: linear-gradient(135deg, #0284c7, #2563eb);">AC</div>
+                        <div class="user-details">
+                          <span class="user-name">Ana Costa</span>
+                          <span style="font-size: 11px; color: var(--text-muted);">ana.costa@empresa.com.br</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td><strong>Analista Fiscal Senior</strong><br><span style="font-size: 11px; color: var(--text-muted);">Dept. Fiscal</span></td>
+                    <td><span class="rbac-badge-op">OPERACIONAL</span></td>
+                    <td><span class="user-status-active">● Ativo</span></td>
+                    <td style="font-size: 12px;">Hoje às 14:20 (IP: 192.168.1.88)</td>
+                    <td style="text-align: right;">
+                      <button class="action-btn" title="Editar Usuário" onclick="openEditUserModal('Ana Costa', 'ana.costa@empresa.com.br', 'OPERACIONAL')">✏️</button>
+                      <button class="action-btn" title="Redefinir Senha" onclick="alert('Link de redefinição enviado para ana.costa@empresa.com.br.')">🔑 Senha</button>
+                      <button class="action-btn btn-delete" title="Desativar Acesso" onclick="toggleUserStatus(this)">🚫</button>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>
+                      <div class="user-profile-widget" style="padding: 0;">
+                        <div class="user-avatar" style="background: linear-gradient(135deg, #059669, #10b981);">CE</div>
+                        <div class="user-details">
+                          <span class="user-name">Carlos Eduardo</span>
+                          <span style="font-size: 11px; color: var(--text-muted);">carlos.eduardo@empresa.com.br</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td><strong>Coordenador Jurídico</strong><br><span style="font-size: 11px; color: var(--text-muted);">Dept. Jurídico</span></td>
+                    <td><span class="rbac-badge-op">OPERACIONAL</span></td>
+                    <td><span class="user-status-active">● Ativo</span></td>
+                    <td style="font-size: 12px;">Ontem às 17:45 (IP: 192.168.1.92)</td>
+                    <td style="text-align: right;">
+                      <button class="action-btn" title="Editar Usuário" onclick="openEditUserModal('Carlos Eduardo', 'carlos.eduardo@empresa.com.br', 'OPERACIONAL')">✏️</button>
+                      <button class="action-btn" title="Redefinir Senha">🔑 Senha</button>
+                      <button class="action-btn btn-delete" title="Desativar Acesso" onclick="toggleUserStatus(this)">🚫</button>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>
+                      <div class="user-profile-widget" style="padding: 0;">
+                        <div class="user-avatar" style="background: linear-gradient(135deg, #d97706, #f59e0b);">FL</div>
+                        <div class="user-details">
+                          <span class="user-name">Fernanda Lima</span>
+                          <span style="font-size: 11px; color: var(--text-muted);">fernanda.lima@empresa.com.br</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td><strong>Gerente de RH & DP</strong><br><span style="font-size: 11px; color: var(--text-muted);">Recursos Humanos</span></td>
+                    <td><span class="rbac-badge-op">OPERACIONAL</span></td>
+                    <td><span class="user-status-active">● Ativo</span></td>
+                    <td style="font-size: 12px;">08/08/2026 às 11:10</td>
+                    <td style="text-align: right;">
+                      <button class="action-btn" title="Editar Usuário" onclick="openEditUserModal('Fernanda Lima', 'fernanda.lima@empresa.com.br', 'OPERACIONAL')">✏️</button>
+                      <button class="action-btn" title="Redefinir Senha">🔑 Senha</button>
+                      <button class="action-btn btn-delete" title="Desativar Acesso" onclick="toggleUserStatus(this)">🚫</button>
+                    </td>
+                  </tr>
+
+                  <tr style="opacity: 0.7;">
+                    <td>
+                      <div class="user-profile-widget" style="padding: 0;">
+                        <div class="user-avatar" style="background: #94a3b8;">RA</div>
+                        <div class="user-details">
+                          <span class="user-name" style="text-decoration: line-through;">Roberto Alves</span>
+                          <span style="font-size: 11px; color: var(--text-muted);">roberto.alves@empresa.com.br</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td><strong>Auditor Externo (Consultoria)</strong><br><span style="font-size: 11px; color: var(--text-muted);">Compliance</span></td>
+                    <td><span class="rbac-badge-op">OPERACIONAL</span></td>
+                    <td><span class="user-status-inactive">○ Inativo</span></td>
+                    <td style="font-size: 12px;">15/07/2026 (Acesso revogado)</td>
+                    <td style="text-align: right;">
+                      <button class="action-btn" title="Reativar Usuário" onclick="toggleUserStatus(this)">🔄 Reativar</button>
+                    </td>
+                  </tr>
+
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+        </div>
+
+        <!-- TAB 3: INTEGRAÇÃO GOOGLE AGENDA -->
+        <div class="tab-content-panel" id="googleTab">
+          <div class="settings-card">
+            <div class="settings-card-header">
+              <h2 class="settings-card-title">🌐 Parâmetros da Sincronização Google Agenda</h2>
+              <p class="settings-card-subtitle">Configurações de integração via Google Calendar API v3 e OAuth 2.0</p>
+            </div>
+
+            <div class="google-sync-banner" style="margin-top: 16px;">
+              <div class="sync-info-left">
+                <div class="google-calendar-big-icon">
+                  <svg viewBox="0 0 24 24" style="width: 28px; height: 28px;">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                  </svg>
+                </div>
+                <div class="sync-details">
+                  <h3>Conexão Google OAuth 2.0 Ativa</h3>
+                  <p>Conta principal conectada: <strong>compliance@empresa.com.br</strong> (Token válido até 2027)</p>
+                </div>
+              </div>
+              <button class="btn btn-secondary" style="font-size: 12px;" onclick="triggerGoogleSync()">🔄 Testar Conexão Agora</button>
+            </div>
+
+            <div class="form-grid-2col" style="margin-top: 20px;">
+              
+              <div class="form-group">
+                <label class="form-label">Frequência de Auto-Sincronização</label>
+                <select class="form-control">
+                  <option value="5">A cada 5 minutos</option>
+                  <option value="15" selected>A cada 15 minutos (Recomendado)</option>
+                  <option value="30">A cada 30 minutos</option>
+                  <option value="60">A cada 1 hora</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Nome da Agenda de Destino no Google</label>
+                <input type="text" class="form-control" value="DocsOb - Vencimentos Corporativos">
+              </div>
+
+              <div class="form-group full-width">
+                <label class="toggle-switch-label">
+                  <input type="checkbox" class="toggle-switch-input" checked>
+                  <span class="toggle-switch-slider"></span>
+                  <span style="font-size: 13px; font-weight: 600;">Sincronização Bidirecional (Criar lembretes na agenda do usuário responsável automaticamente)</span>
+                </label>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 4: SEGURANÇA E RETENÇÃO DE LOGS -->
+        <div class="tab-content-panel" id="securityTab">
+          <div class="settings-card">
+            <div class="settings-card-header">
+              <h2 class="settings-card-title">🔒 Segurança, Ledger & Retenção da Trilha de Auditoria</h2>
+              <p class="settings-card-subtitle">Políticas de integridade e retention period do Audit Log (RF-013)</p>
+            </div>
+
+            <div class="form-grid-2col" style="margin-top: 16px;">
+              <div class="form-group">
+                <label class="form-label">Período Mínimo de Retenção do Audit Log</label>
+                <select class="form-control">
+                  <option value="365">1 Ano (365 dias)</option>
+                  <option value="1825" selected>5 Anos (1.825 dias - Conformidade Fiscal)</option>
+                  <option value="permanent">Indeterminado / Imutável Permanente</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Algoritmo de Assinatura Hash de Integridade</label>
+                <input type="text" class="form-control" value="SHA-256 / HMAC" readonly style="background:#f1f5f9;">
+              </div>
+            </div>
+
+            <div style="margin-top: 20px;">
+              <button class="btn btn-secondary" onclick="window.location.href='auditoria.html'">🛡️ Abrir Tela Dedicada de Trilha de Auditoria (RF-013)</button>
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+
+    <!-- 5. MODAL DE CADASTRO / EDIÇÃO DE USUÁRIO -->
+    <div class="modal-backdrop" id="userModal">
+      <div class="modal-dialog" style="max-width: 580px;">
+        <div class="modal-header">
+          <h2 class="modal-title" id="userModalTitle">Cadastrar Novo Usuário</h2>
+          <button class="modal-close-btn" onclick="closeUserModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          
+          <form id="userForm" onsubmit="handleUserFormSubmit(event)">
+            <div class="form-grid-2col">
+              
+              <div class="form-group full-width">
+                <label class="form-label">Nome Completo <span class="required-star">*</span></label>
+                <input type="text" class="form-control" id="inputUserName" placeholder="Ex: Juliana Mendes" required>
+              </div>
+
+              <div class="form-group full-width">
+                <label class="form-label">E-mail Corporativo <span class="required-star">*</span></label>
+                <input type="email" class="form-control" id="inputUserEmail" placeholder="juliana.mendes@empresa.com.br" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Cargo / Função</label>
+                <input type="text" class="form-control" id="inputUserRoleTitle" placeholder="Ex: Analista de Compliance">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Departamento / Setor</label>
+                <select class="form-control" id="inputUserDept">
+                  <option value="Fiscal">Fiscal</option>
+                  <option value="Jurídico">Jurídico</option>
+                  <option value="RH">RH / Departamento Pessoal</option>
+                  <option value="Compliance">Compliance & Riscos</option>
+                  <option value="Diretoria">Diretoria / Admin</option>
+                </select>
+              </div>
+
+              <div class="form-group full-width">
+                <label class="form-label">Papel de Acesso RBAC <span class="required-star">*</span></label>
+                <select class="form-control" id="inputUserRbac" required>
+                  <option value="OPERACIONAL">👤 OPERACIONAL (Visualiza e renova documentos)</option>
+                  <option value="ADMINISTRADOR">👑 ADMINISTRADOR (Acesso total + Regras globais + Soft/Hard delete)</option>
+                </select>
+              </div>
+
+              <div class="form-group full-width">
+                <label style="font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                  <input type="checkbox" checked>
+                  <span>Enviar convite por e-mail para criação de senha segura</span>
+                </label>
+              </div>
+
+            </div>
+
+            <div class="modal-footer" style="margin-top: 20px; padding-right: 0; padding-bottom: 0;">
+              <button type="button" class="btn btn-secondary" onclick="closeUserModal()">Cancelar</button>
+              <button type="submit" class="btn btn-primary">Salvar Usuário</button>
+            </div>
+          </form>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    // Sidebar Toggle
+    document.getElementById('sidebarToggleBtn').addEventListener('click', function() {
+      document.getElementById('appSidebar').classList.toggle('collapsed');
+    });
+
+    // Google Sync Trigger
+    function triggerGoogleSync() {
+      const syncBtn = document.querySelector('.btn-sync-now');
+      syncBtn.innerText = '🔄 Sincronizando...';
+      setTimeout(() => {
+        syncBtn.innerText = '🔄 Sincronizar';
+        alert('Sincronização com o Google Agenda realizada com sucesso!');
+      }, 1000);
+    }
+
+    // Tab Activation
+    function activateTab(tabPanelId, tabBtn) {
+      document.querySelectorAll('.nav-tabs .tab-item').forEach(btn => btn.classList.remove('active'));
+      if (tabBtn) tabBtn.classList.add('active');
+
+      document.querySelectorAll('.tab-content-panel').forEach(panel => panel.classList.remove('active'));
+      const targetPanel = document.getElementById(tabPanelId);
+      if (targetPanel) targetPanel.classList.add('active');
+    }
+
+    // Check Hash on Page Load
+    window.addEventListener('DOMContentLoaded', () => {
+      if (window.location.hash === '#usuarios') {
+        activateTab('usuariosTab', document.getElementById('tabItemUsers'));
+      } else if (window.location.hash === '#google') {
+        activateTab('googleTab', document.getElementById('tabItemGoogle'));
+      }
+    });
+
+    // Radio Card Selection Highlight
+    function selectRuleCard(cardId, statusText) {
+      document.querySelectorAll('.radio-card').forEach(card => card.classList.remove('selected'));
+      document.getElementById(cardId).classList.add('selected');
+      document.getElementById('sidebarActiveRuleText').innerText = statusText;
+    }
+
+    // Save Settings Feedback
+    function saveGlobalSettings() {
+      alert('Configurações Globais da Empresa e Regra de Alertas (RN-004) salvas com sucesso! Audit Log registrado.');
+    }
+
+    // User Modal Control
+    function openNewUserModal() {
+      document.getElementById('userModalTitle').innerText = 'Cadastrar Novo Usuário';
+      document.getElementById('userForm').reset();
+      document.getElementById('userModal').classList.add('active');
+    }
+
+    function openEditUserModal(name, email, role) {
+      document.getElementById('userModalTitle').innerText = `Editar Usuário: ${name}`;
+      document.getElementById('inputUserName').value = name;
+      document.getElementById('inputUserEmail').value = email;
+      document.getElementById('inputUserRbac').value = role;
+      document.getElementById('userModal').classList.add('active');
+    }
+
+    function closeUserModal() {
+      document.getElementById('userModal').classList.remove('active');
+    }
+
+    function handleUserFormSubmit(event) {
+      event.preventDefault();
+      alert('Usuário salvo e permissões RBAC atualizadas com sucesso!');
+      closeUserModal();
+    }
+
+    function toggleUserStatus(btn) {
+      const tr = btn.closest('tr');
+      const name = tr.querySelector('.user-name').innerText;
+      if (confirm(`Deseja alterar o status de acesso do usuário ${name}?`)) {
+        alert(`Status de acesso de ${name} alterado.`);
+      }
+    }
+  </script>
+</body>
+</html>

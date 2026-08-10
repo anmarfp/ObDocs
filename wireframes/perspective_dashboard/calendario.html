@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DocsOb - Calendário & Agenda Google Sync</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="app-shell">
+
+    <!-- 1. TOP HEADER -->
+    <header class="top-header">
+      <div class="header-left">
+        <button class="sidebar-toggle-btn" id="sidebarToggleBtn" title="Alternar Menu">☰</button>
+        <a href="index.html" class="brand-logo">
+          <div class="brand-icon">DO</div>
+          <div class="brand-info">
+            <span class="brand-title">DocsOb</span>
+            <span class="brand-subtitle">Gestão de Vencimento de Documentos</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="header-center">
+        <!-- Google Sync Status Card -->
+        <div class="google-sync-card">
+          <svg class="google-icon-svg" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+          </svg>
+          <div class="sync-status-indicator">
+            <span class="sync-dot"></span>
+            <span>Google Agenda: Sincronizado</span>
+          </div>
+          <span class="sync-timestamp">(Há 5 min)</span>
+          <button class="btn-sync-now" onclick="triggerGoogleSync()">🔄 Sincronizar</button>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <button class="notifications-btn" title="Notificações Pendentes">
+          🔔 <span class="notification-badge">4</span>
+        </button>
+        <div class="user-profile-widget" id="userProfileBtn">
+          <div class="user-avatar">MS</div>
+          <div class="user-details">
+            <span class="user-name">Marco Silva</span>
+            <span class="user-role-badge">ADMINISTRADOR</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="body-container">
+
+      <!-- 2. EXPANDABLE SIDEBAR -->
+      <aside class="sidebar" id="appSidebar">
+        <div class="sidebar-menu">
+          <div class="menu-label">Navegação Principal</div>
+          <a href="index.html" class="nav-item"><span class="nav-icon">📊</span><span class="nav-text">Dashboard</span></a>
+          <a href="documentos.html" class="nav-item"><span class="nav-icon">📄</span><span class="nav-text">Documentos</span></a>
+          <a href="calendario.html" class="nav-item active"><span class="nav-icon">📅</span><span class="nav-text">Agenda & Google Sync</span></a>
+          <a href="auditoria.html" class="nav-item"><span class="nav-icon">🛡️</span><span class="nav-text">Trilha de Auditoria</span></a>
+          <div class="menu-label">Administração</div>
+          <a href="configuracoes.html#usuarios" class="nav-item"><span class="nav-icon">👥</span><span class="nav-text">Usuários & Papéis</span></a>
+          <a href="configuracoes.html" class="nav-item"><span class="nav-icon">⚙️</span><span class="nav-text">Configurações Empresa</span></a>
+        </div>
+        <div class="sidebar-footer">
+          <div class="company-mode-card">
+            <div class="company-mode-header"><span>🏢 Regra Ativa de Alertas</span></div>
+            <div class="company-mode-status">● Notificar Todos os Admins</div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- 3. MAIN CONTENT -->
+      <main class="main-content">
+        <div class="page-header">
+          <div class="page-title-group">
+            <h1>Calendário de Vencimentos & Agenda Sync</h1>
+            <p>Visualização cronológica mensal com chips de status de documentos e integração em tempo real com Google Agenda</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-secondary" onclick="triggerGoogleSync()">🔄 Forçar Sincronização Google</button>
+            <button class="btn btn-primary" onclick="window.location.href='documentos.html'">➕ Cadastrar Documento</button>
+          </div>
+        </div>
+
+        <!-- 4. GOOGLE CALENDAR SYNC BANNER PANEL -->
+        <section class="google-sync-banner">
+          <div class="sync-info-left">
+            <div class="google-calendar-big-icon">
+              <svg viewBox="0 0 24 24" style="width: 28px; height: 28px;">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+              </svg>
+            </div>
+            <div class="sync-details">
+              <h3>Google Agenda Sync: Conectado & Ativo</h3>
+              <p>Conta vinculada: <strong>compliance@empresa.com.br</strong> | Auto-Sincronização: <strong>A cada 15 minutos</strong> (Última: Hoje às 16:04)</p>
+            </div>
+          </div>
+          <div class="sync-controls-right">
+            <label class="toggle-switch-label" style="color: white; font-size: 12px; font-weight: 500;">
+              <span>Sincronização Automática</span>
+              <input type="checkbox" class="toggle-switch-input" checked onchange="toggleAutoSync(this)">
+              <span class="toggle-switch-slider"></span>
+            </label>
+            <button class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px;" onclick="window.location.href='configuracoes.html#google'">⚙️ Configurar OAuth</button>
+          </div>
+        </section>
+
+        <!-- 5. FULL CALENDAR COMPONENT -->
+        <section class="calendar-card">
+          <!-- Calendar Header Controls -->
+          <div class="calendar-header-toolbar">
+            <div class="month-nav-group">
+              <button class="btn-nav-month" onclick="prevMonth()">◀ Anterior</button>
+              <h2 class="month-nav-title" id="currentMonthDisplay">Agosto 2026</h2>
+              <button class="btn-nav-month" onclick="nextMonth()">Próximo ▶</button>
+              <button class="btn-nav-month" onclick="goToday()" style="background-color: var(--primary-light); color: var(--primary); border-color: var(--primary);">Hoje</button>
+            </div>
+
+            <div class="view-mode-buttons">
+              <button class="view-mode-btn active" onclick="switchViewMode(this, 'mes')">Mês</button>
+              <button class="view-mode-btn" onclick="switchViewMode(this, 'semana')">Semana</button>
+              <button class="view-mode-btn" onclick="switchViewMode(this, 'agenda')">Lista / Agenda</button>
+            </div>
+          </div>
+
+          <!-- Calendar Legend Bar -->
+          <div class="calendar-legend-bar">
+            <span style="font-weight: 700; color: var(--text-main);">Legenda de Status:</span>
+            <div class="legend-item"><span class="status-dot dot-red"></span> Vencido</div>
+            <div class="legend-item"><span class="status-dot dot-yellow"></span> Alerta Crítico (&lt; 30d)</div>
+            <div class="legend-item"><span class="status-dot dot-blue"></span> Em Renovação</div>
+            <div class="legend-item"><span class="status-dot dot-green"></span> Regular / Em Dia</div>
+            <div class="legend-item"><span class="status-dot dot-gray"></span> Indeterminado</div>
+            <div class="legend-item" style="color: #1a73e8;"><span style="display:inline-block; width:10px; height:10px; background:#4285F4; border-radius:50%;"></span> Google Agenda Event</div>
+          </div>
+
+          <!-- Calendar Grid 7-Columns -->
+          <div class="calendar-grid-container" id="calendarGrid">
+            <!-- Day Headings -->
+            <div class="calendar-day-head">Dom</div>
+            <div class="calendar-day-head">Seg</div>
+            <div class="calendar-day-head">Ter</div>
+            <div class="calendar-day-head">Qua</div>
+            <div class="calendar-day-head">Qui</div>
+            <div class="calendar-day-head">Sex</div>
+            <div class="calendar-day-head">Sáb</div>
+
+            <!-- WEEK 1: July 26 - Aug 1 -->
+            <div class="calendar-day-cell other-month"><div class="day-number-row"><span class="day-number">26</span></div></div>
+            <div class="calendar-day-cell other-month"><div class="day-number-row"><span class="day-number">27</span></div></div>
+            <div class="calendar-day-cell other-month"><div class="day-number-row"><span class="day-number">28</span></div></div>
+            <div class="calendar-day-cell other-month"><div class="day-number-row"><span class="day-number">29</span></div></div>
+            <div class="calendar-day-cell other-month"><div class="day-number-row"><span class="day-number">30</span></div></div>
+            <div class="calendar-day-cell other-month"><div class="day-number-row"><span class="day-number">31</span></div></div>
+            <div class="calendar-day-cell">
+              <div class="day-number-row">
+                <span class="day-number">1</span>
+                <span class="day-count-badge">1 Doc</span>
+              </div>
+              <div class="event-chips-list">
+                <div class="event-chip vencido" onclick="openEventModal('CND Receita Federal', 'Vencido em 01/08/2026', 'Fiscal', 'Ana Costa')">
+                  🔴 CND Receita Federal
+                </div>
+              </div>
+            </div>
+
+            <!-- WEEK 2: Aug 2 - Aug 8 -->
+            <div class="calendar-day-cell"><div class="day-number-row"><span class="day-number">2</span></div></div>
+            <div class="calendar-day-cell">
+              <div class="day-number-row">
+                <span class="day-number">3</span>
+                <span class="day-count-badge">1 Doc</span>
+              </div>
+              <div class="event-chips-list">
+                <div class="event-chip vencido" onclick="openEventModal('CND Estadual SEF-MG', 'Vencido em 03/08/2026', 'Licitações', 'Ana Costa')">
+                  🔴 CND Estadual SEF-MG
+                </div>
+              </div>
+            </div>
+            <div class="calendar-day-cell"><div class="day-number-row"><span class="day-number">4</span></div></div>
+            <div class="calendar-day-cell">
+              <div class="day-number-row">
+                <span class="day-number">5</span>
+                <span class="day-count-badge">1 Sync</span>
+              </div>
+              <div class="event-chips-list">
+                <div class="event-chip google-event" onclick="openGoogleEventModal('Reunião Alinhamento Fiscal', '10:00 - 11:30', 'google@empresa.com.br')">
+                  🌐 10:00 Reunião Fiscal
+                </div>
+              </div>
+            </div>
+            <div class="calendar-day-cell"><div class="day-number-row"><span class="day-number">6</span></div></div>
+            <div class="calendar-day-cell"><div class="day-number-row"><span class="day-number">7</span></div></div>
+            <div class="calendar-day-cell"><div class="day-number-row"><span class="day-number">8</span></div></div>
+
+            <!-- WEEK 3: Aug 9 - Aug 15 -->
+            <div class="calendar-day-cell"><div class="day-number-row"><span class="day-number">9</span></div></div>
+            
+            <!-- Aug 10 (TODAY) -->
+            <div class="calendar-day-cell today-cell">
+              <div class="day-number-row">
+                <span class="day-number">10</span>
+                <span class="day-count-badge" style="color: var(--primary); font-weight:700;">HOJE</span>
+              </div>
+              <div class="event-chips-list">
+                <div class="event-chip critico" onclick="openEventModal('Alvará Licença Sanitária', 'Vence em 15/08/2026 (5 dias)', 'Sanitária', 'Carlos Eduardo')">
+                  🟡 Alvará Sanitário (5d)
+                </div>
+              </div>
+            </div>
+
+            <div class="calendar-day-cell"><div class="day-number-row"><span class="day-number">11</span></div></div>
+            <div class="calendar-day-cell">
+              <div class="day-number-row">
+                <span class="day-number">12</span>
+                <span class="day-count-badge">1 Doc</span>
+              </div>
+              <div class="event-chips-list">
+                <div class="event-chip renovacao" onclick="openEventModal('Licença Operação IBAMA', 'Protocolado de Renovação', 'Ambiental', 'Marco Silva')">
+                  🔵 Licença LO-IBAMA
+                </div>
+              </div>
+            </div>
+            <div class="calendar-day-cell"><div class="day-number-row"><span class="day-number">13</span></div></div>
+            <div class="calendar-day-cell"><div class="day-number-row"><span class="day-number">14</span></div></div>
+            <div class="calendar-day-cell">
+              <div class="day-number-row">
+                <span class="day-number">15</span>
+                <span class="day-count-badge">1 Doc</span>
+              </div>
+              <div class="event-chips-list">
+                <div class="event-chip regular" onclick="openEventModal('Certidão FGTS (CRF)', 'Vence em 25/08/2026', 'Trabalhista', 'Fernanda Lima')">
+                  🟢 Certidão FGTS (CRF)
+                </div>
+              </div>
+            </div>
+
+            <!-- WEEK 4: Aug 16 - Aug 22 -->
+            <div class="calendar-day-cell"><div class="day-number-row"><span class="day-number">16</span></div></div>
+            <div class="calendar-day-cell"><div class="day-number-row"><span class="day-number">17</span></div></div>
+            <div class="calendar-day-cell">
+              <div class="day-number-row">
+                <span class="day-number">18</span>
+                <span class="day-count-badge">1 Sync</span>
+              </div>
+              <div class="event-chips-list">
+                <div class="event-chip google-event" onclick="openGoogleEventModal('Auditoria de Segurança do Trabalho', '14:30 - 16:00', 'google@empresa.com.br')">
+                  🌐 14:30 Auditoria ST
+                </div>
+              </div>
+            </div>
+            <div class="calendar-day-cell"><div class="day-number-row"><span class="day-number">19</span></div></div>
+            <div class="calendar-day-cell">
+              <div class="day-number-row">
+                <span class="day-number">20</span>
+                <span class="day-count-badge">1 Doc</span>
+              </div>
+              <div class="event-chips-list">
+                <div class="event-chip renovacao" onclick="openEventModal('Alvará de Funcionamento PBH', 'Em Processo de Renovação', 'Societário', 'Marco Silva')">
+                  🔵 Renovação Alvará PBH
+                </div>
+              </div>
+            </div>
+            <div class="calendar-day-cell"><div class="day-number-row"><span class="day-number">21</span></div></div>
+            <div class="calendar-day-cell"><div class="day-number-row"><span class="day-number">22</span></div></div>
+
+            <!-- WEEK 5: Aug 23 - Aug 29 -->
+            <div class="calendar-day-cell"><div class="day-number-row"><span class="day-number">23</span></div></div>
+            <div class="calendar-day-cell"><div class="day-number-row"><span class="day-number">24</span></div></div>
+            <div class="calendar-day-cell">
+              <div class="day-number-row">
+                <span class="day-number">25</span>
+                <span class="day-count-badge">1 Doc</span>
+              </div>
+              <div class="event-chips-list">
+                <div class="event-chip regular" onclick="openEventModal('CNDT Trabalhista TST', 'Vence em 10/10/2026', 'Trabalhista', 'Fernanda Lima')">
+                  🟢 CNDT Trabalhista
+                </div>
+              </div>
+            </div>
+            <div class="calendar-day-cell"><div class="day-number-row"><span class="day-number">26</span></div></div>
+            <div class="calendar-day-cell"><div class="day-number-row"><span class="day-number">27</span></div></div>
+            <div class="calendar-day-cell">
+              <div class="day-number-row">
+                <span class="day-number">28</span>
+                <span class="day-count-badge">1 Doc</span>
+              </div>
+              <div class="event-chips-list">
+                <div class="event-chip critico" onclick="openEventModal('AVCB - Corpo de Bombeiros', 'Vence em 28/08/2026 (18 dias)', 'Operacional', 'Marco Silva')">
+                  🟡 AVCB Bombeiros (18d)
+                </div>
+              </div>
+            </div>
+            <div class="calendar-day-cell"><div class="day-number-row"><span class="day-number">29</span></div></div>
+
+            <!-- WEEK 6: Aug 30 - Sept 5 -->
+            <div class="calendar-day-cell"><div class="day-number-row"><span class="day-number">30</span></div></div>
+            <div class="calendar-day-cell">
+              <div class="day-number-row">
+                <span class="day-number">31</span>
+                <span class="day-count-badge">1 Doc</span>
+              </div>
+              <div class="event-chips-list">
+                <div class="event-chip regular" onclick="openEventModal('Apólice Seguro Patrimonial', 'Vence em 31/08/2026', 'Contratos/Apólices', 'Carlos Eduardo')">
+                  🟢 Apólice Seguro
+                </div>
+              </div>
+            </div>
+            <div class="calendar-day-cell other-month"><div class="day-number-row"><span class="day-number">1</span></div></div>
+            <div class="calendar-day-cell other-month"><div class="day-number-row"><span class="day-number">2</span></div></div>
+            <div class="calendar-day-cell other-month"><div class="day-number-row"><span class="day-number">3</span></div></div>
+            <div class="calendar-day-cell other-month"><div class="day-number-row"><span class="day-number">4</span></div></div>
+            <div class="calendar-day-cell other-month"><div class="day-number-row"><span class="day-number">5</span></div></div>
+
+          </div>
+        </section>
+
+      </main>
+    </div>
+
+    <!-- 6. MODAL DE DETALHES DO EVENTO / DOCUMENTO DO CALENDÁRIO -->
+    <div class="modal-backdrop" id="eventModal">
+      <div class="modal-dialog" style="max-width: 540px;">
+        <div class="modal-header">
+          <h2 class="modal-title" id="eventModalTitle">Detalhes do Evento</h2>
+          <button class="modal-close-btn" onclick="closeEventModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span id="eventCategoryBadge" class="category-tag">Fiscal</span>
+              <span id="eventStatusBadge" class="status-badge vencido"><span class="status-dot dot-red"></span> Vencido</span>
+            </div>
+
+            <div style="background-color: #f8fafc; border: 1px solid var(--border-color); padding: 14px; border-radius: var(--radius-sm);">
+              <div style="font-size: 11px; color: var(--text-muted); font-weight: 600;">INFORMAÇÕES DE VENCIMENTO</div>
+              <div id="eventDetailDate" style="font-size: 15px; font-weight: 700; color: var(--text-main); margin-top: 4px;">01/08/2026</div>
+              <div id="eventDetailResp" style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Responsável: Ana Costa (Dept. Fiscal)</div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 10px; background-color: #e8f0fe; border: 1px solid #aecbfa; padding: 10px 14px; border-radius: var(--radius-sm); font-size: 12px; color: #1a73e8;">
+              <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; flex-shrink: 0;">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+              </svg>
+              <span>Evento sincronizado automaticamente no <strong>Google Calendar</strong> do responsável.</span>
+            </div>
+
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="closeEventModal()">Fechar</button>
+          <button class="btn btn-primary" onclick="window.location.href='documentos.html'">📄 Ver Ficha no Repositório</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    // Sidebar Toggle
+    document.getElementById('sidebarToggleBtn').addEventListener('click', function() {
+      document.getElementById('appSidebar').classList.toggle('collapsed');
+    });
+
+    // Google Sync Trigger
+    function triggerGoogleSync() {
+      const syncBtns = document.querySelectorAll('.btn-sync-now');
+      syncBtns.forEach(btn => btn.innerText = '🔄 Sincronizando...');
+      setTimeout(() => {
+        syncBtns.forEach(btn => btn.innerText = '🔄 Sincronizar');
+        alert('Google Agenda sincronizado! Todos os vencimentos atualizados na nuvem.');
+      }, 1200);
+    }
+
+    function toggleAutoSync(checkbox) {
+      if (checkbox.checked) {
+        alert('Sincronização automática a cada 15 min ativada.');
+      } else {
+        alert('Sincronização automática pausada.');
+      }
+    }
+
+    // Month Navigation
+    let months = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+    let currentMonthIdx = 7; // Agosto
+    let currentYear = 2026;
+
+    function updateMonthDisplay() {
+      document.getElementById('currentMonthDisplay').innerText = `${months[currentMonthIdx]} ${currentYear}`;
+    }
+
+    function prevMonth() {
+      if (currentMonthIdx === 0) {
+        currentMonthIdx = 11;
+        currentYear--;
+      } else {
+        currentMonthIdx--;
+      }
+      updateMonthDisplay();
+    }
+
+    function nextMonth() {
+      if (currentMonthIdx === 11) {
+        currentMonthIdx = 0;
+        currentYear++;
+      } else {
+        currentMonthIdx++;
+      }
+      updateMonthDisplay();
+    }
+
+    function goToday() {
+      currentMonthIdx = 7;
+      currentYear = 2026;
+      updateMonthDisplay();
+    }
+
+    function switchViewMode(btn, mode) {
+      document.querySelectorAll('.view-mode-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      if (mode !== 'mes') {
+        alert(`Alternando para visualização em modo "${mode.toUpperCase()}".`);
+      }
+    }
+
+    // Modal Control
+    function openEventModal(title, dateInfo, category, responsible) {
+      document.getElementById('eventModalTitle').innerText = title;
+      document.getElementById('eventCategoryBadge').innerText = category;
+      document.getElementById('eventDetailDate').innerText = dateInfo;
+      document.getElementById('eventDetailResp').innerText = `Responsável: ${responsible}`;
+      document.getElementById('eventModal').classList.add('active');
+    }
+
+    function openGoogleEventModal(title, timeInfo, account) {
+      document.getElementById('eventModalTitle').innerText = `🌐 ${title}`;
+      document.getElementById('eventCategoryBadge').innerText = 'Google Calendar';
+      document.getElementById('eventDetailDate').innerText = `Horário: ${timeInfo}`;
+      document.getElementById('eventDetailResp').innerText = `Conta Google: ${account}`;
+      document.getElementById('eventModal').classList.add('active');
+    }
+
+    function closeEventModal() {
+      document.getElementById('eventModal').classList.remove('active');
+    }
+  </script>
+</body>
+</html>

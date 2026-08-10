@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DocsOb - Wireframe (Executive Workspace Perspective)</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <span>📄</span> DocsOb
+    </div>
+    
+    <ul class="nav-menu">
+      <li class="nav-item active"><a href="index.html">📊 Visão Geral</a></li>
+      <li class="nav-item"><a href="documentos.html">📁 Documentos</a></li>
+      <li class="nav-item"><a href="calendario.html">📅 Calendário & Sync</a></li>
+      <li class="nav-item"><a href="auditoria.html">📜 Audit Log</a></li>
+      <li class="nav-item"><a href="configuracoes.html">⚙️ Configurações</a></li>
+    </ul>
+
+    <div class="role-badge">
+      <strong>Perfil Ativo:</strong><br>
+      <span>👑 Administrador</span>
+    </div>
+  </aside>
+
+  <!-- Main Workspace -->
+  <div class="main-wrapper">
+    
+    <!-- Top Header -->
+    <header class="top-header">
+      <div class="search-box">
+        <span>🔍</span>
+        <input type="text" placeholder="Buscar documento por código, nome ou tag...">
+      </div>
+
+      <div class="header-actions">
+        <div class="sync-status">
+          <span>🗓️</span> Google Agenda Sincronizado
+        </div>
+        <div class="user-profile">
+          <span>👤 marco.admin@empresa.com</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="content-area">
+      
+      <!-- Page Title -->
+      <div class="page-title-bar">
+        <div>
+          <h2>Painel de Gestão de Documentos (Executive View)</h2>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">Acompanhamento estratégico de vencimentos e matriz de riscos</p>
+        </div>
+        <button class="btn-primary">+ Novo Documento</button>
+      </div>
+
+      <!-- KPI Status Matrix Bar -->
+      <section class="kpi-grid">
+        <div class="kpi-card vencido">
+          <span class="badge vencido">🔴 Vencido</span>
+          <div class="kpi-val">3</div>
+          <div class="kpi-label">Requer ação imediata</div>
+        </div>
+
+        <div class="kpi-card critico">
+          <span class="badge critico">🟡 Crítico</span>
+          <div class="kpi-val">8</div>
+          <div class="kpi-label">Vence em até 30 dias</div>
+        </div>
+
+        <div class="kpi-card renovacao">
+          <span class="badge renovacao">🔵 Em Renovação</span>
+          <div class="kpi-val">4</div>
+          <div class="kpi-label">Processo em andamento</div>
+        </div>
+
+        <div class="kpi-card regular">
+          <span class="badge regular">🟢 Regular</span>
+          <div class="kpi-val">42</div>
+          <div class="kpi-label">Conforme e atualizado</div>
+        </div>
+
+        <div class="kpi-card indeterminado">
+          <span class="badge indeterminado">⚪ Indeterminado</span>
+          <div class="kpi-val">2</div>
+          <div class="kpi-label">Sem prazo / Permanente</div>
+        </div>
+      </section>
+
+      <!-- Main Data Table Container -->
+      <section class="data-card">
+        <div class="table-filter-header">
+          <h3>Repositório de Documentos</h3>
+          <div class="filter-group">
+            <select>
+              <option>Todos os Status</option>
+              <option>🔴 Vencido</option>
+              <option>🟡 Crítico</option>
+              <option>🔵 Em Renovação</option>
+              <option>🟢 Regular</option>
+              <option>⚪ Indeterminado</option>
+            </select>
+
+            <select>
+              <option>Todas as Categorias</option>
+              <option>Certidões</option>
+              <option>Licenças</option>
+              <option>Seguros</option>
+              <option>Contratos</option>
+            </select>
+
+            <select>
+              <option>Todos os Responsáveis</option>
+              <option>Carlos Silva</option>
+              <option>Ana Souza</option>
+            </select>
+          </div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Status</th>
+              <th>Título do Documento</th>
+              <th>Categoria</th>
+              <th>Vencimento</th>
+              <th>Responsável</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="badge vencido">🔴 Vencido</span></td>
+              <td><strong>Certidão Negativa Federal - RFB</strong></td>
+              <td>Certidões</td>
+              <td>07/08/2026</td>
+              <td>Carlos Silva</td>
+              <td><button>👁️ Visualizar</button> <button>✏️ Editar</button></td>
+            </tr>
+            <tr>
+              <td><span class="badge critico">🟡 Crítico</span></td>
+              <td><strong>Licença Operacional IBAMA 2026</strong></td>
+              <td>Licenças</td>
+              <td>14/08/2026 (5 dias)</td>
+              <td>Ana Souza</td>
+              <td><button>👁️ Visualizar</button> <button>✏️ Editar</button></td>
+            </tr>
+            <tr>
+              <td><span class="badge renovacao">🔵 Em Renovação</span></td>
+              <td><strong>Apólice de Seguro Predial #991</strong></td>
+              <td>Seguros</td>
+              <td>30/08/2026</td>
+              <td>Pedro Santos</td>
+              <td><button>👁️ Visualizar</button> <button>✏️ Editar</button></td>
+            </tr>
+            <tr>
+              <td><span class="badge regular">🟢 Regular</span></td>
+              <td><strong>Contrato Locação Sede Social</strong></td>
+              <td>Contratos</td>
+              <td>15/12/2026</td>
+              <td>Carlos Silva</td>
+              <td><button>👁️ Visualizar</button> <button>✏️ Editar</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Form Wireframe Section -->
+      <section class="wireframe-modal">
+        <div class="modal-header">
+          <h3>Estrutura do Formulário de Cadastro / Edição</h3>
+          <span style="color: var(--primary-accent); font-size: 0.85rem;">[ Modal Wireframe Preview ]</span>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group full">
+            <label>Título do Documento *</label>
+            <input type="text" placeholder="Ex: Alvará de Funcionamento 2026" disabled>
+          </div>
+
+          <div class="form-group">
+            <label>Categoria *</label>
+            <select disabled><option>Selecione a Categoria...</option></select>
+          </div>
+
+          <div class="form-group">
+            <label>Data de Vencimento (Vazio = Indeterminado ⚪)</label>
+            <input type="date" disabled>
+          </div>
+
+          <div class="form-group full">
+            <label>Anexo (Máx 10 MB - PDF, PNG, JPG) *</label>
+            <div class="dropzone">
+              📁 Arraste e solte o arquivo aqui ou clique para selecionar
+            </div>
+          </div>
+
+          <div class="form-group full">
+            <label>Responsável pelo Documento (Visível conforme regra de notificação)</label>
+            <select disabled><option>Selecione o Responsável...</option></select>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+</body>
+</html>

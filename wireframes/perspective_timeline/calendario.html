@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DocsOb - Calendário & Sync Google Agenda</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="app-layout">
+
+    <!-- =========================================================================
+         1. TOP NAVIGATION BAR
+         ========================================================================= -->
+    <header class="top-nav">
+      <div class="brand-section">
+        <a href="index.html" class="brand-logo" style="text-decoration:none;">
+          <div class="brand-icon">DO</div>
+          <span>DocsOb</span>
+        </a>
+        <div class="company-badge" title="Empresa configurada no modo Single-Tenant">
+          <span class="dot"></span>
+          <span>Empresa Demo Inc.</span>
+        </div>
+      </div>
+
+      <nav class="top-nav-links">
+        <a href="index.html" class="nav-link">⏳ Linha do Tempo</a>
+        <a href="documentos.html" class="nav-link">📁 Documentos</a>
+        <a href="calendario.html" class="nav-link active">📅 Calendário</a>
+        <a href="auditoria.html" class="nav-link">📜 Auditoria</a>
+        <a href="configuracoes.html" class="nav-link">⚙️ Configurações</a>
+      </nav>
+
+      <div class="top-search">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="global-search" placeholder="Buscar evento no calendário...">
+      </div>
+
+      <div class="user-actions">
+        <button class="btn-gcal-sync" onclick="triggerGCalSync()" title="Sincronizar vencimentos com Google Agenda">
+          <span>📅</span>
+          <span>Sync Agenda</span>
+        </button>
+        <button class="btn-primary" onclick="openModal()">
+          <span>+</span>
+          <span>Novo Documento</span>
+        </button>
+        <div class="user-profile">
+          <div class="avatar">CS</div>
+          <div class="user-info">
+            <span class="user-name">Carlos Silva</span>
+            <span class="user-role">Administrador</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- =========================================================================
+         2. PAGE TITLE & SYNC HEADER
+         ========================================================================= -->
+    <div class="page-title-bar">
+      <div>
+        <h2>📅 Calendário de Vencimentos & Sincronização Google Agenda (RF-005)</h2>
+        <p>Acompanhamento cronológico visual em formato de grade com integração bi-direcional em tempo real</p>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button class="btn-secondary" onclick="toggleCalendarView('week')">Visão Semana</button>
+        <button class="btn-secondary active" style="background:#eff6ff; color:var(--accent-blue); border-color:var(--accent-blue);">Visão Mês</button>
+        <button class="btn-primary" onclick="triggerGCalSync()">🔄 Sincronizar Google Agenda</button>
+      </div>
+    </div>
+
+    <!-- =========================================================================
+         3. MAIN CALENDAR WORKSPACE
+         ========================================================================= -->
+    <main class="main-viewport" style="padding: 20px;">
+      <div class="calendar-layout">
+        
+        <!-- CALENDAR MAIN PANEL -->
+        <div class="calendar-main">
+          
+          <div class="calendar-nav-head">
+            <div class="calendar-month-title">
+              <button class="btn-nav-arrow" onclick="changeMonth(-1)">‹</button>
+              <span id="current-month-label">Agosto 2026</span>
+              <button class="btn-nav-arrow" onclick="changeMonth(1)">›</button>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:12px;">
+              <div class="gcal-badge-pill">
+                <span>🟢 Google Agenda: Conectado (admin@empresademo.com)</span>
+                <span style="font-size: 10px; opacity: 0.85;">(Sync: Hoje 16:00)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- CALENDAR GRID -->
+          <div class="calendar-grid">
+            <div class="calendar-day-head">Dom</div>
+            <div class="calendar-day-head">Seg</div>
+            <div class="calendar-day-head">Ter</div>
+            <div class="calendar-day-head">Qua</div>
+            <div class="calendar-day-head">Qui</div>
+            <div class="calendar-day-head">Sex</div>
+            <div class="calendar-day-head">Sáb</div>
+
+            <!-- Row 1 -->
+            <div class="day-cell other-month"><span class="day-num">26</span></div>
+            <div class="day-cell other-month"><span class="day-num">27</span></div>
+            <div class="day-cell other-month"><span class="day-num">28</span></div>
+            <div class="day-cell other-month"><span class="day-num">29</span></div>
+            <div class="day-cell other-month"><span class="day-num">30</span></div>
+            <div class="day-cell other-month"><span class="day-num">31</span></div>
+            <div class="day-cell"><span class="day-num">1</span></div>
+
+            <!-- Row 2 -->
+            <div class="day-cell"><span class="day-num">2</span></div>
+            <div class="day-cell"><span class="day-num">3</span></div>
+            <div class="day-cell"><span class="day-num">4</span></div>
+            <div class="day-cell" onclick="openDrawer('Certidão Negativa Federal CND', '🔴 Vencido há 4 dias', 'Fiscal', 'Receita Federal PGFN', '05/08/2026')">
+              <span class="day-num">5</span>
+              <div class="cal-chip expired" title="Vencimento CND Federal">🔴 CND Federal</div>
+            </div>
+            <div class="day-cell" onclick="openDrawer('Guia FGTS Mensal', '🔴 Vencido há 3 dias', 'Trabalhista', 'Caixa Econômica', '06/08/2026')">
+              <span class="day-num">6</span>
+              <div class="cal-chip expired">🔴 Guia FGTS</div>
+            </div>
+            <div class="day-cell"><span class="day-num">7</span></div>
+            <div class="day-cell" onclick="openDrawer('Certidão ICMS Estadual', '🔴 Vencido há 1 dia', 'Fiscal', 'SEFAZ Estadual', '08/08/2026')">
+              <span class="day-num">8</span>
+              <div class="cal-chip expired">🔴 Cert. ICMS</div>
+            </div>
+
+            <!-- Row 3 -->
+            <div class="day-cell"><span class="day-num">9</span></div>
+            <div class="day-cell today">
+              <span class="day-num">10 (Hoje)</span>
+              <div style="font-size:10px; color:var(--accent-blue); font-weight:700; margin-top:2px;">● Data Atual</div>
+            </div>
+            <div class="day-cell"><span class="day-num">11</span></div>
+            <div class="day-cell" onclick="openDrawer('Licença de Operação IBAMA', '🟡 Vence em 2 dias', 'Licenças', 'IBAMA / SEMARH', '12/08/2026')">
+              <span class="day-num">12</span>
+              <div class="cal-chip critical">🟡 LO IBAMA</div>
+            </div>
+            <div class="day-cell"><span class="day-num">13</span></div>
+            <div class="day-cell"><span class="day-num">14</span></div>
+            <div class="day-cell" onclick="openDrawer('Alvará de Funcionamento', '🟡 Vence em 5 dias', 'Licenças', 'Prefeitura Municipal', '15/08/2026')">
+              <span class="day-num">15</span>
+              <div class="cal-chip critical">🟡 Alvará Prefeit.</div>
+            </div>
+
+            <!-- Row 4 -->
+            <div class="day-cell"><span class="day-num">16</span></div>
+            <div class="day-cell"><span class="day-num">17</span></div>
+            <div class="day-cell"><span class="day-num">18</span></div>
+            <div class="day-cell" onclick="openDrawer('Certificado Digital e-CNPJ A1', '🟡 Vence em 9 dias', 'Fiscal', 'Serasa Experian', '19/08/2026')">
+              <span class="day-num">19</span>
+              <div class="cal-chip critical">🟡 e-CNPJ Serasa</div>
+            </div>
+            <div class="day-cell" onclick="openDrawer('AVCB Corpo de Bombeiros', '🔵 Em Renovação', 'Licenças', 'Corpo de Bombeiros PM', '20/08/2026')">
+              <span class="day-num">20</span>
+              <div class="cal-chip renewal">🔵 AVCB Bombeiros</div>
+            </div>
+            <div class="day-cell"><span class="day-num">21</span></div>
+            <div class="day-cell"><span class="day-num">22</span></div>
+
+            <!-- Row 5 -->
+            <div class="day-cell"><span class="day-num">23</span></div>
+            <div class="day-cell"><span class="day-num">24</span></div>
+            <div class="day-cell" onclick="openDrawer('Apólice Seguro Frota', '🔵 Em Renovação', 'Seguros', 'Porto Seguro Cia', '25/08/2026')">
+              <span class="day-num">25</span>
+              <div class="cal-chip renewal">🔵 Seguro Frota</div>
+            </div>
+            <div class="day-cell"><span class="day-num">26</span></div>
+            <div class="day-cell"><span class="day-num">27</span></div>
+            <div class="day-cell"><span class="day-num">28</span></div>
+            <div class="day-cell"><span class="day-num">29</span></div>
+          </div>
+        </div>
+
+        <!-- SIDE EVENT FEED PANEL -->
+        <div class="calendar-side-panel">
+          <h3>📅 Vencimentos & Eventos GCal</h3>
+          <div style="font-size: 11px; color: var(--text-muted);">
+            Lista de compromissos e lembretes sincronizados automaticamente com o Google Agenda.
+          </div>
+
+          <div class="event-side-item" onclick="openDrawer('Licença de Operação IBAMA', '🟡 Vence em 2 dias', 'Licenças', 'IBAMA / SEMARH', '12/08/2026')">
+            <div class="cal-chip critical" style="display:inline-block; margin-bottom: 4px;">12/08/2026 - Alerta Crítico</div>
+            <div style="font-weight:700; font-size:13px;">Licença de Operação IBAMA</div>
+            <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">
+              <span>⏰ Alerta GCal: 60 dias antes</span><br>
+              <span>📧 Notificação enviada para Admins</span>
+            </div>
+          </div>
+
+          <div class="event-side-item" onclick="openDrawer('Alvará de Funcionamento', '🟡 Vence em 5 dias', 'Licenças', 'Prefeitura Municipal', '15/08/2026')">
+            <div class="cal-chip critical" style="display:inline-block; margin-bottom: 4px;">15/08/2026 - Alerta Crítico</div>
+            <div style="font-weight:700; font-size:13px;">Alvará de Funcionamento Sede</div>
+            <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">
+              <span>⏰ Alerta GCal: 30 dias antes</span><br>
+              <span>🏛️ Prefeitura Municipal</span>
+            </div>
+          </div>
+
+          <div class="event-side-item" onclick="openDrawer('AVCB Corpo de Bombeiros', '🔵 Em Renovação', 'Licenças', 'Corpo de Bombeiros PM', '20/08/2026')">
+            <div class="cal-chip renewal" style="display:inline-block; margin-bottom: 4px;">20/08/2026 - Em Renovação</div>
+            <div style="font-weight:700; font-size:13px;">AVCB Corpo de Bombeiros</div>
+            <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">
+              <span>📋 Protocolo #99411 registrado</span><br>
+              <span>⏰ Evento atualizado no GCal</span>
+            </div>
+          </div>
+
+          <div style="margin-top:auto; padding-top:10px; border-top:1px solid var(--border-light);">
+            <button class="btn-secondary" style="width:100%; justify-content:center;" onclick="alert('Abrindo configurações da API do Google Calendar...')">
+              ⚙️ Configurar Integração Google
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- =========================================================================
+       4. LATERAL DOCUMENT DETAILS DRAWER
+       ========================================================================= -->
+  <div class="drawer-overlay" id="drawer-backdrop" onclick="closeDrawer()">
+    <div class="drawer-content" onclick="event.stopPropagation()">
+      
+      <div class="drawer-header">
+        <div class="drawer-title-group">
+          <h2 id="drawer-doc-title">Certidão Negativa de Débitos Federal (CND)</h2>
+          <div class="meta">
+            <span class="status-pill expired" id="drawer-doc-status">🔴 Vencido há 4 dias</span>
+            <span>•</span>
+            <span id="drawer-doc-category">Categoria: Fiscal & Tributário</span>
+          </div>
+        </div>
+        <button class="btn-close-drawer" onclick="closeDrawer()">✕</button>
+      </div>
+
+      <nav class="drawer-tabs">
+        <button class="drawer-tab active" onclick="switchDrawerTab('tab-dados', this)">📋 Dados</button>
+        <button class="drawer-tab" onclick="switchDrawerTab('tab-anexo', this)">📎 Arquivo Anexo</button>
+        <button class="drawer-tab" onclick="switchDrawerTab('tab-gcal', this)">📅 Google Agenda</button>
+        <button class="drawer-tab" onclick="switchDrawerTab('tab-auditoria', this)">📜 Auditoria (RF-013)</button>
+        <button class="drawer-tab" onclick="switchDrawerTab('tab-historico', this)">🔄 Renovações (RF-003)</button>
+      </nav>
+
+      <div class="drawer-body">
+        
+        <!-- Aba 1: Dados do Documento -->
+        <div id="tab-dados" class="drawer-section active">
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-lbl">Órgão Emissor</span>
+              <span class="info-val" id="drawer-emissor">Receita Federal / PGFN</span>
+            </div>
+            <div class="info-item">
+              <span class="info-lbl">Data de Emissão</span>
+              <span class="info-val">06/02/2026</span>
+            </div>
+            <div class="info-item">
+              <span class="info-lbl">Data de Vencimento</span>
+              <span class="info-val" id="drawer-vencimento" style="color: var(--status-expired-text);">05/08/2026</span>
+            </div>
+            <div class="info-item">
+              <span class="info-lbl">Antecedência Alerta</span>
+              <span class="info-val">30 Dias</span>
+            </div>
+            <div class="info-item full-width">
+              <span class="info-lbl">Regra de Notificação Ativa</span>
+              <span class="info-val">Notificar Todos os Administradores (RF-012)</span>
+            </div>
+            <div class="info-item full-width">
+              <span class="info-lbl">Observações & Instruções de Renovação</span>
+              <div class="notes-box">
+                Emitir nova certidão via portal da PGFN/Receita Federal com certificado digital. Requer validação das pendências no E-CAC antes da emissão.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Aba 2: Arquivo Anexo -->
+        <div id="tab-anexo" class="drawer-section">
+          <div style="border: 1px solid var(--border-color); border-radius: 6px; padding: 14px; background: #f8fafc;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+              <div>
+                <strong>📄 Documento_Anexo_Assinado.pdf</strong>
+                <div style="font-size:11px; color:var(--text-muted);">2.4 MB • PDF Document • Upload em 06/02/2026</div>
+              </div>
+              <button class="btn-primary" style="font-size:12px; padding:4px 8px;">Download ⬇</button>
+            </div>
+            <div style="height: 180px; background: #e2e8f0; border-radius: 4px; display:flex; align-items:center; justify-content:center; color: #64748b; font-weight:600;">
+              [ Visualizador de PDF / Preview do Documento ]
+            </div>
+          </div>
+        </div>
+
+        <!-- Aba 3: Google Agenda -->
+        <div id="tab-gcal" class="drawer-section">
+          <div class="gcal-badge-pill" style="margin-bottom:10px;">
+            <span>🟢 Sincronizado com Google Agenda</span>
+          </div>
+          <div class="info-grid">
+            <div class="info-item full-width">
+              <span class="info-lbl">ID do Evento no Google Agenda</span>
+              <span class="info-val" style="font-family:monospace;">gcal_event_992014819</span>
+            </div>
+            <div class="info-item">
+              <span class="info-lbl">Data do Evento</span>
+              <span class="info-val">Vencimento às 09:00</span>
+            </div>
+            <div class="info-item">
+              <span class="info-lbl">Notificação GCal</span>
+              <span class="info-val">30 dias antes (E-mail + Pop-up)</span>
+            </div>
+          </div>
+          <button class="btn-secondary" style="margin-top:10px; width:100%; justify-content:center;">
+            <span>Abrir Evento no Google Agenda ↗</span>
+          </button>
+        </div>
+
+        <!-- Aba 4: Trilha de Auditoria (RF-013) -->
+        <div id="tab-auditoria" class="drawer-section">
+          <div class="audit-timeline">
+            <div class="audit-entry">
+              <div class="audit-head">
+                <span class="audit-user">Carlos Silva (Admin)</span>
+                <span>10/08/2026 às 16:00</span>
+              </div>
+              <div>Sincronização executada via Google Agenda API</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Aba 5: Renovações (RF-003) -->
+        <div id="tab-historico" class="drawer-section">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Versão</th>
+                <th>Data Vencimento</th>
+                <th>Status Histórico</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>v2.0 (Atual)</strong></td>
+                <td>12/08/2026</td>
+                <td><span class="status-pill critical">🟡 Crítico</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+      <div class="drawer-footer">
+        <div>
+          <button class="btn-danger" onclick="confirmHardDelete()">Excluir Permanente (Admin)</button>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button class="btn-secondary" onclick="archiveDocument()">Arquivar (Soft Delete)</button>
+          <button class="btn-primary" onclick="alert('Protocolando renovação...')">Protocolar Renovação 🔵</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       5. MODAL (+ NOVO DOCUMENTO)
+       ========================================================================= -->
+  <div class="modal-overlay" id="modal-overlay" onclick="closeModal()">
+    <div class="modal-card" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3>+ Cadastrar Novo Documento</h3>
+        <button class="btn-close-drawer" onclick="closeModal()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Título / Nome do Documento *</label>
+          <input type="text" placeholder="Ex: Certidão Negativa de Débitos Federais">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Categoria / Tipo *</label>
+            <select>
+              <option value="">Selecione...</option>
+              <option>Fiscal & Tributário</option>
+              <option>Licenças & Alvarás</option>
+              <option>Trabalhista & RH</option>
+              <option>Seguros & Frota</option>
+              <option>Contratos & Parcerias</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Órgão Emissor / Entidade</label>
+            <input type="text" placeholder="Ex: Receita Federal, IBAMA, Prefeitura">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Data de Emissão *</label>
+            <input type="date">
+          </div>
+          <div class="form-group">
+            <label>Data de Vencimento *</label>
+            <input type="date">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Arquivo Anexo (PDF, PNG, JPG - Máx 10 MB)</label>
+          <div class="file-upload-box">
+            <span>📁 Clique aqui para selecionar o arquivo ou arraste para esta área</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
+        <button class="btn-primary" onclick="saveDocument()">Salvar e Sincronizar Google Agenda 📅</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function openDrawer(title, status, category, emissor, vencimento) {
+      if(title) document.getElementById('drawer-doc-title').innerText = title;
+      if(status) document.getElementById('drawer-doc-status').innerText = status;
+      if(category) document.getElementById('drawer-doc-category').innerText = "Categoria: " + category;
+      if(emissor) document.getElementById('drawer-emissor').innerText = emissor;
+      if(vencimento) document.getElementById('drawer-vencimento').innerText = vencimento;
+
+      document.getElementById('drawer-backdrop').classList.add('active');
+    }
+
+    function closeDrawer() {
+      document.getElementById('drawer-backdrop').classList.remove('active');
+    }
+
+    function switchDrawerTab(tabId, btnElement) {
+      document.querySelectorAll('.drawer-section').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.drawer-tab').forEach(el => el.classList.remove('active'));
+
+      document.getElementById(tabId).classList.add('active');
+      btnElement.classList.add('active');
+    }
+
+    function openModal() {
+      document.getElementById('modal-overlay').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('modal-overlay').classList.remove('active');
+    }
+
+    function triggerGCalSync() {
+      alert("🟢 Sincronização em tempo real realizada com a Google Agenda do Administrador!");
+    }
+
+    function saveDocument() {
+      alert("✅ Documento cadastrado com sucesso! Evento criado no Google Agenda.");
+      closeModal();
+    }
+
+    function confirmHardDelete() {
+      if(confirm("⚠️ ATENÇÃO: Confirma a exclusão permanente deste documento?")) {
+        alert("Documento excluído com sucesso.");
+        closeDrawer();
+      }
+    }
+
+    function archiveDocument() {
+      alert("📦 Documento arquivado com sucesso.");
+      closeDrawer();
+    }
+
+    function changeMonth(delta) {
+      alert("Navegando entre meses do calendário...");
+    }
+
+    function toggleCalendarView(viewType) {
+      alert("Alternando visão para " + viewType.toUpperCase());
+    }
+  </script>
+
+</body>
+</html>

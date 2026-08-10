@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DocsOb - Trilha de Auditoria Imutável (RF-013)</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="app-shell">
+
+    <!-- 1. TOP HEADER -->
+    <header class="top-header">
+      <div class="header-left">
+        <button class="sidebar-toggle-btn" id="sidebarToggleBtn" title="Alternar Menu">☰</button>
+        <a href="index.html" class="brand-logo">
+          <div class="brand-icon">DO</div>
+          <div class="brand-info">
+            <span class="brand-title">DocsOb</span>
+            <span class="brand-subtitle">Gestão de Vencimento de Documentos</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="header-center">
+        <!-- Google Sync Status Card -->
+        <div class="google-sync-card">
+          <svg class="google-icon-svg" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+          </svg>
+          <div class="sync-status-indicator">
+            <span class="sync-dot"></span>
+            <span>Google Agenda: Sincronizado</span>
+          </div>
+          <span class="sync-timestamp">(Há 5 min)</span>
+          <button class="btn-sync-now" onclick="triggerGoogleSync()">🔄 Sincronizar</button>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <button class="notifications-btn" title="Notificações Pendentes">
+          🔔 <span class="notification-badge">4</span>
+        </button>
+        <div class="user-profile-widget" id="userProfileBtn">
+          <div class="user-avatar">MS</div>
+          <div class="user-details">
+            <span class="user-name">Marco Silva</span>
+            <span class="user-role-badge">ADMINISTRADOR</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="body-container">
+
+      <!-- 2. EXPANDABLE SIDEBAR -->
+      <aside class="sidebar" id="appSidebar">
+        <div class="sidebar-menu">
+          <div class="menu-label">Navegação Principal</div>
+          <a href="index.html" class="nav-item"><span class="nav-icon">📊</span><span class="nav-text">Dashboard</span></a>
+          <a href="documentos.html" class="nav-item"><span class="nav-icon">📄</span><span class="nav-text">Documentos</span></a>
+          <a href="calendario.html" class="nav-item"><span class="nav-icon">📅</span><span class="nav-text">Agenda & Google Sync</span></a>
+          <a href="auditoria.html" class="nav-item active"><span class="nav-icon">🛡️</span><span class="nav-text">Trilha de Auditoria</span></a>
+          <div class="menu-label">Administração</div>
+          <a href="configuracoes.html#usuarios" class="nav-item"><span class="nav-icon">👥</span><span class="nav-text">Usuários & Papéis</span></a>
+          <a href="configuracoes.html" class="nav-item"><span class="nav-icon">⚙️</span><span class="nav-text">Configurações Empresa</span></a>
+        </div>
+        <div class="sidebar-footer">
+          <div class="company-mode-card">
+            <div class="company-mode-header"><span>🏢 Regra Ativa de Alertas</span></div>
+            <div class="company-mode-status">● Notificar Todos os Admins</div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- 3. MAIN CONTENT -->
+      <main class="main-content">
+        <div class="page-header">
+          <div class="page-title-group">
+            <h1>Trilha de Auditoria Imutável (RF-013)</h1>
+            <p>Rastreabilidade rigorosa de alterações, trocas de status, cadastros, arquivamentos (soft delete) e acessos com diffs detalhados</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-secondary" onclick="exportAuditLog()">📥 Exportar Audit Log (CSV/PDF)</button>
+            <button class="btn btn-primary" onclick="verifyLogIntegrity()">🛡️ Checar Hash SHA-256</button>
+          </div>
+        </div>
+
+        <!-- 4. STATS SUMMARY ROW -->
+        <section class="status-matrix-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 20px;">
+          <div class="status-card regular" style="cursor: default;">
+            <div class="card-header-row">
+              <span class="card-label">Total de Eventos Gravados</span>
+              <span class="badge" style="background:#e2e8f0; color:#334155;">Imutável</span>
+            </div>
+            <div class="card-count-val">1,428</div>
+            <div class="card-subtext"><span>Logs registrados no sistema</span></div>
+          </div>
+
+          <div class="status-card renovacao" style="cursor: default;">
+            <div class="card-header-row">
+              <span class="card-label">Alterações de Status (Mês)</span>
+              <span class="badge-rn004">RF-013</span>
+            </div>
+            <div class="card-count-val">34</div>
+            <div class="card-subtext"><span>Transições registradas</span></div>
+          </div>
+
+          <div class="status-card vencido" style="cursor: default;">
+            <div class="card-header-row">
+              <span class="card-label">Arquivamentos / Soft Deletes</span>
+              <span class="admin-only-tag">ADMIN ONLY</span>
+            </div>
+            <div class="card-count-val">3</div>
+            <div class="card-subtext"><span>Documentos ocultos</span></div>
+          </div>
+
+          <div class="status-card indeterminado" style="cursor: default;">
+            <div class="card-header-row">
+              <span class="card-label">Usuários Ativos Auditados</span>
+              <span class="badge" style="background:#dbeafe; color:#1e40af;">RBAC</span>
+            </div>
+            <div class="card-count-val">12</div>
+            <div class="card-subtext"><span>Com sessões ativas</span></div>
+          </div>
+        </section>
+
+        <!-- 5. SEARCH & FILTERS FOR AUDIT LOG -->
+        <section class="filter-card-bar">
+          <div class="filter-inputs-group">
+            <div class="search-box-wrapper">
+              <span class="search-icon">🔍</span>
+              <input type="text" class="search-input" id="auditSearchInput" placeholder="Buscar por documento, usuário, evento ou IP..." onkeyup="filterAuditLogs()">
+            </div>
+
+            <select class="select-filter" id="actionTypeFilter" onchange="filterAuditLogs()">
+              <option value="">Todas as Ações</option>
+              <option value="STATUS_UPDATE">STATUS_UPDATE (Troca de Status)</option>
+              <option value="DOC_CREATE">DOC_CREATE (Novo Cadastro)</option>
+              <option value="METADATA_EDIT">METADATA_EDIT (Edição Metadados)</option>
+              <option value="SOFT_DELETE">SOFT_DELETE (Arquivamento)</option>
+              <option value="HARD_DELETE">HARD_DELETE (Exclusão Permanente)</option>
+              <option value="GOOGLE_SYNC">GOOGLE_SYNC (Sincronização Agenda)</option>
+              <option value="ALERT_TRIGGERED">ALERT_TRIGGERED (Envio de Alerta)</option>
+            </select>
+
+            <select class="select-filter" id="userRoleFilter" onchange="filterAuditLogs()">
+              <option value="">Todos os Papéis</option>
+              <option value="ADMINISTRADOR">Administrador</option>
+              <option value="OPERACIONAL">Operacional</option>
+              <option value="SISTEMA">Sistema Auto</option>
+            </select>
+
+            <select class="select-filter" id="timePeriodFilter" onchange="filterAuditLogs()">
+              <option value="30">Últimos 30 Dias</option>
+              <option value="7">Últimos 7 Dias</option>
+              <option value="90">Últimos 90 Dias</option>
+              <option value="all">Todo o Histórico</option>
+            </select>
+          </div>
+
+          <div class="filter-actions-right">
+            <button class="btn-clear-filters" onclick="resetAuditFilters()">❌ Limpar Filtros</button>
+          </div>
+        </section>
+
+        <!-- 6. NAVIGATION TABS (TABELA VS LINHA DO TEMPO) -->
+        <div class="nav-tabs">
+          <div class="tab-item active" onclick="switchAuditTab(this, 'tableTab')">
+            <span>📋 Tabela de Registros</span>
+          </div>
+          <div class="tab-item" onclick="switchAuditTab(this, 'timelineTab')">
+            <span>⏱️ Linha do Tempo (Timeline Visual)</span>
+          </div>
+        </div>
+
+        <!-- TAB 1: DATA TABLE VIEW -->
+        <div class="tab-content-panel active" id="tableTab">
+          <section class="table-card">
+            <div class="table-header-info">
+              <div class="table-title">
+                <span>🛡️ Audit Log Completo (Gravado em Ledger Imutável)</span>
+                <span class="records-counter" id="auditCounter">(Exibindo 6 registros de 1.428)</span>
+              </div>
+            </div>
+
+            <div class="table-wrapper">
+              <table class="data-dense-table" id="auditTable">
+                <thead>
+                  <tr>
+                    <th>Data & Hora</th>
+                    <th>Usuário & Role RBAC</th>
+                    <th>Tipo de Ação</th>
+                    <th>Documento / Alvo</th>
+                    <th>IP & Origem</th>
+                    <th>Diff de Alteração (De / Para)</th>
+                    <th style="text-align: right;">Detalhes</th>
+                  </tr>
+                </thead>
+                <tbody>
+
+                  <tr data-action="STATUS_UPDATE" data-role="ADMINISTRADOR">
+                    <td style="white-space: nowrap; font-weight: 600;">10/08/2026 15:45:12</td>
+                    <td>
+                      <strong>Marco Silva</strong><br>
+                      <span class="rbac-badge-admin">ADMINISTRADOR</span>
+                    </td>
+                    <td><span class="badge" style="background:#e0f2fe; color:#0369a1; border:1px solid #bae6fd;">STATUS_UPDATE</span></td>
+                    <td><strong>Licença de Operação LO-IBAMA</strong></td>
+                    <td style="font-size: 11px; color: var(--text-muted);">192.168.1.45<br>Chrome / Win11</td>
+                    <td>
+                      <div class="diff-box">
+                        <span class="diff-old">Status: Regular</span> ➔ <span class="diff-new">Status: Em Renovação</span>
+                        <div style="font-size: 10px; color: var(--text-muted); margin-top:2px;">Prot. de Renovação: #PROT-99201 anexado</div>
+                      </div>
+                    </td>
+                    <td style="text-align: right;">
+                      <button class="action-btn btn-audit" onclick="openDiffModal('STATUS_UPDATE', 'Marco Silva', 'LO-IBAMA', 'Status: Regular -> Em Renovação')">🔍 Diff</button>
+                    </td>
+                  </tr>
+
+                  <tr data-action="DOC_CREATE" data-role="OPERACIONAL">
+                    <td style="white-space: nowrap; font-weight: 600;">10/08/2026 14:20:05</td>
+                    <td>
+                      <strong>Ana Costa</strong><br>
+                      <span class="rbac-badge-op">OPERACIONAL</span>
+                    </td>
+                    <td><span class="badge" style="background:#f0fdf4; color:#166534; border:1px solid #bbf7d0;">DOC_CREATE</span></td>
+                    <td><strong>CND Estadual SEF-MG</strong></td>
+                    <td style="font-size: 11px; color: var(--text-muted);">192.168.1.88<br>Firefox / Win10</td>
+                    <td>
+                      <div class="diff-box">
+                        <span class="diff-new">+ Novo documento cadastrado</span>
+                        <div style="font-size: 10px; color: var(--text-muted); margin-top:2px;">Vencimento: 03/08/2026 | Cat: Licitações</div>
+                      </div>
+                    </td>
+                    <td style="text-align: right;">
+                      <button class="action-btn btn-audit" onclick="openDiffModal('DOC_CREATE', 'Ana Costa', 'CND Estadual', '+ Novo Cadastro Realizado')">🔍 Diff</button>
+                    </td>
+                  </tr>
+
+                  <tr data-action="SOFT_DELETE" data-role="ADMINISTRADOR">
+                    <td style="white-space: nowrap; font-weight: 600;">09/08/2026 18:11:30</td>
+                    <td>
+                      <strong>Marco Silva</strong><br>
+                      <span class="rbac-badge-admin">ADMINISTRADOR</span>
+                    </td>
+                    <td><span class="badge" style="background:#fef2f2; color:#991b1b; border:1px solid #fecaca;">SOFT_DELETE</span></td>
+                    <td><strong>CND Municipal PBH 2025</strong></td>
+                    <td style="font-size: 11px; color: var(--text-muted);">192.168.1.45<br>Chrome / Win11</td>
+                    <td>
+                      <div class="diff-box">
+                        <span class="diff-old">Visibilidade: Ativo</span> ➔ <span class="diff-new" style="color:#dc2626;">Visibilidade: Arquivado (Soft Delete)</span>
+                        <div style="font-size: 10px; color: var(--text-muted); margin-top:2px;">Motivo: Documento obsoleto do exercício anterior</div>
+                      </div>
+                    </td>
+                    <td style="text-align: right;">
+                      <button class="action-btn btn-audit" onclick="openDiffModal('SOFT_DELETE', 'Marco Silva', 'CND Municipal 2025', 'Soft Delete / Arquivamento')">🔍 Diff</button>
+                    </td>
+                  </tr>
+
+                  <tr data-action="GOOGLE_SYNC" data-role="SISTEMA">
+                    <td style="white-space: nowrap; font-weight: 600;">08/08/2026 11:05:44</td>
+                    <td>
+                      <strong>Sistema DocsOb</strong><br>
+                      <span class="badge" style="background:#f1f5f9; color:#475569;">AUTO_SYNC</span>
+                    </td>
+                    <td><span class="badge" style="background:#e8f0fe; color:#1a73e8; border:1px solid #aecbfa;">GOOGLE_SYNC</span></td>
+                    <td><strong>Engine de Sincronização Google</strong></td>
+                    <td style="font-size: 11px; color: var(--text-muted);">OAuth 2.0 API<br>Server Daemon</td>
+                    <td>
+                      <div class="diff-box">
+                        <span class="diff-new">+ Sincronizados 4 vencimentos no Google Agenda</span>
+                        <div style="font-size: 10px; color: var(--text-muted); margin-top:2px;">Conta: compliance@empresa.com.br</div>
+                      </div>
+                    </td>
+                    <td style="text-align: right;">
+                      <button class="action-btn btn-audit" onclick="openDiffModal('GOOGLE_SYNC', 'Sistema', 'Google OAuth', 'Automated Calendar Sync')">🔍 Diff</button>
+                    </td>
+                  </tr>
+
+                  <tr data-action="METADATA_EDIT" data-role="OPERACIONAL">
+                    <td style="white-space: nowrap; font-weight: 600;">05/08/2026 09:30:12</td>
+                    <td>
+                      <strong>Carlos Eduardo</strong><br>
+                      <span class="rbac-badge-op">OPERACIONAL</span>
+                    </td>
+                    <td><span class="badge" style="background:#fffbe6; color:#92400e; border:1px solid #fef08a;">METADATA_EDIT</span></td>
+                    <td><strong>Alvará de Licença Sanitária</strong></td>
+                    <td style="font-size: 11px; color: var(--text-muted);">192.168.1.92<br>Edge / Win11</td>
+                    <td>
+                      <div class="diff-box">
+                        <span class="diff-old">Antecedência Alerta: 15 dias</span> ➔ <span class="diff-new">Antecedência Alerta: 30 dias</span>
+                      </div>
+                    </td>
+                    <td style="text-align: right;">
+                      <button class="action-btn btn-audit" onclick="openDiffModal('METADATA_EDIT', 'Carlos Eduardo', 'Alvará Sanitário', 'Antecedência alterada de 15d para 30d')">🔍 Diff</button>
+                    </td>
+                  </tr>
+
+                  <tr data-action="ALERT_TRIGGERED" data-role="SISTEMA">
+                    <td style="white-space: nowrap; font-weight: 600;">01/08/2026 08:00:00</td>
+                    <td>
+                      <strong>Sistema DocsOb</strong><br>
+                      <span class="badge" style="background:#f1f5f9; color:#475569;">CRON_ALERT</span>
+                    </td>
+                    <td><span class="badge" style="background:#fef2f2; color:#991b1b; border:1px solid #fecaca;">ALERT_TRIGGERED</span></td>
+                    <td><strong>CND Receita Federal</strong></td>
+                    <td style="font-size: 11px; color: var(--text-muted);">SMTP Relay<br>Regra RN-004</td>
+                    <td>
+                      <div class="diff-box">
+                        <span class="diff-new">+ Disparo de E-mail de Alerta Vencido</span>
+                        <div style="font-size: 10px; color: var(--text-muted); margin-top:2px;">Enviado para: 2 Administradores (Regra Broadcast Ativa)</div>
+                      </div>
+                    </td>
+                    <td style="text-align: right;">
+                      <button class="action-btn btn-audit" onclick="openDiffModal('ALERT_TRIGGERED', 'Sistema', 'CND Receita Federal', 'Alerta Vencido Broadcast enviado')">🔍 Diff</button>
+                    </td>
+                  </tr>
+
+                </tbody>
+              </table>
+            </div>
+
+            <div class="table-footer">
+              <div>Mostrando <strong>1</strong> a <strong>6</strong> de <strong>1.428</strong> registros auditados</div>
+              <div class="pagination-controls">
+                <button class="page-btn" disabled>Anterior</button>
+                <button class="page-btn active">1</button>
+                <button class="page-btn">2</button>
+                <button class="page-btn">3</button>
+                <button class="page-btn">Próximo</button>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- TAB 2: TIMELINE VIEW -->
+        <div class="tab-content-panel" id="timelineTab">
+          <section class="audit-log-card">
+            <div class="section-title-bar">
+              <h2 class="section-title">⏱️ Linha do Tempo Cronológica de Eventos</h2>
+              <span style="font-size: 12px; color: var(--text-muted);">Eventos ordenados do mais recente para o mais antigo</span>
+            </div>
+
+            <div class="audit-timeline">
+
+              <div class="timeline-item">
+                <div class="timeline-header">
+                  <div class="timeline-user">
+                    <span>Marco Silva</span>
+                    <span class="rbac-badge-admin">ADMINISTRADOR</span>
+                  </div>
+                  <span class="timeline-time">Hoje às 15:45:12</span>
+                </div>
+                <div class="timeline-action">
+                  Alterou o status do documento <strong>Licença de Operação LO-IBAMA</strong> para <em>Em Renovação</em> (🔵).
+                </div>
+                <div class="diff-box">
+                  <span class="diff-old">- Status: Regular (🟢)</span> <br>
+                  <span class="diff-new">+ Status: Em Renovação (🔵) [Protocolo #PROT-99201]</span>
+                </div>
+              </div>
+
+              <div class="timeline-item">
+                <div class="timeline-header">
+                  <div class="timeline-user">
+                    <span>Ana Costa</span>
+                    <span class="rbac-badge-op">OPERACIONAL</span>
+                  </div>
+                  <span class="timeline-time">Hoje às 14:20:05</span>
+                </div>
+                <div class="timeline-action">
+                  Cadastrou o novo documento <strong>CND Estadual SEF-MG</strong> (Categoria: Licitações).
+                </div>
+                <div class="diff-box">
+                  <span class="diff-new">+ Novo registro inserido. Data Vencimento: 03/08/2026.</span>
+                </div>
+              </div>
+
+              <div class="timeline-item">
+                <div class="timeline-header">
+                  <div class="timeline-user">
+                    <span>Marco Silva</span>
+                    <span class="rbac-badge-admin">ADMINISTRADOR</span>
+                  </div>
+                  <span class="timeline-time">09/08/2026 às 18:11:30</span>
+                </div>
+                <div class="timeline-action">
+                  Executou <strong>Soft Delete (Arquivamento)</strong> no documento <strong>CND Municipal PBH 2025</strong>.
+                </div>
+                <div class="diff-box">
+                  <span class="diff-old">- Estado: Ativo (Listagem Pública)</span> <br>
+                  <span class="diff-new">+ Estado: Arquivado (Oculto para Operacional, visível apenas para Admin)</span>
+                </div>
+              </div>
+
+              <div class="timeline-item">
+                <div class="timeline-header">
+                  <div class="timeline-user">
+                    <span>Sistema DocsOb</span>
+                    <span class="badge" style="background:#f1f5f9; color:#475569;">AUTO_SYNC</span>
+                  </div>
+                  <span class="timeline-time">08/08/2026 às 11:05:44</span>
+                </div>
+                <div class="timeline-action">
+                  Sincronização bidirecional concluída com <strong>Google Agenda</strong>.
+                </div>
+                <div class="diff-box">
+                  <span class="diff-new">+ Sincronizados 4 eventos com compliance@empresa.com.br.</span>
+                </div>
+              </div>
+
+            </div>
+          </section>
+        </div>
+
+      </main>
+    </div>
+
+    <!-- 7. MODAL DE INSPEÇÃO DE DIFF (RF-013) -->
+    <div class="modal-backdrop" id="diffModal">
+      <div class="modal-dialog" style="max-width: 620px;">
+        <div class="modal-header">
+          <h2 class="modal-title" id="diffModalTitle">Inspeção Detalhada do Audit Log (RF-013)</h2>
+          <button class="modal-close-btn" onclick="closeDiffModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            
+            <div style="display: flex; align-items: center; justify-content: space-between; font-size: 12px;">
+              <div><strong>Evento ID:</strong> <code id="diffEventId">#LOG-883921</code></div>
+              <div><strong>Hash Integridade:</strong> <code style="font-size:10px; background:#f1f5f9; padding:2px 6px;">sha256:e3b0c442...</code></div>
+            </div>
+
+            <div style="background-color: #0f172a; color: #f8fafc; padding: 14px; border-radius: var(--radius-sm); font-family: monospace; font-size: 12px; line-height: 1.6;">
+              <div style="color: #94a3b8;">// Payload Audit Trail Snapshot:</div>
+              <div>{</div>
+              <div>&nbsp;&nbsp;<span style="color: #38bdf8;">"timestamp"</span>: <span style="color: #f59e0b;" id="diffTimestamp">"2026-08-10T15:45:12Z"</span>,</div>
+              <div>&nbsp;&nbsp;<span style="color: #38bdf8;">"executor"</span>: <span style="color: #a7f3d0;" id="diffExecutor">"Marco Silva (ADMIN)"</span>,</div>
+              <div>&nbsp;&nbsp;<span style="color: #38bdf8;">"action_code"</span>: <span style="color: #f472b6;" id="diffActionCode">"STATUS_UPDATE"</span>,</div>
+              <div>&nbsp;&nbsp;<span style="color: #38bdf8;">"target_doc"</span>: <span style="color: #a7f3d0;" id="diffTarget">"Licença LO-IBAMA"</span>,</div>
+              <div>&nbsp;&nbsp;<span style="color: #38bdf8;">"ip_address"</span>: <span style="color: #cbd5e1;">"192.168.1.45"</span>,</div>
+              <div>&nbsp;&nbsp;<span style="color: #38bdf8;">"changes"</span>: {</div>
+              <div>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #ef4444;">"- previous_state"</span>: <span style="color: #ef4444;" id="diffBefore">"Regular"</span>,</div>
+              <div>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #22c55e;">"+ updated_state"</span>: <span style="color: #22c55e;" id="diffAfter">"Em Renovação"</span></div>
+              <div>&nbsp;&nbsp;}</div>
+              <div>}</div>
+            </div>
+
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="closeDiffModal()">Fechar</button>
+          <button class="btn btn-primary" onclick="alert('Cópia do registro JSON assinada com hash SHA-256 gerada.')">📋 Copiar JSON Autenticado</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- JAVASCRIPT FUNCTIONS -->
+  <script>
+    // Sidebar Toggle
+    document.getElementById('sidebarToggleBtn').addEventListener('click', function() {
+      document.getElementById('appSidebar').classList.toggle('collapsed');
+    });
+
+    // Google Sync Trigger
+    function triggerGoogleSync() {
+      const syncBtn = document.querySelector('.btn-sync-now');
+      syncBtn.innerText = '🔄 Sincronizando...';
+      setTimeout(() => {
+        syncBtn.innerText = '🔄 Sincronizar';
+        alert('Google Agenda sincronizado com a Trilha de Auditoria!');
+      }, 1000);
+    }
+
+    // Audit Tab Switcher
+    function switchAuditTab(tabBtn, targetTabId) {
+      document.querySelectorAll('.nav-tabs .tab-item').forEach(btn => btn.classList.remove('active'));
+      tabBtn.classList.add('active');
+
+      document.querySelectorAll('.tab-content-panel').forEach(panel => panel.classList.remove('active'));
+      document.getElementById(targetTabId).classList.add('active');
+    }
+
+    // Filter Audit Table
+    function filterAuditLogs() {
+      const searchVal = document.getElementById('auditSearchInput').value.toLowerCase();
+      const actionVal = document.getElementById('actionTypeFilter').value;
+      const roleVal = document.getElementById('userRoleFilter').value;
+
+      const rows = document.querySelectorAll('#auditTable tbody tr');
+      let visible = 0;
+
+      rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        const rowAction = row.getAttribute('data-action');
+        const rowRole = row.getAttribute('data-role');
+
+        const matchSearch = text.includes(searchVal);
+        const matchAction = actionVal === '' || rowAction === actionVal;
+        const matchRole = roleVal === '' || rowRole === roleVal;
+
+        if (matchSearch && matchAction && matchRole) {
+          row.style.display = '';
+          visible++;
+        } else {
+          row.style.display = 'none';
+        }
+      });
+
+      document.getElementById('auditCounter').innerText = `(Exibindo ${visible} registros de 1.428)`;
+    }
+
+    function resetAuditFilters() {
+      document.getElementById('auditSearchInput').value = '';
+      document.getElementById('actionTypeFilter').value = '';
+      document.getElementById('userRoleFilter').value = '';
+      document.getElementById('timePeriodFilter').value = '30';
+      filterAuditLogs();
+    }
+
+    // Diff Modal
+    function openDiffModal(actionCode, user, targetDoc, summary) {
+      document.getElementById('diffEventId').innerText = `#LOG-${Math.floor(100000 + Math.random() * 900000)}`;
+      document.getElementById('diffActionCode').innerText = actionCode;
+      document.getElementById('diffExecutor').innerText = user;
+      document.getElementById('diffTarget').innerText = targetDoc;
+      document.getElementById('diffBefore').innerText = summary.includes('->') ? summary.split('->')[0] : 'Previous Snapshot';
+      document.getElementById('diffAfter').innerText = summary.includes('->') ? summary.split('->')[1] : summary;
+      document.getElementById('diffModal').classList.add('active');
+    }
+
+    function closeDiffModal() {
+      document.getElementById('diffModal').classList.remove('active');
+    }
+
+    function exportAuditLog() {
+      alert('Gerando relatório imutável da Trilha de Auditoria (RF-013) em formato CSV e PDF criptografado...');
+    }
+
+    function verifyLogIntegrity() {
+      alert('Integridade da Trilha de Auditoria verificada com sucesso! Todos os hashes SHA-256 coincidem com o Ledger.');
+    }
+  </script>
+</body>
+</html>

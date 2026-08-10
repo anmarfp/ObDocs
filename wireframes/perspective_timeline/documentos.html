@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DocsOb - Repositório de Documentos (Kanban & Tabela)</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="app-layout">
+
+    <!-- =========================================================================
+         1. TOP NAVIGATION BAR
+         ========================================================================= -->
+    <header class="top-nav">
+      <div class="brand-section">
+        <a href="index.html" class="brand-logo" style="text-decoration:none;">
+          <div class="brand-icon">DO</div>
+          <span>DocsOb</span>
+        </a>
+        <div class="company-badge" title="Empresa configurada no modo Single-Tenant">
+          <span class="dot"></span>
+          <span>Empresa Demo Inc.</span>
+        </div>
+      </div>
+
+      <nav class="top-nav-links">
+        <a href="index.html" class="nav-link">⏳ Linha do Tempo</a>
+        <a href="documentos.html" class="nav-link active">📁 Documentos</a>
+        <a href="calendario.html" class="nav-link">📅 Calendário</a>
+        <a href="auditoria.html" class="nav-link">📜 Auditoria</a>
+        <a href="configuracoes.html" class="nav-link">⚙️ Configurações</a>
+      </nav>
+
+      <div class="top-search">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="global-search" placeholder="Buscar por documento, emissor, categoria..." onkeyup="filterTableAndKanban()">
+      </div>
+
+      <div class="user-actions">
+        <button class="btn-gcal-sync" onclick="triggerGCalSync()" title="Sincronizar vencimentos com Google Agenda">
+          <span>📅</span>
+          <span>Sync Agenda</span>
+        </button>
+        <button class="btn-primary" onclick="openModal()">
+          <span>+</span>
+          <span>Novo Documento</span>
+        </button>
+        <div class="user-profile">
+          <div class="avatar">CS</div>
+          <div class="user-info">
+            <span class="user-name">Carlos Silva</span>
+            <span class="user-role">Administrador</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- =========================================================================
+         2. STATUS METRICS SUMMARY BAR
+         ========================================================================= -->
+    <section class="metrics-bar">
+      <div class="metrics-group">
+        <div class="metric-card total active" onclick="filterByStatus('all')">
+          <span class="metric-val">43</span>
+          <span class="metric-lbl">Total Repositório</span>
+        </div>
+        <div class="metric-card expired" onclick="filterByStatus('expired')">
+          <span class="metric-val">🔴 3</span>
+          <span class="metric-lbl">Vencidos</span>
+        </div>
+        <div class="metric-card critical" onclick="filterByStatus('critical')">
+          <span class="metric-val">🟡 5</span>
+          <span class="metric-lbl">Alerta Crítico</span>
+        </div>
+        <div class="metric-card renewal" onclick="filterByStatus('renewal')">
+          <span class="metric-val">🔵 4</span>
+          <span class="metric-lbl">Em Renovação</span>
+        </div>
+        <div class="metric-card regular" onclick="filterByStatus('regular')">
+          <span class="metric-val">🟢 28</span>
+          <span class="metric-lbl">Em Dia</span>
+        </div>
+        <div class="metric-card archived" onclick="filterByStatus('archived')">
+          <span class="metric-val">📦 2</span>
+          <span class="metric-lbl">Arquivados</span>
+        </div>
+      </div>
+
+      <div class="company-mode-pill" title="Configuração RF-012: Notificações globais da empresa">
+        <span>Notificações:</span>
+        <span class="mode-badge">Notificar Todos os Admins</span>
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         3. CONTROLS TOOLBAR & VIEW TOGGLE
+         ========================================================================= -->
+    <nav class="controls-toolbar">
+      <div class="view-tabs">
+        <button class="tab-btn active" data-target="view-kanban" onclick="switchView('view-kanban', this)">
+          <span>📋 Quadro Kanban</span>
+          <span class="count">43</span>
+        </button>
+        <button class="tab-btn" data-target="view-table" onclick="switchView('view-table', this)">
+          <span>📑 Tabela / Lista</span>
+          <span class="count">43</span>
+        </button>
+      </div>
+
+      <div class="filter-controls">
+        <select class="filter-select" id="filter-status-select" onchange="applyFilters()">
+          <option value="all">Todos os Status</option>
+          <option value="expired">🔴 Vencido</option>
+          <option value="critical">🟡 Alerta Crítico</option>
+          <option value="renewal">🔵 Em Renovação</option>
+          <option value="regular">🟢 Em Dia</option>
+          <option value="indefinite">⚪ Sem Vencimento</option>
+          <option value="archived">📦 Arquivado (Soft Delete)</option>
+        </select>
+
+        <select class="filter-select" id="filter-category-select" onchange="applyFilters()">
+          <option value="all">Todas Categorias</option>
+          <option value="Fiscal">Fiscal & Tributário</option>
+          <option value="Licenças">Licenças & Alvarás</option>
+          <option value="Trabalhista">Trabalhista & RH</option>
+          <option value="Seguros">Seguros & Frota</option>
+          <option value="Contratos">Contratos & Parcerias</option>
+        </select>
+
+        <label style="display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text-muted); cursor:pointer;">
+          <input type="checkbox" id="chk-show-archived" onchange="applyFilters()"> Exibir Arquivados (Soft Delete)
+        </label>
+
+        <button class="btn-secondary" onclick="exportData('pdf')">
+          <span>📥 Exportar PDF</span>
+        </button>
+        <button class="btn-secondary" onclick="exportData('excel')">
+          <span>📊 Exportar Excel</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- =========================================================================
+         4. MAIN VIEWPORT
+         ========================================================================= -->
+    <main class="main-viewport">
+
+      <!-- VIEW 1: KANBAN BOARD -->
+      <section id="view-kanban" class="view-container active">
+        <div class="kanban-board">
+
+          <!-- Coluna 1: Vencidos -->
+          <div class="kanban-column expired">
+            <div class="column-header">
+              <span>🔴 Vencidos</span>
+              <span class="count">3</span>
+            </div>
+            <div class="column-cards">
+              <div class="kanban-card" onclick="openDrawer('CND Federal PGFN', '🔴 Vencido há 4 dias', 'Fiscal', 'Receita Federal', '05/08/2026')">
+                <span class="card-tag">Fiscal</span>
+                <div class="kanban-card-title">Certidão Negativa Federal (CND)</div>
+                <div class="card-meta">
+                  <div>📅 Vencido: 05/08/2026</div>
+                  <div>🏛️ Receita Federal PGFN</div>
+                </div>
+                <div class="kanban-card-actions">
+                  <span class="card-badge expired">🔴 Vencido</span>
+                  <button class="btn-card-link">Ver detalhes →</button>
+                </div>
+              </div>
+
+              <div class="kanban-card" onclick="openDrawer('Certidão ICMS Estadual', '🔴 Vencido há 1 dia', 'Fiscal', 'SEFAZ / Governo do Estado', '08/08/2026')">
+                <span class="card-tag">Fiscal</span>
+                <div class="kanban-card-title">Certidão Negativa ICMS Estadual</div>
+                <div class="card-meta">
+                  <div>📅 Vencido: 08/08/2026</div>
+                  <div>🏛️ SEFAZ Estadual</div>
+                </div>
+                <div class="kanban-card-actions">
+                  <span class="card-badge expired">🔴 Vencido</span>
+                  <button class="btn-card-link">Ver detalhes →</button>
+                </div>
+              </div>
+
+              <div class="kanban-card" onclick="openDrawer('Guia FGTS Mensal', '🔴 Vencido há 3 dias', 'Trabalhista', 'Caixa Econômica Federal', '06/08/2026')">
+                <span class="card-tag">Trabalhista</span>
+                <div class="kanban-card-title">Comprovante Quitação FGTS</div>
+                <div class="card-meta">
+                  <div>📅 Vencido: 06/08/2026</div>
+                  <div>🏛️ Caixa Econômica</div>
+                </div>
+                <div class="kanban-card-actions">
+                  <span class="card-badge expired">🔴 Vencido</span>
+                  <button class="btn-card-link">Ver detalhes →</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Coluna 2: Alerta Crítico -->
+          <div class="kanban-column critical">
+            <div class="column-header">
+              <span>🟡 Alerta Crítico</span>
+              <span class="count">5</span>
+            </div>
+            <div class="column-cards">
+              <div class="kanban-card" onclick="openDrawer('Licença de Operação IBAMA', '🟡 Vence em 3 dias', 'Licenças', 'IBAMA / SEMARH', '12/08/2026')">
+                <span class="card-tag">Licenças</span>
+                <div class="kanban-card-title">Licença Ambiental de Operação LO-889</div>
+                <div class="card-meta">
+                  <div>📅 Vencimento: 12/08/2026</div>
+                  <div>⏳ 3 dias restantes</div>
+                </div>
+                <div class="kanban-card-actions">
+                  <span class="card-badge critical">🟡 Crítico</span>
+                  <button class="btn-card-link">Ver detalhes →</button>
+                </div>
+              </div>
+
+              <div class="kanban-card" onclick="openDrawer('Alvará de Funcionamento', '🟡 Vence em 6 dias', 'Licenças', 'Prefeitura Municipal', '15/08/2026')">
+                <span class="card-tag">Licenças</span>
+                <div class="kanban-card-title">Alvará de Funcionamento Sede Principal</div>
+                <div class="card-meta">
+                  <div>📅 Vencimento: 15/08/2026</div>
+                  <div>⏳ 6 dias restantes</div>
+                </div>
+                <div class="kanban-card-actions">
+                  <span class="card-badge critical">🟡 Crítico</span>
+                  <button class="btn-card-link">Ver detalhes →</button>
+                </div>
+              </div>
+
+              <div class="kanban-card" onclick="openDrawer('Certificado Digital e-CNPJ A1', '🟡 Vence em 10 dias', 'Fiscal', 'Serasa Experian', '19/08/2026')">
+                <span class="card-tag">Fiscal</span>
+                <div class="kanban-card-title">Certificado Digital e-CNPJ Matriz</div>
+                <div class="card-meta">
+                  <div>📅 Vencimento: 19/08/2026</div>
+                  <div>🏛️ Serasa Experian</div>
+                </div>
+                <div class="kanban-card-actions">
+                  <span class="card-badge critical">🟡 Crítico</span>
+                  <button class="btn-card-link">Ver detalhes →</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Coluna 3: Em Renovação -->
+          <div class="kanban-column renewal">
+            <div class="column-header">
+              <span>🔵 Em Renovação</span>
+              <span class="count">4</span>
+            </div>
+            <div class="column-cards">
+              <div class="kanban-card" onclick="openDrawer('AVCB Corpo de Bombeiros', '🔵 Em Renovação (Protocolado)', 'Licenças', 'Corpo de Bombeiros PM', '20/08/2026')">
+                <span class="card-tag">Licenças</span>
+                <div class="kanban-card-title">AVCB Vistoria de Incêndio Bombeiros</div>
+                <div class="card-meta">
+                  <div>📅 Protocolo: #99411</div>
+                  <div>📝 Vistoria agendada</div>
+                </div>
+                <div class="kanban-card-actions">
+                  <span class="card-badge renewal">🔵 Em Renovação</span>
+                  <button class="btn-card-link">Ver detalhes →</button>
+                </div>
+              </div>
+
+              <div class="kanban-card" onclick="openDrawer('Apólice Seguro Frota', '🔵 Em Renovação (Em Análise)', 'Seguros', 'Porto Seguro Cia', '25/08/2026')">
+                <span class="card-tag">Seguros</span>
+                <div class="kanban-card-title">Apólice Coletiva Frota Comercial</div>
+                <div class="card-meta">
+                  <div>📅 Minuta em cotação</div>
+                  <div>🏛️ Porto Seguro</div>
+                </div>
+                <div class="kanban-card-actions">
+                  <span class="card-badge renewal">🔵 Em Renovação</span>
+                  <button class="btn-card-link">Ver detalhes →</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Coluna 4: Em Dia -->
+          <div class="kanban-column regular">
+            <div class="column-header">
+              <span>🟢 Em Dia</span>
+              <span class="count">28</span>
+            </div>
+            <div class="column-cards">
+              <div class="kanban-card" onclick="openDrawer('Licença Sanitária Anvisa', '🟢 Vence em 45 dias', 'Licenças', 'Vigilância Sanitária Municipal', '23/09/2026')">
+                <span class="card-tag">Licenças</span>
+                <div class="kanban-card-title">Licença Sanitária Anvisa Sede</div>
+                <div class="card-meta">
+                  <div>📅 Vencimento: 23/09/2026</div>
+                  <div>🏛️ Vigilância Sanitária</div>
+                </div>
+                <div class="kanban-card-actions">
+                  <span class="card-badge regular">🟢 Em Dia</span>
+                  <button class="btn-card-link">Ver detalhes →</button>
+                </div>
+              </div>
+
+              <div class="kanban-card" onclick="openDrawer('Contrato Prestação Serviços TI', '🟢 Vence em 88 dias', 'Contratos', 'Tech Provider Ltda', '05/11/2026')">
+                <span class="card-tag">Contratos</span>
+                <div class="kanban-card-title">Contrato Suporte & Infraestrutura TI</div>
+                <div class="card-meta">
+                  <div>📅 Vencimento: 05/11/2026</div>
+                  <div>🏛️ Tech Provider Ltda</div>
+                </div>
+                <div class="kanban-card-actions">
+                  <span class="card-badge regular">🟢 Em Dia</span>
+                  <button class="btn-card-link">Ver detalhes →</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Coluna 5: Sem Vencimento -->
+          <div class="kanban-column indefinite">
+            <div class="column-header">
+              <span>⚪ Sem Vencimento</span>
+              <span class="count">3</span>
+            </div>
+            <div class="column-cards">
+              <div class="kanban-card" onclick="openDrawer('Contrato Social Consolidação', '⚪ Validade Permanente', 'Contratos', 'Junta Comercial JUCESP', 'Indeterminado')">
+                <span class="card-tag">Contratos</span>
+                <div class="kanban-card-title">Contrato Social e Alterações</div>
+                <div class="card-meta">
+                  <div>📅 Validade Permanente</div>
+                  <div>🏛️ Junta Comercial</div>
+                </div>
+                <div class="kanban-card-actions">
+                  <span class="card-badge regular">⚪ Permanente</span>
+                  <button class="btn-card-link">Ver detalhes →</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Coluna 6: Arquivados -->
+          <div class="kanban-column archived">
+            <div class="column-header">
+              <span>📦 Arquivados (Admin)</span>
+              <span class="count">2</span>
+            </div>
+            <div class="column-cards">
+              <div class="kanban-card" onclick="openDrawer('Certidão Estadual 2025 (Antiga)', '📦 Arquivado (Soft Delete)', 'Fiscal', 'SEFAZ Estadual', 'Arquivado')">
+                <span class="card-tag">Fiscal</span>
+                <div class="kanban-card-title">Certidão Estadual Exercício 2025</div>
+                <div class="card-meta">
+                  <div>📦 Arquivado por Soft Delete</div>
+                </div>
+                <div class="kanban-card-actions">
+                  <span class="card-badge archived">📦 Arquivado</span>
+                  <button class="btn-card-link">Ver detalhes →</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- VIEW 2: TABLE VIEW -->
+      <section id="view-table" class="view-container">
+        <div class="table-card-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th><input type="checkbox"></th>
+                <th>Status Visual</th>
+                <th>Documento / Título</th>
+                <th>Categoria</th>
+                <th>Órgão Emissor</th>
+                <th>Data Vencimento</th>
+                <th>Antecedência</th>
+                <th>Anexo</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr onclick="openDrawer('CND Federal PGFN', '🔴 Vencido há 4 dias', 'Fiscal', 'Receita Federal PGFN', '05/08/2026')">
+                <td><input type="checkbox" onclick="event.stopPropagation()"></td>
+                <td><span class="status-pill expired">🔴 Vencido</span></td>
+                <td><strong>Certidão Negativa Federal (CND)</strong></td>
+                <td>Fiscal</td>
+                <td>Receita Federal PGFN</td>
+                <td>05/08/2026</td>
+                <td>30 dias</td>
+                <td>📄 CND_Federal.pdf (2.4MB)</td>
+                <td><button class="btn-card-link">Ver detalhes →</button></td>
+              </tr>
+              <tr onclick="openDrawer('Certidão ICMS Estadual', '🔴 Vencido há 1 dia', 'Fiscal', 'SEFAZ Estadual', '08/08/2026')">
+                <td><input type="checkbox" onclick="event.stopPropagation()"></td>
+                <td><span class="status-pill expired">🔴 Vencido</span></td>
+                <td><strong>Certidão ICMS Estadual</strong></td>
+                <td>Fiscal</td>
+                <td>SEFAZ Estadual</td>
+                <td>08/08/2026</td>
+                <td>30 dias</td>
+                <td>📄 Cert_ICMS_2026.pdf (1.2MB)</td>
+                <td><button class="btn-card-link">Ver detalhes →</button></td>
+              </tr>
+              <tr onclick="openDrawer('Licença de Operação IBAMA', '🟡 Vence em 3 dias', 'Licenças', 'IBAMA / SEMARH', '12/08/2026')">
+                <td><input type="checkbox" onclick="event.stopPropagation()"></td>
+                <td><span class="status-pill critical">🟡 Alerta Crítico</span></td>
+                <td><strong>Licença Ambiental de Operação LO-889</strong></td>
+                <td>Licenças</td>
+                <td>IBAMA / SEMARH</td>
+                <td>12/08/2026</td>
+                <td>60 dias</td>
+                <td>📄 LO_2026_Assinada.pdf (1.8MB)</td>
+                <td><button class="btn-card-link">Ver detalhes →</button></td>
+              </tr>
+              <tr onclick="openDrawer('Alvará de Funcionamento', '🟡 Vence em 6 dias', 'Licenças', 'Prefeitura Municipal', '15/08/2026')">
+                <td><input type="checkbox" onclick="event.stopPropagation()"></td>
+                <td><span class="status-pill critical">🟡 Alerta Crítico</span></td>
+                <td><strong>Alvará de Funcionamento Sede</strong></td>
+                <td>Licenças</td>
+                <td>Prefeitura Municipal</td>
+                <td>15/08/2026</td>
+                <td>30 dias</td>
+                <td>📄 Alvara_Sede_2025.pdf (980KB)</td>
+                <td><button class="btn-card-link">Ver detalhes →</button></td>
+              </tr>
+              <tr onclick="openDrawer('AVCB Corpo de Bombeiros', '🔵 Em Renovação', 'Licenças', 'Corpo de Bombeiros PM', '20/08/2026')">
+                <td><input type="checkbox" onclick="event.stopPropagation()"></td>
+                <td><span class="status-pill renewal">🔵 Em Renovação</span></td>
+                <td><strong>AVCB Vistoria de Incêndio Bombeiros</strong></td>
+                <td>Licenças</td>
+                <td>Corpo de Bombeiros</td>
+                <td>20/08/2026</td>
+                <td>45 dias</td>
+                <td>📄 Protocolo_Bombeiros.pdf (950KB)</td>
+                <td><button class="btn-card-link">Ver detalhes →</button></td>
+              </tr>
+              <tr onclick="openDrawer('Licença Sanitária Anvisa', '🟢 Em Dia', 'Licenças', 'Vigilância Sanitária Municipal', '23/09/2026')">
+                <td><input type="checkbox" onclick="event.stopPropagation()"></td>
+                <td><span class="status-pill regular">🟢 Em Dia</span></td>
+                <td><strong>Licença Sanitária Anvisa Sede</strong></td>
+                <td>Licenças</td>
+                <td>Vigilância Sanitária</td>
+                <td>23/09/2026</td>
+                <td>30 dias</td>
+                <td>📄 Licenca_Sanitaria.pdf (1.1MB)</td>
+                <td><button class="btn-card-link">Ver detalhes →</button></td>
+              </tr>
+              <tr onclick="openDrawer('Certidão Estadual 2025 (Antiga)', '📦 Arquivado', 'Fiscal', 'SEFAZ Estadual', 'Arquivado')">
+                <td><input type="checkbox" onclick="event.stopPropagation()"></td>
+                <td><span class="status-pill archived">📦 Arquivado</span></td>
+                <td><strong>Certidão Estadual Exercício 2025</strong></td>
+                <td>Fiscal</td>
+                <td>SEFAZ Estadual</td>
+                <td>01/01/2026</td>
+                <td>30 dias</td>
+                <td>📄 Cert_Estadual_2025.pdf (1.5MB)</td>
+                <td><button class="btn-card-link">Ver detalhes →</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- =========================================================================
+       5. LATERAL DOCUMENT DETAILS DRAWER
+       ========================================================================= -->
+  <div class="drawer-overlay" id="drawer-backdrop" onclick="closeDrawer()">
+    <div class="drawer-content" onclick="event.stopPropagation()">
+      
+      <div class="drawer-header">
+        <div class="drawer-title-group">
+          <h2 id="drawer-doc-title">Certidão Negativa de Débitos Federal (CND)</h2>
+          <div class="meta">
+            <span class="status-pill expired" id="drawer-doc-status">🔴 Vencido há 4 dias</span>
+            <span>•</span>
+            <span id="drawer-doc-category">Categoria: Fiscal & Tributário</span>
+          </div>
+        </div>
+        <button class="btn-close-drawer" onclick="closeDrawer()">✕</button>
+      </div>
+
+      <nav class="drawer-tabs">
+        <button class="drawer-tab active" onclick="switchDrawerTab('tab-dados', this)">📋 Dados</button>
+        <button class="drawer-tab" onclick="switchDrawerTab('tab-anexo', this)">📎 Arquivo Anexo</button>
+        <button class="drawer-tab" onclick="switchDrawerTab('tab-gcal', this)">📅 Google Agenda</button>
+        <button class="drawer-tab" onclick="switchDrawerTab('tab-auditoria', this)">📜 Auditoria (RF-013)</button>
+        <button class="drawer-tab" onclick="switchDrawerTab('tab-historico', this)">🔄 Renovações (RF-003)</button>
+      </nav>
+
+      <div class="drawer-body">
+        
+        <!-- Aba 1: Dados do Documento -->
+        <div id="tab-dados" class="drawer-section active">
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-lbl">Órgão Emissor</span>
+              <span class="info-val" id="drawer-emissor">Receita Federal / PGFN</span>
+            </div>
+            <div class="info-item">
+              <span class="info-lbl">Data de Emissão</span>
+              <span class="info-val">06/02/2026</span>
+            </div>
+            <div class="info-item">
+              <span class="info-lbl">Data de Vencimento</span>
+              <span class="info-val" id="drawer-vencimento" style="color: var(--status-expired-text);">05/08/2026</span>
+            </div>
+            <div class="info-item">
+              <span class="info-lbl">Antecedência Alerta</span>
+              <span class="info-val">30 Dias</span>
+            </div>
+            <div class="info-item full-width">
+              <span class="info-lbl">Regra de Notificação Ativa</span>
+              <span class="info-val">Notificar Todos os Administradores (RF-012)</span>
+            </div>
+            <div class="info-item full-width">
+              <span class="info-lbl">Observações & Instruções de Renovação</span>
+              <div class="notes-box">
+                Emitir nova certidão via portal da PGFN/Receita Federal com certificado digital. Requer validação das pendências no E-CAC antes da emissão.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Aba 2: Arquivo Anexo -->
+        <div id="tab-anexo" class="drawer-section">
+          <div style="border: 1px solid var(--border-color); border-radius: 6px; padding: 14px; background: #f8fafc;">
+            <div style="display:flex; align-items:center; justify-space-between; margin-bottom:10px;">
+              <div>
+                <strong>📄 CND_Federal_2026_Assinada.pdf</strong>
+                <div style="font-size:11px; color:var(--text-muted);">2.4 MB • PDF Document • Upload por Maria Oliveira em 06/02/2026</div>
+              </div>
+              <button class="btn-primary" style="font-size:12px; padding:4px 8px;">Download ⬇</button>
+            </div>
+            <div style="height: 180px; background: #e2e8f0; border-radius: 4px; display:flex; align-items:center; justify-content:center; color: #64748b; font-weight:600;">
+              [ Visualizador de PDF / Preview do Documento ]
+            </div>
+          </div>
+        </div>
+
+        <!-- Aba 3: Google Agenda -->
+        <div id="tab-gcal" class="drawer-section">
+          <div class="gcal-badge-pill" style="margin-bottom:10px;">
+            <span>🟢 Sincronizado com Google Agenda</span>
+          </div>
+          <div class="info-grid">
+            <div class="info-item full-width">
+              <span class="info-lbl">ID do Evento no Google Agenda</span>
+              <span class="info-val" style="font-family:monospace;">gcal_event_88392194812</span>
+            </div>
+            <div class="info-item">
+              <span class="info-lbl">Data do Evento</span>
+              <span class="info-val">05/08/2026 às 09:00</span>
+            </div>
+            <div class="info-item">
+              <span class="info-lbl">Notificação GCal</span>
+              <span class="info-val">30 dias antes (E-mail + Pop-up)</span>
+            </div>
+          </div>
+          <button class="btn-secondary" style="margin-top:10px; width:100%; justify-content:center;">
+            <span>Abrir Evento no Google Agenda ↗</span>
+          </button>
+        </div>
+
+        <!-- Aba 4: Trilha de Auditoria (RF-013) -->
+        <div id="tab-auditoria" class="drawer-section">
+          <div class="audit-timeline">
+            
+            <div class="audit-entry">
+              <div class="audit-head">
+                <span class="audit-user">Carlos Silva (Admin)</span>
+                <span>09/08/2026 às 14:32</span>
+              </div>
+              <div>Alterou o status e registrou protocolo de emissão</div>
+              <div class="audit-diff">
+                Status: <span class="diff-old">"Alerta Crítico"</span> ➔ <span class="diff-new">"Vencido"</span>
+              </div>
+            </div>
+
+            <div class="audit-entry">
+              <div class="audit-head">
+                <span class="audit-user">Maria Oliveira (Operacional)</span>
+                <span>01/08/2026 às 09:15</span>
+              </div>
+              <div>Atualizou a data de antecedência de alerta</div>
+              <div class="audit-diff">
+                Antecedência: <span class="diff-old">"15 dias"</span> ➔ <span class="diff-new">"30 dias"</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Aba 5: Renovações / Histórico de Versões (RF-003) -->
+        <div id="tab-historico" class="drawer-section">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Versão</th>
+                <th>Data Vencimento</th>
+                <th>Status Histórico</th>
+                <th>Anexo Versão</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>v2.0 (Atual)</strong></td>
+                <td>05/08/2026</td>
+                <td><span class="status-pill expired">🔴 Vencido</span></td>
+                <td>📄 CND_2026.pdf</td>
+              </tr>
+              <tr>
+                <td>v1.0 (Anterior)</td>
+                <td>05/08/2025</td>
+                <td><span class="status-pill archived">📦 Arquivado</span></td>
+                <td>📄 CND_2025.pdf</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+      <div class="drawer-footer">
+        <div>
+          <button class="btn-danger" onclick="confirmHardDelete()">Excluir Permanente (Admin)</button>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button class="btn-secondary" onclick="archiveDocument()">Arquivar (Soft Delete)</button>
+          <button class="btn-primary" onclick="alert('Protocolando renovação do documento...')">Protocolar Renovação 🔵</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       6. MODAL (+ NOVO DOCUMENTO - RF-001, RN-004)
+       ========================================================================= -->
+  <div class="modal-overlay" id="modal-overlay" onclick="closeModal()">
+    <div class="modal-card" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3>+ Cadastrar Novo Documento</h3>
+        <button class="btn-close-drawer" onclick="closeModal()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Título / Nome do Documento *</label>
+          <input type="text" placeholder="Ex: Certidão Negativa de Débitos Federais">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Categoria / Tipo *</label>
+            <select>
+              <option value="">Selecione...</option>
+              <option>Fiscal & Tributário</option>
+              <option>Licenças & Alvarás</option>
+              <option>Trabalhista & RH</option>
+              <option>Seguros & Frota</option>
+              <option>Contratos & Parcerias</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Órgão Emissor / Entidade</label>
+            <input type="text" placeholder="Ex: Receita Federal, IBAMA, Prefeitura">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Data de Emissão *</label>
+            <input type="date">
+          </div>
+          <div class="form-group">
+            <label>Data de Vencimento *</label>
+            <input type="date">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Antecedência do Alerta (Dias)</label>
+            <select>
+              <option value="60">60 Dias Antes</option>
+              <option value="30" selected>30 Dias Antes</option>
+              <option value="15">15 Dias Antes</option>
+              <option value="7">7 Dias Antes</option>
+            </select>
+          </div>
+          <div class="form-group" id="group-responsavel" style="display:none;">
+            <label>E-mail do Responsável *</label>
+            <input type="email" placeholder="responsavel@empresa.com">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Arquivo Anexo (PDF, PNG, JPG - Máx 10 MB)</label>
+          <div class="file-upload-box">
+            <span>📁 Clique aqui para selecionar o arquivo ou arraste para esta área</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Observações / Instruções de Renovação</label>
+          <textarea rows="3" placeholder="Instruções para a equipe no momento da renovação..."></textarea>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
+        <button class="btn-primary" onclick="saveDocument()">Salvar e Sincronizar Google Agenda 📅</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Script Controls -->
+  <script>
+    function switchView(viewId, btnElement) {
+      document.querySelectorAll('.view-container').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      
+      document.getElementById(viewId).classList.add('active');
+      btnElement.classList.add('active');
+    }
+
+    function openDrawer(title, status, category, emissor, vencimento) {
+      if(title) document.getElementById('drawer-doc-title').innerText = title;
+      if(status) document.getElementById('drawer-doc-status').innerText = status;
+      if(category) document.getElementById('drawer-doc-category').innerText = "Categoria: " + category;
+      if(emissor) document.getElementById('drawer-emissor').innerText = emissor;
+      if(vencimento) document.getElementById('drawer-vencimento').innerText = vencimento;
+
+      document.getElementById('drawer-backdrop').classList.add('active');
+    }
+
+    function closeDrawer() {
+      document.getElementById('drawer-backdrop').classList.remove('active');
+    }
+
+    function switchDrawerTab(tabId, btnElement) {
+      document.querySelectorAll('.drawer-section').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.drawer-tab').forEach(el => el.classList.remove('active'));
+
+      document.getElementById(tabId).classList.add('active');
+      btnElement.classList.add('active');
+    }
+
+    function openModal() {
+      document.getElementById('modal-overlay').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('modal-overlay').classList.remove('active');
+    }
+
+    function triggerGCalSync() {
+      alert("🟢 Sincronização em tempo real realizada com a Google Agenda do Administrador!");
+    }
+
+    function saveDocument() {
+      alert("✅ Documento cadastrado com sucesso! Evento criado no Google Agenda.");
+      closeModal();
+    }
+
+    function confirmHardDelete() {
+      if(confirm("⚠️ ATENÇÃO: Confirma a exclusão permanente (Hard Delete) deste documento? Esta ação não pode ser desfeita.")) {
+        alert("Documento excluído com sucesso.");
+        closeDrawer();
+      }
+    }
+
+    function archiveDocument() {
+      alert("📦 Documento arquivado com sucesso (Soft Delete). Visível apenas para Administradores.");
+      closeDrawer();
+    }
+
+    function exportData(type) {
+      alert("📊 Exportando relatório no formato " + type.toUpperCase() + "...");
+    }
+
+    function filterByStatus(statusKey) {
+      document.getElementById('filter-status-select').value = statusKey;
+      applyFilters();
+    }
+
+    function applyFilters() {
+      const statusVal = document.getElementById('filter-status-select').value;
+      const catVal = document.getElementById('filter-category-select').value;
+      const showArchived = document.getElementById('chk-show-archived').checked;
+
+      // Filter Kanban columns
+      document.querySelectorAll('.kanban-column').forEach(col => {
+        if(col.classList.contains('archived')) {
+          col.style.display = (showArchived || statusVal === 'archived' || statusVal === 'all') ? 'flex' : 'none';
+        }
+      });
+    }
+
+    function filterTableAndKanban() {
+      const query = document.getElementById('global-search').value.toLowerCase();
+      document.querySelectorAll('.kanban-card, .data-table tbody tr').forEach(el => {
+        const text = el.innerText.toLowerCase();
+        el.style.display = text.includes(query) ? '' : 'none';
+      });
+    }
+  </script>
+
+</body>
+</html>

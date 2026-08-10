@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DocsOb - Repositório de Documentos</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="app-shell">
+
+    <!-- 1. TOP HEADER -->
+    <header class="top-header">
+      <div class="header-left">
+        <button class="sidebar-toggle-btn" id="sidebarToggleBtn" title="Alternar Menu">☰</button>
+        <a href="index.html" class="brand-logo">
+          <div class="brand-icon">DO</div>
+          <div class="brand-info">
+            <span class="brand-title">DocsOb</span>
+            <span class="brand-subtitle">Gestão de Vencimento de Documentos</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="header-center">
+        <!-- Google Sync Status Card -->
+        <div class="google-sync-card">
+          <svg class="google-icon-svg" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+          </svg>
+          <div class="sync-status-indicator">
+            <span class="sync-dot"></span>
+            <span>Google Agenda: Sincronizado</span>
+          </div>
+          <span class="sync-timestamp">(Há 5 min)</span>
+          <button class="btn-sync-now" onclick="triggerGoogleSync()">🔄 Sincronizar</button>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <button class="notifications-btn" title="Notificações Pendentes">
+          🔔 <span class="notification-badge">4</span>
+        </button>
+        <div class="user-profile-widget" id="userProfileBtn">
+          <div class="user-avatar">MS</div>
+          <div class="user-details">
+            <span class="user-name">Marco Silva</span>
+            <span class="user-role-badge">ADMINISTRADOR</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="body-container">
+
+      <!-- 2. EXPANDABLE SIDEBAR -->
+      <aside class="sidebar" id="appSidebar">
+        <div class="sidebar-menu">
+          <div class="menu-label">Navegação Principal</div>
+          <a href="index.html" class="nav-item"><span class="nav-icon">📊</span><span class="nav-text">Dashboard</span></a>
+          <a href="documentos.html" class="nav-item active"><span class="nav-icon">📄</span><span class="nav-text">Documentos</span></a>
+          <a href="calendario.html" class="nav-item"><span class="nav-icon">📅</span><span class="nav-text">Agenda & Google Sync</span></a>
+          <a href="auditoria.html" class="nav-item"><span class="nav-icon">🛡️</span><span class="nav-text">Trilha de Auditoria</span></a>
+          <div class="menu-label">Administração</div>
+          <a href="configuracoes.html#usuarios" class="nav-item"><span class="nav-icon">👥</span><span class="nav-text">Usuários & Papéis</span></a>
+          <a href="configuracoes.html" class="nav-item"><span class="nav-icon">⚙️</span><span class="nav-text">Configurações Empresa</span></a>
+        </div>
+        <div class="sidebar-footer">
+          <div class="company-mode-card">
+            <div class="company-mode-header"><span>🏢 Regra Ativa de Alertas</span></div>
+            <div class="company-mode-status">● Notificar Todos os Admins</div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- 3. MAIN CONTENT -->
+      <main class="main-content">
+        <div class="page-header">
+          <div class="page-title-group">
+            <h1>Repositório Geral de Documentos</h1>
+            <p>Gestão centralizada de certidões, alvarás, licenças, contratos e apólices com acompanhamento de vencimento</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-secondary" onclick="exportRepositoryReport()">📥 Exportar Relatório</button>
+            <button class="btn btn-primary" onclick="openNewDocModal()">➕ Cadastrar Documento</button>
+          </div>
+        </div>
+
+        <!-- 4. CARDS DE MATRIZ DE STATUS -->
+        <section class="status-matrix-grid">
+          <div class="status-card vencido" onclick="filterByStatus('Vencido')">
+            <div class="card-header-row">
+              <div class="card-title-group"><span class="status-dot dot-red"></span><span class="card-label">Vencidos</span></div>
+              <span class="card-pill-tag pill-red">Ação Imediata</span>
+            </div>
+            <div class="card-count-val" id="countVencidos">4</div>
+            <div class="card-subtext"><span>Data ultrapassada</span><span class="card-action-link">Filtrar →</span></div>
+          </div>
+
+          <div class="status-card critico" onclick="filterByStatus('Critico')">
+            <div class="card-header-row">
+              <div class="card-title-group"><span class="status-dot dot-yellow"></span><span class="card-label">Alerta Crítico</span></div>
+              <span class="card-pill-tag pill-yellow">Próximo Venc.</span>
+            </div>
+            <div class="card-count-val" id="countCriticos">7</div>
+            <div class="card-subtext"><span>Dentro da antecedência</span><span class="card-action-link">Filtrar →</span></div>
+          </div>
+
+          <div class="status-card renovacao" onclick="filterByStatus('Renovacao')">
+            <div class="card-header-row">
+              <div class="card-title-group"><span class="status-dot dot-blue"></span><span class="card-label">Em Renovação</span></div>
+              <span class="card-pill-tag pill-blue">Protocolado</span>
+            </div>
+            <div class="card-count-val" id="countRenovacao">3</div>
+            <div class="card-subtext"><span>Aguardando emissão</span><span class="card-action-link">Filtrar →</span></div>
+          </div>
+
+          <div class="status-card regular" onclick="filterByStatus('Regular')">
+            <div class="card-header-row">
+              <div class="card-title-group"><span class="status-dot dot-green"></span><span class="card-label">Regular / Em Dia</span></div>
+              <span class="card-pill-tag pill-green">Vigente</span>
+            </div>
+            <div class="card-count-val" id="countRegular">42</div>
+            <div class="card-subtext"><span>Vencimento distante</span><span class="card-action-link">Filtrar →</span></div>
+          </div>
+
+          <div class="status-card indeterminado" onclick="filterByStatus('Indeterminado')">
+            <div class="card-header-row">
+              <div class="card-title-group"><span class="status-dot dot-gray"></span><span class="card-label">Indeterminado</span></div>
+              <span class="card-pill-tag pill-gray">Permanente</span>
+            </div>
+            <div class="card-count-val" id="countIndeterminados">8</div>
+            <div class="card-subtext"><span>Sem vencimento</span><span class="card-action-link">Filtrar →</span></div>
+          </div>
+        </section>
+
+        <!-- 5. FAST FILTERS BAR -->
+        <section class="filter-card-bar">
+          <div class="filter-inputs-group">
+            <div class="search-box-wrapper">
+              <span class="search-icon">🔍</span>
+              <input type="text" class="search-input" id="tableSearchInput" placeholder="Buscar por título, órgão emissor ou número..." onkeyup="filterTable()">
+            </div>
+
+            <select class="select-filter" id="categoryFilter" onchange="filterTable()">
+              <option value="">Todas as Categorias</option>
+              <option value="Fiscal">Fiscal</option>
+              <option value="Trabalhista">Trabalhista</option>
+              <option value="Ambiental">Ambiental</option>
+              <option value="Sanitária">Sanitária</option>
+              <option value="Societário">Societário</option>
+              <option value="Licitações">Licitações</option>
+              <option value="Operacional">Operacional</option>
+              <option value="Contratos/Apólices">Contratos/Apólices</option>
+            </select>
+
+            <select class="select-filter" id="statusFilter" onchange="filterTable()">
+              <option value="">Todos os Status</option>
+              <option value="Vencido">🔴 Vencidos</option>
+              <option value="Critico">🟡 Alerta Crítico</option>
+              <option value="Renovacao">🔵 Em Renovação</option>
+              <option value="Regular">🟢 Regular / Em Dia</option>
+              <option value="Indeterminado">⚪ Indeterminado</option>
+            </select>
+
+            <select class="select-filter" id="responsibleFilter" onchange="filterTable()">
+              <option value="">Todos os Responsáveis</option>
+              <option value="Marco Silva">Marco Silva (Admin)</option>
+              <option value="Ana Costa">Ana Costa (Fiscal)</option>
+              <option value="Carlos Eduardo">Carlos Eduardo (Jurídico)</option>
+              <option value="Fernanda Lima">Fernanda Lima (RH)</option>
+            </select>
+
+            <label class="checkbox-filter-label" title="Exibir documentos arquivados via Soft Delete (Apenas Administradores)">
+              <input type="checkbox" id="includeArchivedCheckbox" onchange="toggleArchivedDocs()">
+              <span>Exibir Arquivados (Soft Delete)</span>
+              <span class="admin-only-tag">ADMIN</span>
+            </label>
+          </div>
+
+          <div class="filter-actions-right">
+            <button class="btn-clear-filters" onclick="resetFilters()">❌ Limpar Filtros</button>
+          </div>
+        </section>
+
+        <!-- 6. DATA DENSE TABLE -->
+        <section class="table-card">
+          <div class="table-header-info">
+            <div class="table-title">
+              <span>📄 Documentos Cadastrados</span>
+              <span class="records-counter" id="recordsCounter">(Exibindo 10 registros de 64)</span>
+            </div>
+            <div class="table-actions">
+              <button class="btn btn-secondary btn-icon-only" title="Atualizar tabela" onclick="filterTable()">🔄</button>
+            </div>
+          </div>
+
+          <div class="table-wrapper">
+            <table class="data-dense-table" id="documentsTable">
+              <thead>
+                <tr>
+                  <th style="width: 38px;"><input type="checkbox" id="selectAllCheckbox" onclick="toggleSelectAll(this)"></th>
+                  <th>Documento & Órgão Emissor</th>
+                  <th>Categoria</th>
+                  <th>Status Matrix</th>
+                  <th>Data de Vencimento</th>
+                  <th>Responsável / Setor</th>
+                  <th>Minuta / Anexo</th>
+                  <th style="text-align: right;">Ações Rápidas</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Row 1: Vencido -->
+                <tr data-category="Fiscal" data-status="Vencido" data-responsible="Ana Costa">
+                  <td><input type="checkbox"></td>
+                  <td class="doc-name-cell">
+                    <a href="#" class="doc-title" onclick="openDocDetailsModal('CND Receita Federal', 'Receita Federal do Brasil')">CND Receita Federal e PGFN</a>
+                    <span class="doc-issuer">Emissor: Receita Federal | Ref: #CND-8829/2026</span>
+                  </td>
+                  <td><span class="category-tag">Fiscal</span></td>
+                  <td><span class="status-badge vencido"><span class="status-dot dot-red"></span> Vencido</span></td>
+                  <td class="due-date-cell">
+                    <span class="due-date" style="color: var(--status-red-text);">01/08/2026</span>
+                    <span class="due-days" style="color: #dc2626; font-weight: 700;">Há 9 dias atrás</span>
+                  </td>
+                  <td class="responsible-cell">
+                    <strong>Ana Costa</strong><br><span style="font-size: 11px; color: var(--text-muted);">Dept. Fiscal</span>
+                  </td>
+                  <td><a href="#" class="attachment-pill">📎 cnd_receita_2026.pdf</a></td>
+                  <td class="table-actions-cell" style="justify-content: flex-end;">
+                    <button class="action-btn" title="Editar Metadados" onclick="openEditDocModal('CND Receita Federal')">✏️</button>
+                    <button class="action-btn" title="Marcar como Em Renovação (🔵)" onclick="updateStatusToRenovacao(this)">🔵 Renovação</button>
+                    <button class="action-btn btn-audit" title="Ver Audit Log" onclick="window.location.href='auditoria.html'">🛡️ Audit</button>
+                    <button class="action-btn" title="Arquivar (Soft Delete)" onclick="archiveRow(this)">📦</button>
+                    <button class="action-btn btn-delete" title="Excluir Permanentemente (Hard Delete)" onclick="deleteRow(this)">🗑️</button>
+                  </td>
+                </tr>
+
+                <!-- Row 2: Alerta Crítico -->
+                <tr data-category="Sanitária" data-status="Critico" data-responsible="Carlos Eduardo">
+                  <td><input type="checkbox"></td>
+                  <td class="doc-name-cell">
+                    <a href="#" class="doc-title" onclick="openDocDetailsModal('Alvará de Licença Sanitária', 'Vigilância Sanitária Municipal')">Alvará de Licença Sanitária Municipal</a>
+                    <span class="doc-issuer">Emissor: VISA Municipal | Proc: #2026-VISA-991</span>
+                  </td>
+                  <td><span class="category-tag">Sanitária</span></td>
+                  <td><span class="status-badge critico"><span class="status-dot dot-yellow"></span> Alerta Crítico</span></td>
+                  <td class="due-date-cell">
+                    <span class="due-date">15/08/2026</span>
+                    <span class="due-days" style="color: #d97706; font-weight: 600;">Faltam 5 dias</span>
+                  </td>
+                  <td class="responsible-cell">
+                    <strong>Carlos Eduardo</strong><br><span style="font-size: 11px; color: var(--text-muted);">Compliance</span>
+                  </td>
+                  <td><a href="#" class="attachment-pill">📎 alvara_sanitario_v2.pdf</a></td>
+                  <td class="table-actions-cell" style="justify-content: flex-end;">
+                    <button class="action-btn" title="Editar Metadados" onclick="openEditDocModal('Alvará Sanitário')">✏️</button>
+                    <button class="action-btn" title="Marcar como Em Renovação (🔵)" onclick="updateStatusToRenovacao(this)">🔵 Renovação</button>
+                    <button class="action-btn btn-audit" title="Ver Audit Log" onclick="window.location.href='auditoria.html'">🛡️ Audit</button>
+                    <button class="action-btn" title="Arquivar (Soft Delete)" onclick="archiveRow(this)">📦</button>
+                    <button class="action-btn btn-delete" title="Excluir Permanentemente (Hard Delete)" onclick="deleteRow(this)">🗑️</button>
+                  </td>
+                </tr>
+
+                <!-- Row 3: Em Renovação -->
+                <tr data-category="Ambiental" data-status="Renovacao" data-responsible="Marco Silva">
+                  <td><input type="checkbox"></td>
+                  <td class="doc-name-cell">
+                    <a href="#" class="doc-title" onclick="openDocDetailsModal('Licença de Operação Ambiental', 'IBAMA / SEMAD')">Licença de Operação Ambiental LO-IBAMA</a>
+                    <span class="doc-issuer">Emissor: IBAMA | Protocolo de Renovação: #PROT-99201</span>
+                  </td>
+                  <td><span class="category-tag">Ambiental</span></td>
+                  <td><span class="status-badge renovacao"><span class="status-dot dot-blue"></span> Em Renovação</span></td>
+                  <td class="due-date-cell">
+                    <span class="due-date">20/08/2026</span>
+                    <span class="due-days" style="color: #0284c7;">Protocolado há 12d</span>
+                  </td>
+                  <td class="responsible-cell">
+                    <strong>Marco Silva</strong><br><span style="font-size: 11px; color: var(--text-muted);">Diretoria / Admin</span>
+                  </td>
+                  <td><a href="#" class="attachment-pill">📎 comprovante_protocolo_lo.pdf</a></td>
+                  <td class="table-actions-cell" style="justify-content: flex-end;">
+                    <button class="action-btn" title="Editar Metadados" onclick="openEditDocModal('LO IBAMA')">✏️</button>
+                    <button class="action-btn" title="Atualizar Protocolo">📄 Anexo</button>
+                    <button class="action-btn btn-audit" title="Ver Audit Log" onclick="window.location.href='auditoria.html'">🛡️ Audit</button>
+                    <button class="action-btn" title="Arquivar (Soft Delete)" onclick="archiveRow(this)">📦</button>
+                    <button class="action-btn btn-delete" title="Excluir Permanentemente (Hard Delete)" onclick="deleteRow(this)">🗑️</button>
+                  </td>
+                </tr>
+
+                <!-- Row 4: Regular -->
+                <tr data-category="Trabalhista" data-status="Regular" data-responsible="Fernanda Lima">
+                  <td><input type="checkbox"></td>
+                  <td class="doc-name-cell">
+                    <a href="#" class="doc-title" onclick="openDocDetailsModal('Certidão Negativa FGTS (CRF)', 'Caixa Econômica Federal')">Certidão de Regularidade do FGTS (CRF)</a>
+                    <span class="doc-issuer">Emissor: Caixa Econômica Federal</span>
+                  </td>
+                  <td><span class="category-tag">Trabalhista</span></td>
+                  <td><span class="status-badge regular"><span class="status-dot dot-green"></span> Regular</span></td>
+                  <td class="due-date-cell">
+                    <span class="due-date">25/08/2026</span>
+                    <span class="due-days">Faltam 15 dias</span>
+                  </td>
+                  <td class="responsible-cell">
+                    <strong>Fernanda Lima</strong><br><span style="font-size: 11px; color: var(--text-muted);">Dept. RH</span>
+                  </td>
+                  <td><a href="#" class="attachment-pill">📎 crf_fgts_agosto2026.pdf</a></td>
+                  <td class="table-actions-cell" style="justify-content: flex-end;">
+                    <button class="action-btn" title="Editar Metadados" onclick="openEditDocModal('CRF FGTS')">✏️</button>
+                    <button class="action-btn" title="Marcar como Em Renovação (🔵)" onclick="updateStatusToRenovacao(this)">🔵 Renovação</button>
+                    <button class="action-btn btn-audit" title="Ver Audit Log" onclick="window.location.href='auditoria.html'">🛡️ Audit</button>
+                    <button class="action-btn" title="Arquivar (Soft Delete)" onclick="archiveRow(this)">📦</button>
+                    <button class="action-btn btn-delete" title="Excluir Permanentemente (Hard Delete)" onclick="deleteRow(this)">🗑️</button>
+                  </td>
+                </tr>
+
+                <!-- Row 5: Alerta Crítico -->
+                <tr data-category="Operacional" data-status="Critico" data-responsible="Marco Silva">
+                  <td><input type="checkbox"></td>
+                  <td class="doc-name-cell">
+                    <a href="#" class="doc-title" onclick="openDocDetailsModal('AVCB - Corpo de Bombeiros', 'Corpo de Bombeiros Militar')">Auto de Vistoria do Corpo de Bombeiros (AVCB)</a>
+                    <span class="doc-issuer">Emissor: CBMMG | Reg: #AVCB-7731</span>
+                  </td>
+                  <td><span class="category-tag">Operacional</span></td>
+                  <td><span class="status-badge critico"><span class="status-dot dot-yellow"></span> Alerta Crítico</span></td>
+                  <td class="due-date-cell">
+                    <span class="due-date">28/08/2026</span>
+                    <span class="due-days" style="color: #d97706; font-weight: 600;">Faltam 18 dias</span>
+                  </td>
+                  <td class="responsible-cell">
+                    <strong>Marco Silva</strong><br><span style="font-size: 11px; color: var(--text-muted);">Instalações / Admin</span>
+                  </td>
+                  <td><a href="#" class="attachment-pill">📎 avcb_planta_2026.pdf</a></td>
+                  <td class="table-actions-cell" style="justify-content: flex-end;">
+                    <button class="action-btn" title="Editar Metadados" onclick="openEditDocModal('AVCB Bombeiros')">✏️</button>
+                    <button class="action-btn" title="Marcar como Em Renovação (🔵)" onclick="updateStatusToRenovacao(this)">🔵 Renovação</button>
+                    <button class="action-btn btn-audit" title="Ver Audit Log" onclick="window.location.href='auditoria.html'">🛡️ Audit</button>
+                    <button class="action-btn" title="Arquivar (Soft Delete)" onclick="archiveRow(this)">📦</button>
+                    <button class="action-btn btn-delete" title="Excluir Permanentemente (Hard Delete)" onclick="deleteRow(this)">🗑️</button>
+                  </td>
+                </tr>
+
+                <!-- Row 6: Regular -->
+                <tr data-category="Contratos/Apólices" data-status="Regular" data-responsible="Carlos Eduardo">
+                  <td><input type="checkbox"></td>
+                  <td class="doc-name-cell">
+                    <a href="#" class="doc-title" onclick="openDocDetailsModal('Apólice de Seguro Patrimonial', 'Porto Seguro Seguros')">Apólice de Seguro Patrimonial & Incêndio</a>
+                    <span class="doc-issuer">Emissor: Porto Seguro | Contrato: #PS-44019</span>
+                  </td>
+                  <td><span class="category-tag">Contratos/Apólices</span></td>
+                  <td><span class="status-badge regular"><span class="status-dot dot-green"></span> Regular</span></td>
+                  <td class="due-date-cell">
+                    <span class="due-date">31/08/2026</span>
+                    <span class="due-days">Faltam 21 dias</span>
+                  </td>
+                  <td class="responsible-cell">
+                    <strong>Carlos Eduardo</strong><br><span style="font-size: 11px; color: var(--text-muted);">Jurídico / Riscos</span>
+                  </td>
+                  <td><a href="#" class="attachment-pill">📎 apolice_patrimonial_2026.pdf</a></td>
+                  <td class="table-actions-cell" style="justify-content: flex-end;">
+                    <button class="action-btn" title="Editar Metadados" onclick="openEditDocModal('Apólice Seguro')">✏️</button>
+                    <button class="action-btn" title="Marcar como Em Renovação (🔵)" onclick="updateStatusToRenovacao(this)">🔵 Renovação</button>
+                    <button class="action-btn btn-audit" title="Ver Audit Log" onclick="window.location.href='auditoria.html'">🛡️ Audit</button>
+                    <button class="action-btn" title="Arquivar (Soft Delete)" onclick="archiveRow(this)">📦</button>
+                    <button class="action-btn btn-delete" title="Excluir Permanentemente (Hard Delete)" onclick="deleteRow(this)">🗑️</button>
+                  </td>
+                </tr>
+
+                <!-- Row 7: Indeterminado -->
+                <tr data-category="Societário" data-status="Indeterminado" data-responsible="Marco Silva">
+                  <td><input type="checkbox"></td>
+                  <td class="doc-name-cell">
+                    <a href="#" class="doc-title" onclick="openDocDetailsModal('Contrato Social Consolidado', 'Junta Comercial JUCEMG')">Contrato Social Consolidado & Quinta Alteração</a>
+                    <span class="doc-issuer">Emissor: JUCEMG | NIRE: #3120994412</span>
+                  </td>
+                  <td><span class="category-tag">Societário</span></td>
+                  <td><span class="status-badge indeterminado"><span class="status-dot dot-gray"></span> Indeterminado</span></td>
+                  <td class="due-date-cell">
+                    <span class="due-date" style="color: var(--text-muted);">Permanente</span>
+                    <span class="due-days">Sem Vencimento</span>
+                  </td>
+                  <td class="responsible-cell">
+                    <strong>Marco Silva</strong><br><span style="font-size: 11px; color: var(--text-muted);">Societário / Admin</span>
+                  </td>
+                  <td><a href="#" class="attachment-pill">📎 contrato_social_consolidado.pdf</a></td>
+                  <td class="table-actions-cell" style="justify-content: flex-end;">
+                    <button class="action-btn" title="Editar Metadados" onclick="openEditDocModal('Contrato Social')">✏️</button>
+                    <button class="action-btn btn-audit" title="Ver Audit Log" onclick="window.location.href='auditoria.html'">🛡️ Audit</button>
+                    <button class="action-btn" title="Arquivar (Soft Delete)" onclick="archiveRow(this)">📦</button>
+                    <button class="action-btn btn-delete" title="Excluir Permanentemente (Hard Delete)" onclick="deleteRow(this)">🗑️</button>
+                  </td>
+                </tr>
+
+                <!-- Row 8: Regular -->
+                <tr data-category="Trabalhista" data-status="Regular" data-responsible="Fernanda Lima">
+                  <td><input type="checkbox"></td>
+                  <td class="doc-name-cell">
+                    <a href="#" class="doc-title" onclick="openDocDetailsModal('CNDT Certidão Débitos Trabalhistas', 'Tribunal Superior do Trabalho')">Certidão Negativa de Débitos Trabalhistas (CNDT)</a>
+                    <span class="doc-issuer">Emissor: TST / Justiça do Trabalho</span>
+                  </td>
+                  <td><span class="category-tag">Trabalhista</span></td>
+                  <td><span class="status-badge regular"><span class="status-dot dot-green"></span> Regular</span></td>
+                  <td class="due-date-cell">
+                    <span class="due-date">10/10/2026</span>
+                    <span class="due-days">Faltam 61 dias</span>
+                  </td>
+                  <td class="responsible-cell">
+                    <strong>Fernanda Lima</strong><br><span style="font-size: 11px; color: var(--text-muted);">Dept. RH</span>
+                  </td>
+                  <td><a href="#" class="attachment-pill">📎 cndt_tst_2026.pdf</a></td>
+                  <td class="table-actions-cell" style="justify-content: flex-end;">
+                    <button class="action-btn" title="Editar Metadados" onclick="openEditDocModal('CNDT Trabalhista')">✏️</button>
+                    <button class="action-btn" title="Marcar como Em Renovação (🔵)" onclick="updateStatusToRenovacao(this)">🔵 Renovação</button>
+                    <button class="action-btn btn-audit" title="Ver Audit Log" onclick="window.location.href='auditoria.html'">🛡️ Audit</button>
+                    <button class="action-btn" title="Arquivar (Soft Delete)" onclick="archiveRow(this)">📦</button>
+                    <button class="action-btn btn-delete" title="Excluir Permanentemente (Hard Delete)" onclick="deleteRow(this)">🗑️</button>
+                  </td>
+                </tr>
+
+                <!-- Row 9: Vencido -->
+                <tr data-category="Licitações" data-status="Vencido" data-responsible="Ana Costa">
+                  <td><input type="checkbox"></td>
+                  <td class="doc-name-cell">
+                    <a href="#" class="doc-title" onclick="openDocDetailsModal('Certidão Estadual de Débitos Não Inscritos', 'SEF / Secretaria Fazenda')">Certidão Negativa de Débitos Estaduais</a>
+                    <span class="doc-issuer">Emissor: SEF-MG | Reg: #SEF-55102</span>
+                  </td>
+                  <td><span class="category-tag">Licitações</span></td>
+                  <td><span class="status-badge vencido"><span class="status-dot dot-red"></span> Vencido</span></td>
+                  <td class="due-date-cell">
+                    <span class="due-date" style="color: var(--status-red-text);">03/08/2026</span>
+                    <span class="due-days" style="color: #dc2626; font-weight: 700;">Há 7 dias atrás</span>
+                  </td>
+                  <td class="responsible-cell">
+                    <strong>Ana Costa</strong><br><span style="font-size: 11px; color: var(--text-muted);">Licitações / Fiscal</span>
+                  </td>
+                  <td><a href="#" class="attachment-pill">📎 cnd_estadual_mg.pdf</a></td>
+                  <td class="table-actions-cell" style="justify-content: flex-end;">
+                    <button class="action-btn" title="Editar Metadados" onclick="openEditDocModal('CND Estadual')">✏️</button>
+                    <button class="action-btn" title="Marcar como Em Renovação (🔵)" onclick="updateStatusToRenovacao(this)">🔵 Renovação</button>
+                    <button class="action-btn btn-audit" title="Ver Audit Log" onclick="window.location.href='auditoria.html'">🛡️ Audit</button>
+                    <button class="action-btn" title="Arquivar (Soft Delete)" onclick="archiveRow(this)">📦</button>
+                    <button class="action-btn btn-delete" title="Excluir Permanentemente (Hard Delete)" onclick="deleteRow(this)">🗑️</button>
+                  </td>
+                </tr>
+
+                <!-- Row 10: Soft-Deleted Archived Row (Hidden by default unless checkbox checked) -->
+                <tr class="archived-row" id="archivedSampleRow" style="display: none;" data-category="Fiscal" data-status="Regular" data-responsible="Marco Silva">
+                  <td><input type="checkbox" disabled></td>
+                  <td class="doc-name-cell">
+                    <span class="doc-title" style="text-decoration: line-through; color: var(--text-muted);">CND Municipal Pref. Belo Horizonte (2025 - Obsoleta)</span>
+                    <span class="doc-issuer">Emissor: PBH | Status: 🔒 Arquivado (Soft Delete)</span>
+                  </td>
+                  <td><span class="category-tag">Fiscal</span></td>
+                  <td><span class="status-badge indeterminado"><span class="status-dot dot-gray"></span> Arquivado</span></td>
+                  <td class="due-date-cell">
+                    <span class="due-date">31/12/2025</span>
+                    <span class="due-days">Arquivado em 10/01/2026</span>
+                  </td>
+                  <td class="responsible-cell">
+                    <strong>Marco Silva</strong><br><span style="font-size: 11px; color: var(--text-muted);">Admin</span>
+                  </td>
+                  <td><a href="#" class="attachment-pill">📎 cnd_pbh_2025_old.pdf</a></td>
+                  <td class="table-actions-cell" style="justify-content: flex-end;">
+                    <button class="action-btn" title="Desarquivar Documento" onclick="unarchiveRow(this)">🔄 Restaurar</button>
+                    <button class="action-btn btn-delete" title="Excluir Permanentemente (Hard Delete)" onclick="deleteRow(this)">🗑️ Excluir</button>
+                  </td>
+                </tr>
+
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination Footer -->
+          <div class="table-footer">
+            <div>Mostrando <strong id="visibleMin">1</strong> a <strong id="visibleMax">10</strong> de <strong>64</strong> documentos cadastrados</div>
+            <div class="pagination-controls">
+              <button class="page-btn" disabled>Anterior</button>
+              <button class="page-btn active">1</button>
+              <button class="page-btn">2</button>
+              <button class="page-btn">3</button>
+              <button class="page-btn">4</button>
+              <button class="page-btn">Próximo</button>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- 7. MODAL DE CADASTRO / EDIÇÃO DE DOCUMENTO -->
+    <div class="modal-backdrop" id="docModal">
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <h2 class="modal-title" id="modalTitle">Cadastrar Novo Documento</h2>
+          <button class="modal-close-btn" onclick="closeDocModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          
+          <div class="company-rule-notice">
+            <span class="rule-icon">ℹ️</span>
+            <div>
+              <strong>Regra Global de Notificação Ativa (RN-004):</strong> 
+              Este documento herdará o envio automático de alertas para <em>"Todos os Administradores"</em>. As notificações serão iniciadas conforme a antecedência cadastrada.
+            </div>
+          </div>
+
+          <form id="docForm" onsubmit="handleFormSubmit(event)">
+            <div class="form-grid-2col">
+              
+              <div class="form-group full-width">
+                <label class="form-label">Título do Documento <span class="required-star">*</span></label>
+                <input type="text" class="form-control" id="inputDocTitle" placeholder="Ex: Certidão Negativa de Débitos Trabalhistas (CNDT)" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Órgão Emissor / Entidade <span class="required-star">*</span></label>
+                <input type="text" class="form-control" id="inputDocIssuer" placeholder="Ex: Receita Federal, IBAMA, PBH..." required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Número do Protocolo / Registro</label>
+                <input type="text" class="form-control" id="inputDocRef" placeholder="Ex: #CND-8829/2026">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Categoria <span class="required-star">*</span></label>
+                <select class="form-control" id="inputDocCategory" required>
+                  <option value="">Selecione...</option>
+                  <option value="Fiscal">Fiscal</option>
+                  <option value="Trabalhista">Trabalhista</option>
+                  <option value="Ambiental">Ambiental</option>
+                  <option value="Sanitária">Sanitária</option>
+                  <option value="Societário">Societário</option>
+                  <option value="Licitações">Licitações</option>
+                  <option value="Operacional">Operacional</option>
+                  <option value="Contratos/Apólices">Contratos/Apólices</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Usuário Responsável <span class="required-star">*</span></label>
+                <select class="form-control" id="inputDocResponsible" required>
+                  <option value="Marco Silva">Marco Silva (Admin)</option>
+                  <option value="Ana Costa">Ana Costa (Fiscal)</option>
+                  <option value="Carlos Eduardo">Carlos Eduardo (Jurídico)</option>
+                  <option value="Fernanda Lima">Fernanda Lima (RH)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Data de Emissão</label>
+                <input type="date" class="form-control" id="inputIssueDate">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Data de Vencimento</label>
+                <input type="date" class="form-control" id="inputDueDate">
+                <label style="font-size: 11px; margin-top: 4px; display: flex; align-items: center; gap: 6px; color: var(--text-muted);">
+                  <input type="checkbox" id="inputIndeterminate" onchange="toggleIndeterminateDueDate(this)">
+                  <span>Prazo Indeterminado / Permanente (Sem Vencimento)</span>
+                </label>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Antecedência de Alerta (Dias)</label>
+                <input type="number" class="form-control" id="inputAlertDays" value="30" min="1" max="180">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Status Inicial</label>
+                <select class="form-control" id="inputStatus">
+                  <option value="Regular">🟢 Regular / Em Dia</option>
+                  <option value="Renovacao">🔵 Em Renovação</option>
+                  <option value="Critico">🟡 Alerta Crítico</option>
+                  <option value="Vencido">🔴 Vencido</option>
+                  <option value="Indeterminado">⚪ Indeterminado</option>
+                </select>
+              </div>
+
+              <!-- Upload File Area -->
+              <div class="form-group full-width">
+                <label class="form-label">Anexo do Documento (PDF, PNG, JPG)</label>
+                <div class="dropzone-container" onclick="document.getElementById('fileUploadInput').click()">
+                  <div class="upload-cloud-icon">☁️</div>
+                  <div class="upload-title">Clique para selecionar ou arraste o arquivo PDF aqui</div>
+                  <div class="upload-subtitle">Tamanho máximo: 25MB | Formatos suportados: PDF, PNG, JPG</div>
+                  <input type="file" id="fileUploadInput" style="display: none;" onchange="handleFileSelected(this)">
+                </div>
+                <div id="filePreview" class="file-attached-preview" style="display: none;">
+                  <div class="file-info">
+                    <span>📄</span>
+                    <span id="fileNameSpan">documento_anexo.pdf</span>
+                  </div>
+                  <button type="button" class="action-btn btn-delete" onclick="removeAttachedFile()">✕ Remover</button>
+                </div>
+              </div>
+
+              <div class="form-group full-width">
+                <label class="form-label">Observações / Instruções de Renovação</label>
+                <textarea class="form-control" rows="3" placeholder="Insira detalhes adicionais sobre taxas de renovação, senhas de acesso aos portais de emissão ou notas internas..."></textarea>
+              </div>
+
+            </div>
+
+            <div class="modal-footer" style="margin-top: 20px; padding-right: 0; padding-bottom: 0;">
+              <button type="button" class="btn btn-secondary" onclick="closeDocModal()">Cancelar</button>
+              <button type="submit" class="btn btn-primary">Salvar Documento</button>
+            </div>
+          </form>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- JAVASCRIPT FUNCTIONS -->
+  <script>
+    // Sidebar Toggle
+    document.getElementById('sidebarToggleBtn').addEventListener('click', function() {
+      document.getElementById('appSidebar').classList.toggle('collapsed');
+    });
+
+    // Google Sync Trigger
+    function triggerGoogleSync() {
+      const syncBtn = document.querySelector('.btn-sync-now');
+      syncBtn.innerText = '🔄 Sincronizando...';
+      syncBtn.disabled = true;
+      setTimeout(() => {
+        syncBtn.innerText = '🔄 Sincronizar';
+        syncBtn.disabled = false;
+        alert('Sincronização bidirecional com o Google Agenda concluída com sucesso!');
+      }, 1200);
+    }
+
+    // Modal Control
+    function openNewDocModal() {
+      document.getElementById('modalTitle').innerText = 'Cadastrar Novo Documento';
+      document.getElementById('docForm').reset();
+      document.getElementById('filePreview').style.display = 'none';
+      document.getElementById('docModal').classList.add('active');
+    }
+
+    function openEditDocModal(docTitle) {
+      document.getElementById('modalTitle').innerText = `Editar Metadados: ${docTitle}`;
+      document.getElementById('inputDocTitle').value = docTitle;
+      document.getElementById('docModal').classList.add('active');
+    }
+
+    function closeDocModal() {
+      document.getElementById('docModal').classList.remove('active');
+    }
+
+    function toggleIndeterminateDueDate(checkbox) {
+      const dueDateInput = document.getElementById('inputDueDate');
+      const statusInput = document.getElementById('inputStatus');
+      if (checkbox.checked) {
+        dueDateInput.value = '';
+        dueDateInput.disabled = true;
+        statusInput.value = 'Indeterminado';
+      } else {
+        dueDateInput.disabled = false;
+        statusInput.value = 'Regular';
+      }
+    }
+
+    function handleFileSelected(input) {
+      if (input.files && input.files[0]) {
+        document.getElementById('fileNameSpan').innerText = input.files[0].name;
+        document.getElementById('filePreview').style.display = 'flex';
+      }
+    }
+
+    function removeAttachedFile() {
+      document.getElementById('fileUploadInput').value = '';
+      document.getElementById('filePreview').style.display = 'none';
+    }
+
+    function handleFormSubmit(event) {
+      event.preventDefault();
+      alert('Documento gravado com sucesso! Trilha de auditoria gerada.');
+      closeDocModal();
+      filterTable();
+    }
+
+    // Table Filtering
+    function filterTable() {
+      const searchVal = document.getElementById('tableSearchInput').value.toLowerCase();
+      const catVal = document.getElementById('categoryFilter').value;
+      const statusVal = document.getElementById('statusFilter').value;
+      const respVal = document.getElementById('responsibleFilter').value;
+      const showArchived = document.getElementById('includeArchivedCheckbox').checked;
+
+      const rows = document.querySelectorAll('#documentsTable tbody tr');
+      let visibleCount = 0;
+
+      rows.forEach(row => {
+        const isArchived = row.classList.contains('archived-row');
+        if (isArchived && !showArchived) {
+          row.style.display = 'none';
+          return;
+        }
+
+        const text = row.innerText.toLowerCase();
+        const rowCat = row.getAttribute('data-category');
+        const rowStatus = row.getAttribute('data-status');
+        const rowResp = row.getAttribute('data-responsible');
+
+        const matchSearch = text.includes(searchVal);
+        const matchCat = catVal === '' || rowCat === catVal;
+        const matchStatus = statusVal === '' || rowStatus === statusVal;
+        const matchResp = respVal === '' || rowResp === respVal;
+
+        if (matchSearch && matchCat && matchStatus && matchResp) {
+          row.style.display = '';
+          visibleCount++;
+        } else {
+          row.style.display = 'none';
+        }
+      });
+
+      document.getElementById('recordsCounter').innerText = `(Exibindo ${visibleCount} registros de 64)`;
+      document.getElementById('visibleMin').innerText = visibleCount > 0 ? 1 : 0;
+      document.getElementById('visibleMax').innerText = visibleCount;
+    }
+
+    function filterByStatus(statusName) {
+      document.getElementById('statusFilter').value = statusName;
+      filterTable();
+    }
+
+    function resetFilters() {
+      document.getElementById('tableSearchInput').value = '';
+      document.getElementById('categoryFilter').value = '';
+      document.getElementById('statusFilter').value = '';
+      document.getElementById('responsibleFilter').value = '';
+      document.getElementById('includeArchivedCheckbox').checked = false;
+      toggleArchivedDocs();
+      filterTable();
+    }
+
+    function toggleArchivedDocs() {
+      const isChecked = document.getElementById('includeArchivedCheckbox').checked;
+      const archivedSampleRow = document.getElementById('archivedSampleRow');
+      if (archivedSampleRow) {
+        archivedSampleRow.style.display = isChecked ? '' : 'none';
+      }
+      filterTable();
+    }
+
+    function toggleSelectAll(masterCheckbox) {
+      const checkboxes = document.querySelectorAll('#documentsTable tbody tr:not([style*="display: none"]) input[type="checkbox"]');
+      checkboxes.forEach(cb => cb.checked = masterCheckbox.checked);
+    }
+
+    function updateStatusToRenovacao(btn) {
+      const tr = btn.closest('tr');
+      tr.setAttribute('data-status', 'Renovacao');
+      const badgeCell = tr.children[3];
+      badgeCell.innerHTML = '<span class="status-badge renovacao"><span class="status-dot dot-blue"></span> Em Renovação</span>';
+      alert('Status do documento alterado para "Em Renovação" (🔵)! Audit log gravado.');
+    }
+
+    function archiveRow(btn) {
+      if (confirm('Deseja arquivar este documento (Soft Delete)? Ele ficará oculto para usuários operacionais e visível apenas para Administradores.')) {
+        const tr = btn.closest('tr');
+        tr.classList.add('archived-row');
+        tr.setAttribute('data-status', 'Indeterminado');
+        tr.style.display = document.getElementById('includeArchivedCheckbox').checked ? '' : 'none';
+        alert('Documento arquivado com sucesso!');
+        filterTable();
+      }
+    }
+
+    function unarchiveRow(btn) {
+      const tr = btn.closest('tr');
+      tr.classList.remove('archived-row');
+      tr.setAttribute('data-status', 'Regular');
+      alert('Documento desarquivado e restaurado à listagem principal!');
+      filterTable();
+    }
+
+    function deleteRow(btn) {
+      if (confirm('ATENÇÃO: Deseja realmente excluir permanentemente este documento (Hard Delete)? Esta ação não poderá ser desfeita.')) {
+        const tr = btn.closest('tr');
+        tr.remove();
+        alert('Documento excluído permanentemente.');
+        filterTable();
+      }
+    }
+
+    function exportRepositoryReport() {
+      alert('Exportando repositório de documentos nos formatos CSV e PDF...');
+    }
+
+    function openDocDetailsModal(title, issuer) {
+      alert(`Visualizando ficha completa do documento:\n\nTítulo: ${title}\nEmissor: ${issuer}\n\nStatus: Vigente e rastreado pelo DocsOb.`);
+    }
+  </script>
+</body>
+</html>
