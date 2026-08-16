@@ -23,23 +23,7 @@
         </a>
       </div>
 
-      <div class="header-center">
-        <!-- Google Sync Status Card -->
-        <div class="google-sync-card">
-          <svg class="google-icon-svg" viewBox="0 0 24 24">
-            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-          </svg>
-          <div class="sync-status-indicator">
-            <span class="sync-dot"></span>
-            <span>Google Agenda: Sincronizado</span>
-          </div>
-          <span class="sync-timestamp">(Há 5 min)</span>
-          <button class="btn-sync-now" onclick="triggerGoogleSync()">🔄 Sincronizar</button>
-        </div>
-      </div>
+      <div class="header-center"></div>
 
       <div class="header-right">
         <button class="notifications-btn" title="Notificações Pendentes">
@@ -65,14 +49,10 @@
           <a href="documentos.html" class="nav-item"><span class="nav-icon">📄</span><span class="nav-text">Documentos</span></a>
           <a href="calendario.html" class="nav-item"><span class="nav-icon">📅</span><span class="nav-text">Agenda & Google Sync</span></a>
           <a href="auditoria.html" class="nav-item"><span class="nav-icon">🛡️</span><span class="nav-text">Trilha de Auditoria</span></a>
-          <div class="menu-label">Administração</div>
-          <a href="configuracoes.html#usuarios" class="nav-item"><span class="nav-icon">👥</span><span class="nav-text">Usuários & Papéis</span></a>
-          <a href="configuracoes.html" class="nav-item"><span class="nav-icon">⚙️</span><span class="nav-text">Configurações Empresa</span></a>
-        </div>
-        <div class="sidebar-footer">
-          <div class="company-mode-card">
-            <div class="company-mode-header"><span>🏢 Regra Ativa de Alertas</span></div>
-            <div class="company-mode-status">● Notificar Todos os Admins</div>
+          <div class="admin-menu-group">
+            <div class="menu-label">Administração</div>
+            <a href="configuracoes.html#usuarios" class="nav-item"><span class="nav-icon">👥</span><span class="nav-text">Usuários & Papéis</span></a>
+            <a href="configuracoes.html" class="nav-item"><span class="nav-icon">⚙️</span><span class="nav-text">Configurações</span></a>
           </div>
         </div>
       </aside>
@@ -189,42 +169,36 @@
             <table class="data-dense-table" id="docsTable">
               <thead>
                 <tr>
-                  <th style="width: 40px;"><input type="checkbox"></th>
                   <th>Status</th>
-                  <th>Documento / Emissor</th>
+                  <th>Título do Documento</th>
                   <th>Categoria</th>
                   <th>Vencimento</th>
-                  <th>Antecedência</th>
                   <th>Responsável</th>
-                  <th>Anexo</th>
                   <th style="text-align: right;">Ações</th>
                 </tr>
               </thead>
               <tbody>
                 <tr data-status="Vencido" data-category="Fiscal">
-                  <td><input type="checkbox"></td>
                   <td><span class="status-badge vencido"><span class="status-dot dot-red"></span> Vencido</span></td>
                   <td>
                     <div class="doc-name-cell">
-                      <a href="#" class="doc-title" onclick="openAuditModal('CND Federal')">CND Federal - SRFB / PGFN</a>
+                      <a href="detalhes-documento.html?doc=Certidão%20Negativa%20Federal%20-%20SRFB%20/%20PGFN" class="doc-title">Certidão Negativa Federal - SRFB / PGFN</a>
                       <span class="doc-issuer">Receita Federal do Brasil</span>
                     </div>
                   </td>
                   <td><span class="category-tag">Fiscal</span></td>
                   <td>
                     <div class="due-date-cell">
-                      <span class="due-date" style="color: #dc2626;">01/08/2026</span>
+                      <span class="due-date" style="color: #dc2626;">07/08/2026</span>
                       <span class="due-days">(Vencido há 8 dias)</span>
                     </div>
                   </td>
-                  <td>30 dias</td>
-                  <td><span class="responsible-cell">Notificar Admins</span></td>
-                  <td><a href="#" class="attachment-pill">📎 CND_Ref.pdf</a></td>
+                  <td><span class="responsible-cell">Carlos Silva</span></td>
                   <td style="text-align: right;">
                     <div class="table-actions-cell" style="justify-content: flex-end;">
-                      <button class="action-btn btn-audit" title="Ver Audit Log (RF-013)" onclick="openAuditModal('CND Federal')">🛡️</button>
-                      <button class="action-btn" title="Protocolar Renovação (🔵)" onclick="updateStatusToRenovacao(this)">🔄</button>
-                      <button class="action-btn" title="Editar Documento" onclick="openEditDocModal('CND Federal')">✏️</button>
+                      <button class="action-btn btn-audit" title="Visualizar Detalhes" onclick="window.location.href='detalhes-documento.html?doc=Certidão%20Negativa%20Federal%20-%20SRFB%20/%20PGFN'">👁️ Visualizar</button>
+                      <button class="action-btn" title="Editar Documento" onclick="openEditDocModal('CND Federal')">✏️ Editar</button>
+                      <button class="action-btn" title="Protocolar Renovação (🔵)" onclick="updateStatusToRenovacao(this)">🔄 Renovação</button>
                       <button class="action-btn" title="Arquivar (Soft Delete)" onclick="archiveRow(this)">📥</button>
                       <button class="action-btn btn-delete" title="Excluir (Hard Delete)" onclick="deleteRow(this)">🗑️</button>
                     </div>
@@ -232,89 +206,80 @@
                 </tr>
 
                 <tr data-status="Critico" data-category="Licença">
-                  <td><input type="checkbox"></td>
                   <td><span class="status-badge critico"><span class="status-dot dot-yellow"></span> Alerta Crítico</span></td>
                   <td>
                     <div class="doc-name-cell">
-                      <a href="#" class="doc-title" onclick="openAuditModal('Alvará de Funcionamento 2026')">Alvará de Funcionamento 2026</a>
-                      <span class="doc-issuer">Prefeitura Municipal de SP</span>
+                      <a href="detalhes-documento.html?doc=Licença%20Operacional%20IBAMA%202026" class="doc-title">Licença Operacional IBAMA 2026</a>
+                      <span class="doc-issuer">Prefeitura Municipal de SP / IBAMA</span>
                     </div>
                   </td>
                   <td><span class="category-tag">Licença</span></td>
                   <td>
                     <div class="due-date-cell">
-                      <span class="due-date" style="color: #d97706;">20/08/2026</span>
-                      <span class="due-days">(Faltam 11 dias)</span>
+                      <span class="due-date" style="color: #d97706;">14/08/2026</span>
+                      <span class="due-days">(Faltam 5 dias)</span>
                     </div>
                   </td>
-                  <td>30 dias</td>
-                  <td><span class="responsible-cell">Notificar Admins</span></td>
-                  <td><a href="#" class="attachment-pill">📎 Alvara2026.pdf</a></td>
+                  <td><span class="responsible-cell">Ana Souza</span></td>
                   <td style="text-align: right;">
                     <div class="table-actions-cell" style="justify-content: flex-end;">
-                      <button class="action-btn btn-audit" title="Ver Audit Log (RF-013)" onclick="openAuditModal('Alvará de Funcionamento')">🛡️</button>
-                      <button class="action-btn" title="Protocolar Renovação (🔵)" onclick="updateStatusToRenovacao(this)">🔄</button>
-                      <button class="action-btn" title="Editar Documento" onclick="openEditDocModal('Alvará de Funcionamento')">✏️</button>
+                      <button class="action-btn btn-audit" title="Visualizar Detalhes" onclick="window.location.href='detalhes-documento.html?doc=Licença%20Operacional%20IBAMA%202026'">👁️ Visualizar</button>
+                      <button class="action-btn" title="Editar Documento" onclick="openEditDocModal('Licença Operacional IBAMA')">✏️ Editar</button>
+                      <button class="action-btn" title="Protocolar Renovação (🔵)" onclick="updateStatusToRenovacao(this)">🔄 Renovação</button>
                       <button class="action-btn" title="Arquivar (Soft Delete)" onclick="archiveRow(this)">📥</button>
                       <button class="action-btn btn-delete" title="Excluir (Hard Delete)" onclick="deleteRow(this)">🗑️</button>
                     </div>
                   </td>
                 </tr>
 
-                <tr data-status="Renovacao" data-category="Licença">
-                  <td><input type="checkbox"></td>
+                <tr data-status="Renovacao" data-category="Seguros">
                   <td><span class="status-badge renovacao"><span class="status-dot dot-blue"></span> Em Renovação</span></td>
                   <td>
                     <div class="doc-name-cell">
-                      <a href="#" class="doc-title" onclick="openAuditModal('AVCB Bombeiros')">AVCB - Licença de Bombeiros</a>
-                      <span class="doc-issuer">Corpo de Bombeiros SP</span>
+                      <a href="detalhes-documento.html?doc=Apólice%20de%20Seguro%20Predial%20%23991" class="doc-title">Apólice de Seguro Predial #991</a>
+                      <span class="doc-issuer">Porto Seguro Cia de Seguros</span>
                     </div>
                   </td>
-                  <td><span class="category-tag">Licença</span></td>
+                  <td><span class="category-tag">Seguros</span></td>
                   <td>
                     <div class="due-date-cell">
-                      <span class="due-date">15/08/2026</span>
+                      <span class="due-date">30/08/2026</span>
                       <span class="due-days">(Prot. #884920)</span>
                     </div>
                   </td>
-                  <td>60 dias</td>
-                  <td><span class="responsible-cell">Notificar Admins</span></td>
-                  <td><a href="#" class="attachment-pill">📎 Prot_AVCB.pdf</a></td>
+                  <td><span class="responsible-cell">Pedro Santos</span></td>
                   <td style="text-align: right;">
                     <div class="table-actions-cell" style="justify-content: flex-end;">
-                      <button class="action-btn btn-audit" title="Ver Audit Log (RF-013)" onclick="openAuditModal('AVCB Bombeiros')">🛡️</button>
-                      <button class="action-btn" title="Protocolar Renovação (🔵)" onclick="updateStatusToRenovacao(this)">🔄</button>
-                      <button class="action-btn" title="Editar Documento" onclick="openEditDocModal('AVCB Bombeiros')">✏️</button>
+                      <button class="action-btn btn-audit" title="Visualizar Detalhes" onclick="window.location.href='detalhes-documento.html?doc=Apólice%20de%20Seguro%20Predial%20%23991'">👁️ Visualizar</button>
+                      <button class="action-btn" title="Editar Documento" onclick="openEditDocModal('Apólice de Seguro Predial')">✏️ Editar</button>
+                      <button class="action-btn" title="Protocolar Renovação (🔵)" onclick="updateStatusToRenovacao(this)">🔄 Renovação</button>
                       <button class="action-btn" title="Arquivar (Soft Delete)" onclick="archiveRow(this)">📥</button>
                       <button class="action-btn btn-delete" title="Excluir (Hard Delete)" onclick="deleteRow(this)">🗑️</button>
                     </div>
                   </td>
                 </tr>
 
-                <tr data-status="Regular" data-category="Trabalhista">
-                  <td><input type="checkbox"></td>
+                <tr data-status="Regular" data-category="Contrato">
                   <td><span class="status-badge regular"><span class="status-dot dot-green"></span> Regular</span></td>
                   <td>
                     <div class="doc-name-cell">
-                      <a href="#" class="doc-title" onclick="openAuditModal('CRF do FGTS')">CRF do FGTS</a>
-                      <span class="doc-issuer">Caixa Econômica Federal</span>
+                      <a href="detalhes-documento.html?doc=Contrato%20Locação%20Sede%20Social" class="doc-title">Contrato Locação Sede Social</a>
+                      <span class="doc-issuer">Imobiliária Central SP</span>
                     </div>
                   </td>
-                  <td><span class="category-tag">Trabalhista</span></td>
+                  <td><span class="category-tag">Contrato</span></td>
                   <td>
                     <div class="due-date-cell">
-                      <span class="due-date" style="color: #166534;">15/10/2026</span>
-                      <span class="due-days">(Faltam 67 dias)</span>
+                      <span class="due-date" style="color: #166534;">15/12/2026</span>
+                      <span class="due-days">(Faltam 122 dias)</span>
                     </div>
                   </td>
-                  <td>15 dias</td>
-                  <td><span class="responsible-cell">Notificar Admins</span></td>
-                  <td><a href="#" class="attachment-pill">📎 CRF_FGTS.pdf</a></td>
+                  <td><span class="responsible-cell">Carlos Silva</span></td>
                   <td style="text-align: right;">
                     <div class="table-actions-cell" style="justify-content: flex-end;">
-                      <button class="action-btn btn-audit" title="Ver Audit Log (RF-013)" onclick="openAuditModal('CRF do FGTS')">🛡️</button>
-                      <button class="action-btn" title="Protocolar Renovação (🔵)" onclick="updateStatusToRenovacao(this)">🔄</button>
-                      <button class="action-btn" title="Editar Documento" onclick="openEditDocModal('CRF do FGTS')">✏️</button>
+                      <button class="action-btn btn-audit" title="Visualizar Detalhes" onclick="window.location.href='detalhes-documento.html?doc=Contrato%20Locação%20Sede%20Social'">👁️ Visualizar</button>
+                      <button class="action-btn" title="Editar Documento" onclick="openEditDocModal('Contrato Locação Sede Social')">✏️ Editar</button>
+                      <button class="action-btn" title="Protocolar Renovação (🔵)" onclick="updateStatusToRenovacao(this)">🔄 Renovação</button>
                       <button class="action-btn" title="Arquivar (Soft Delete)" onclick="archiveRow(this)">📥</button>
                       <button class="action-btn btn-delete" title="Excluir (Hard Delete)" onclick="deleteRow(this)">🗑️</button>
                     </div>
@@ -322,11 +287,10 @@
                 </tr>
 
                 <tr data-status="Indeterminado" data-category="Contrato">
-                  <td><input type="checkbox"></td>
                   <td><span class="status-badge indeterminado"><span class="status-dot dot-gray"></span> Indeterminado</span></td>
                   <td>
                     <div class="doc-name-cell">
-                      <a href="#" class="doc-title" onclick="openAuditModal('Contrato Social Consolidado')">Contrato Social Consolidado</a>
+                      <a href="detalhes-documento.html?doc=Contrato%20Social%20Consolidado" class="doc-title">Contrato Social Consolidado</a>
                       <span class="doc-issuer">Junta Comercial (JUCESP)</span>
                     </div>
                   </td>
@@ -337,14 +301,12 @@
                       <span class="due-days">(Permanente)</span>
                     </div>
                   </td>
-                  <td>—</td>
-                  <td><span class="responsible-cell">Notificar Admins</span></td>
-                  <td><a href="#" class="attachment-pill">📎 Contrato_Social.pdf</a></td>
+                  <td><span class="responsible-cell">Carlos Silva</span></td>
                   <td style="text-align: right;">
                     <div class="table-actions-cell" style="justify-content: flex-end;">
-                      <button class="action-btn btn-audit" title="Ver Audit Log (RF-013)" onclick="openAuditModal('Contrato Social')">🛡️</button>
-                      <button class="action-btn" title="Protocolar Renovação (🔵)" onclick="updateStatusToRenovacao(this)">🔄</button>
-                      <button class="action-btn" title="Editar Documento" onclick="openEditDocModal('Contrato Social')">✏️</button>
+                      <button class="action-btn btn-audit" title="Visualizar Detalhes" onclick="window.location.href='detalhes-documento.html?doc=Contrato%20Social%20Consolidado'">👁️ Visualizar</button>
+                      <button class="action-btn" title="Editar Documento" onclick="openEditDocModal('Contrato Social')">✏️ Editar</button>
+                      <button class="action-btn" title="Protocolar Renovação (🔵)" onclick="updateStatusToRenovacao(this)">🔄 Renovação</button>
                       <button class="action-btn" title="Arquivar (Soft Delete)" onclick="archiveRow(this)">📥</button>
                       <button class="action-btn btn-delete" title="Excluir (Hard Delete)" onclick="deleteRow(this)">🗑️</button>
                     </div>
@@ -352,11 +314,10 @@
                 </tr>
 
                 <tr data-status="Regular" data-category="Seguros" class="archived-row" id="archivedSampleRow" style="display: none;">
-                  <td><input type="checkbox"></td>
                   <td><span class="status-badge indeterminado"><span class="status-dot dot-gray"></span> Arquivado</span></td>
                   <td>
                     <div class="doc-name-cell">
-                      <a href="#" class="doc-title">Apólice de Seguro Frota 2024 (Antiga)</a>
+                      <a href="detalhes-documento.html?doc=Apólice%20de%20Seguro%20Frota%202024" class="doc-title">Apólice de Seguro Frota 2024 (Antiga)</a>
                       <span class="doc-issuer">Porto Seguro</span>
                     </div>
                   </td>
@@ -367,13 +328,11 @@
                       <span class="due-days">(Versão Anterior)</span>
                     </div>
                   </td>
-                  <td>30 dias</td>
-                  <td><span class="responsible-cell">Notificar Admins</span></td>
-                  <td><a href="#" class="attachment-pill">📎 Apolice2024.pdf</a></td>
+                  <td><span class="responsible-cell">Pedro Santos</span></td>
                   <td style="text-align: right;">
                     <div class="table-actions-cell" style="justify-content: flex-end;">
-                      <button class="action-btn btn-audit" title="Ver Audit Log (RF-013)" onclick="openAuditModal('Apólice 2024')">🛡️</button>
-                      <button class="action-btn" title="Desarquivar" onclick="unarchiveRow(this)">📤</button>
+                      <button class="action-btn btn-audit" title="Visualizar Detalhes" onclick="window.location.href='detalhes-documento.html?doc=Apólice%20de%20Seguro%20Frota%202024'">👁️ Visualizar</button>
+                      <button class="action-btn" title="Desarquivar" onclick="unarchiveRow(this)">📤 Desarquivar</button>
                       <button class="action-btn btn-delete" title="Excluir (Hard Delete)" onclick="deleteRow(this)">🗑️</button>
                     </div>
                   </td>
@@ -390,56 +349,6 @@
               <button class="page-btn">2</button>
               <button class="page-btn">3</button>
               <button class="page-btn">Próxima</button>
-            </div>
-          </div>
-        </section>
-
-        <!-- 7. SEÇÃO DE AUDIT LOG (RF-013) -->
-        <section class="audit-log-card" id="auditLogSection">
-          <div class="section-title-bar">
-            <div class="section-title">
-              <span>🛡️ Trilha de Auditoria Imutável (Audit Log - RF-013)</span>
-              <span class="badge" style="background-color: #dbeafe; color: #1e40af;">Histórico de Alterações</span>
-            </div>
-            <span style="font-size: 12px; color: var(--text-muted);">Registros gravados com timestamp e diff exato de campos</span>
-          </div>
-
-          <div class="audit-timeline">
-            <div class="timeline-item">
-              <div class="timeline-header">
-                <span class="timeline-user"><span>Marco Silva</span><span class="timeline-role">ADMINISTRADOR</span></span>
-                <span class="timeline-time">Hoje às 14:32:09 (2026-08-09)</span>
-              </div>
-              <div class="timeline-action">Atualização de Status de Renovação: <strong>AVCB - Licença de Bombeiros</strong></div>
-              <div class="diff-box">
-                <div><strong>Campo:</strong> Status Visual</div>
-                <div><span class="diff-old">De: 🟡 Alerta Crítico</span> ➡️ <span class="diff-new">Para: 🔵 Em Renovação</span></div>
-                <div><strong>Protocolo:</strong> #884920</div>
-              </div>
-            </div>
-
-            <div class="timeline-item">
-              <div class="timeline-header">
-                <span class="timeline-user"><span>Ana Paula Souza</span><span class="timeline-role">OPERACIONAL</span></span>
-                <span class="timeline-time">Ontem às 09:15:44 (2026-08-08)</span>
-              </div>
-              <div class="timeline-action">Inclusão de novo comprovante anexo em: <strong>CND Federal - SRFB / PGFN</strong></div>
-              <div class="diff-box">
-                <div><strong>Campo:</strong> Arquivo Anexo</div>
-                <div><span class="diff-old">De: (Sem arquivo)</span> ➡️ <span class="diff-new">Para: CND_Ref.pdf (2.4 MB)</span></div>
-              </div>
-            </div>
-
-            <div class="timeline-item">
-              <div class="timeline-header">
-                <span class="timeline-user"><span>Sistema DocsOb</span><span class="timeline-role">SISTEMA / RN-001</span></span>
-                <span class="timeline-time">01/08/2026 às 00:00:01</span>
-              </div>
-              <div class="timeline-action">Recálculo diário automático de status por data de vencimento (RN-001)</div>
-              <div class="diff-box">
-                <div><strong>Documento:</strong> CND Federal - SRFB / PGFN</div>
-                <div><span class="diff-old">De: 🟡 Alerta Crítico</span> ➡️ <span class="diff-new">Para: 🔴 Vencido</span></div>
-              </div>
             </div>
           </div>
         </section>
@@ -605,10 +514,7 @@
     }
 
     function openAuditModal(docName) {
-      const auditSection = document.getElementById('auditLogSection');
-      auditSection.scrollIntoView({ behavior: 'smooth' });
-      auditSection.style.outline = '2px solid #2563eb';
-      setTimeout(() => { auditSection.style.outline = 'none'; }, 2000);
+      window.location.href = 'auditoria.html';
     }
 
     function filterTable() {
@@ -667,7 +573,7 @@
     function updateStatusToRenovacao(btn) {
       const tr = btn.closest('tr');
       tr.setAttribute('data-status', 'Renovacao');
-      const badgeCell = tr.children[1];
+      const badgeCell = tr.children[0];
       badgeCell.innerHTML = '<span class="status-badge renovacao"><span class="status-dot dot-blue"></span> Em Renovação</span>';
       alert('Status do documento alterado para "Em Renovação" (🔵)! Audit log atualizado.');
     }

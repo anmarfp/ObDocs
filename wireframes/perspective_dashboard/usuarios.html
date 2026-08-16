@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DocsOb - Gestão de Usuários & Papéis (RBAC)</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="app-shell">
+
+    <!-- 1. TOP HEADER -->
+    <header class="top-header">
+      <div class="header-left">
+        <button class="sidebar-toggle-btn" id="sidebarToggleBtn" title="Alternar Menu">☰</button>
+        <a href="index.html" class="brand-logo">
+          <div class="brand-icon">DO</div>
+          <div class="brand-info">
+            <span class="brand-title">DocsOb</span>
+            <span class="brand-subtitle">Gestão de Vencimento de Documentos</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="header-center">
+        <!-- Google Sync Status Card (Removed in DOC-10) -->
+      </div>
+
+      <div class="header-right">
+        <button class="notifications-btn" title="Notificações Pendentes">
+          🔔 <span class="notification-badge">4</span>
+        </button>
+        <div class="user-profile-widget" id="userProfileBtn">
+          <div class="user-avatar">MS</div>
+          <div class="user-details">
+            <span class="user-name">Marco Silva</span>
+            <span class="user-role-badge">ADMINISTRADOR</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="body-container">
+
+      <!-- 2. EXPANDABLE SIDEBAR -->
+      <aside class="sidebar" id="appSidebar">
+        <div class="sidebar-menu">
+          <div class="menu-label">Navegação Principal</div>
+          <a href="index.html" class="nav-item"><span class="nav-icon">📊</span><span class="nav-text">Dashboard</span></a>
+          <a href="documentos.html" class="nav-item"><span class="nav-icon">📄</span><span class="nav-text">Documentos</span></a>
+          <a href="calendario.html" class="nav-item"><span class="nav-icon">📅</span><span class="nav-text">Agenda & Google Sync</span></a>
+          <a href="auditoria.html" class="nav-item"><span class="nav-icon">🛡️</span><span class="nav-text">Trilha de Auditoria</span></a>
+          <div class="admin-menu-group">
+            <div class="menu-label">Administração</div>
+            <a href="usuarios.html" class="nav-item active"><span class="nav-icon">👥</span><span class="nav-text">Usuários & Papéis</span></a>
+            <a href="configuracoes.html" class="nav-item"><span class="nav-icon">⚙️</span><span class="nav-text">Configurações</span></a>
+          </div>
+        </div>
+      </aside>
+
+      <!-- 3. MAIN CONTENT -->
+      <main class="main-content">
+        <div class="page-header">
+          <div class="page-title-group">
+            <h1>Gestão de Usuários & Papéis (RBAC)</h1>
+            <p>Controle centralizado de acessos, privilégios de Administrador / Operacional e contas de acesso ao DocsOb</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-primary" onclick="openNewUserModal()">➕ Novo Usuário</button>
+          </div>
+        </div>
+
+        <!-- RBAC Summary Cards -->
+        <div class="rbac-grid-summary">
+          <div class="rbac-role-card admin-card">
+            <div class="rbac-role-header">
+              <span class="rbac-role-title" style="color: #6b21a8;">👑 Papel ADMINISTRADOR</span>
+              <span class="rbac-badge-admin">ACESSO TOTAL</span>
+            </div>
+            <p style="font-size: 12px; color: var(--text-muted); line-height: 1.4; margin-bottom: 8px;">
+              Permissão total de leitura, criação, edição e exclusão. Pode configurar regras globais (RN-004), gerenciar usuários, visualizar documentos arquivados (soft delete) e executar hard delete.
+            </p>
+            <div style="font-size: 11px; font-weight: 700; color: #6b21a8;">1 Usuário Ativo</div>
+          </div>
+
+          <div class="rbac-role-card operacional-card">
+            <div class="rbac-role-header">
+              <span class="rbac-role-title" style="color: #0369a1;">👤 Papel OPERACIONAL</span>
+              <span class="rbac-badge-op">ACESSO RESTRITO</span>
+            </div>
+            <p style="font-size: 12px; color: var(--text-muted); line-height: 1.4; margin-bottom: 8px;">
+              Visualiza e cadastra documentos, realiza uploads de minutas/anexos, altera status para <em>"Em Renovação" (🔵)</em>. Não tem acesso a documentos arquivados ou excluídos nem a configurações.
+            </p>
+            <div style="font-size: 11px; font-weight: 700; color: #0369a1;">4 Usuários Ativos</div>
+          </div>
+        </div>
+
+        <!-- User Table Card -->
+        <section class="table-card" style="margin-top: 20px;">
+          <div class="table-header-info">
+            <div class="table-title">
+              <span>👥 Usuários Cadastrados no DocsOb</span>
+              <span class="records-counter">(5 usuários ativos / 1 inativo)</span>
+            </div>
+            <div class="table-actions">
+              <button class="btn btn-primary" onclick="openNewUserModal()">➕ Adicionar Usuário</button>
+            </div>
+          </div>
+
+          <div class="table-wrapper">
+            <table class="data-dense-table" id="usersTable">
+              <thead>
+                <tr>
+                  <th>Usuário</th>
+                  <th>Cargo / Departamento</th>
+                  <th>Papel RBAC</th>
+                  <th>Status</th>
+                  <th>Último Acesso</th>
+                  <th style="text-align: right;">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <div class="user-profile-widget" style="padding: 0;">
+                      <div class="user-avatar" style="background: linear-gradient(135deg, #7c3aed, #4c1d95);">MS</div>
+                      <div class="user-details">
+                        <span class="user-name">Marco Silva</span>
+                        <span style="font-size: 11px; color: var(--text-muted);">marco.silva@empresa.com.br</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td><strong>Diretor Operacional / Compliance</strong><br><span style="font-size: 11px; color: var(--text-muted);">Diretoria</span></td>
+                  <td><span class="rbac-badge-admin">ADMINISTRADOR</span></td>
+                  <td><span class="user-status-active">● Ativo</span></td>
+                  <td style="font-size: 12px;">Hoje às 16:04 (IP: 192.168.1.45)</td>
+                  <td style="text-align: right;">
+                    <button class="action-btn" title="Editar Usuário" onclick="openEditUserModal('Marco Silva', 'marco.silva@empresa.com.br', 'ADMINISTRADOR')">✏️</button>
+                    <button class="action-btn" title="Redefinir Senha" onclick="alert('Link de redefinição de senha enviado para marco.silva@empresa.com.br.')">🔑 Senha</button>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td>
+                    <div class="user-profile-widget" style="padding: 0;">
+                      <div class="user-avatar" style="background: linear-gradient(135deg, #0284c7, #2563eb);">AC</div>
+                      <div class="user-details">
+                        <span class="user-name">Ana Costa</span>
+                        <span style="font-size: 11px; color: var(--text-muted);">ana.costa@empresa.com.br</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td><strong>Analista Fiscal Senior</strong><br><span style="font-size: 11px; color: var(--text-muted);">Dept. Fiscal</span></td>
+                  <td><span class="rbac-badge-op">OPERACIONAL</span></td>
+                  <td><span class="user-status-active">● Ativo</span></td>
+                  <td style="font-size: 12px;">Hoje às 14:20 (IP: 192.168.1.88)</td>
+                  <td style="text-align: right;">
+                    <button class="action-btn" title="Editar Usuário" onclick="openEditUserModal('Ana Costa', 'ana.costa@empresa.com.br', 'OPERACIONAL')">✏️</button>
+                    <button class="action-btn" title="Redefinir Senha" onclick="alert('Link enviado para ana.costa@empresa.com.br.')">🔑 Senha</button>
+                    <button class="action-btn btn-delete" title="Desativar Acesso" onclick="toggleUserStatus(this)">🚫</button>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td>
+                    <div class="user-profile-widget" style="padding: 0;">
+                      <div class="user-avatar" style="background: linear-gradient(135deg, #059669, #10b981);">CE</div>
+                      <div class="user-details">
+                        <span class="user-name">Carlos Eduardo</span>
+                        <span style="font-size: 11px; color: var(--text-muted);">carlos.eduardo@empresa.com.br</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td><strong>Coordenador Jurídico</strong><br><span style="font-size: 11px; color: var(--text-muted);">Dept. Jurídico</span></td>
+                  <td><span class="rbac-badge-op">OPERACIONAL</span></td>
+                  <td><span class="user-status-active">● Ativo</span></td>
+                  <td style="font-size: 12px;">Ontem às 17:45 (IP: 192.168.1.92)</td>
+                  <td style="text-align: right;">
+                    <button class="action-btn" title="Editar Usuário" onclick="openEditUserModal('Carlos Eduardo', 'carlos.eduardo@empresa.com.br', 'OPERACIONAL')">✏️</button>
+                    <button class="action-btn" title="Redefinir Senha">🔑 Senha</button>
+                    <button class="action-btn btn-delete" title="Desativar Acesso" onclick="toggleUserStatus(this)">🚫</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+      </main>
+    </div>
+
+    <!-- Modal Novo / Editar Usuário -->
+    <div class="modal-backdrop" id="userModal">
+      <div class="modal-dialog" style="max-width: 580px;">
+        <div class="modal-header">
+          <h2 class="modal-title" id="userModalTitle">Cadastrar Novo Usuário</h2>
+          <button class="modal-close-btn" onclick="closeUserModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          <form id="userForm" onsubmit="handleUserFormSubmit(event)">
+            <div class="form-grid-2col">
+              <div class="form-group full-width">
+                <label class="form-label">Nome Completo <span class="required-star">*</span></label>
+                <input type="text" class="form-control" id="inputUserName" placeholder="Ex: Juliana Mendes" required>
+              </div>
+              <div class="form-group full-width">
+                <label class="form-label">E-mail Corporativo <span class="required-star">*</span></label>
+                <input type="email" class="form-control" id="inputUserEmail" placeholder="juliana.mendes@empresa.com.br" required>
+              </div>
+              <div class="form-group full-width">
+                <label class="form-label">Papel de Acesso RBAC <span class="required-star">*</span></label>
+                <select class="form-control" id="inputUserRbac" required>
+                  <option value="OPERACIONAL">👤 OPERACIONAL (Visualiza e renova documentos)</option>
+                  <option value="ADMINISTRADOR">👑 ADMINISTRADOR (Acesso total + Regras globais)</option>
+                </select>
+              </div>
+            </div>
+            <div class="modal-footer" style="margin-top: 20px;">
+              <button type="button" class="btn btn-secondary" onclick="closeUserModal()">Cancelar</button>
+              <button type="submit" class="btn btn-primary">Salvar Usuário</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    document.getElementById('sidebarToggleBtn').addEventListener('click', function() {
+      document.getElementById('appSidebar').classList.toggle('collapsed');
+    });
+
+    function openNewUserModal() {
+      document.getElementById('userModalTitle').innerText = 'Cadastrar Novo Usuário';
+      document.getElementById('userForm').reset();
+      document.getElementById('userModal').classList.add('active');
+    }
+
+    function openEditUserModal(name, email, role) {
+      document.getElementById('userModalTitle').innerText = `Editar Usuário: ${name}`;
+      document.getElementById('inputUserName').value = name;
+      document.getElementById('inputUserEmail').value = email;
+      document.getElementById('inputUserRbac').value = role;
+      document.getElementById('userModal').classList.add('active');
+    }
+
+    function closeUserModal() {
+      document.getElementById('userModal').classList.remove('active');
+    }
+
+    function handleUserFormSubmit(event) {
+      event.preventDefault();
+      alert('Usuário salvo com sucesso!');
+      closeUserModal();
+    }
+
+    function toggleUserStatus(btn) {
+      const tr = btn.closest('tr');
+      const name = tr.querySelector('.user-name').innerText;
+      if (confirm(`Deseja alterar o status de acesso do usuário ${name}?`)) {
+        alert(`Status de acesso de ${name} alterado.`);
+      }
+    }
+  </script>
+</body>
+</html>

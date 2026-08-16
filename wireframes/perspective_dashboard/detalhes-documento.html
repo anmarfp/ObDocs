@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DocsOb - Detalhes do Documento</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .details-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 992px) {
+      .details-grid { grid-template-columns: 1fr; }
+    }
+    .info-block-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+    .info-block-header {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .meta-data-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    .meta-data-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .meta-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+    }
+    .meta-val {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+    .notes-callout {
+      background-color: #f8fafc;
+      border-left: 4px solid var(--primary);
+      border-radius: 4px;
+      padding: 12px 16px;
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 12px;
+    }
+    .attachment-box {
+      background-color: #f1f5f9;
+      border: 1px dashed #cbd5e1;
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .version-timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .version-item {
+      background: #f8fafc;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-shell">
+
+    <!-- 1. TOP HEADER -->
+    <header class="top-header">
+      <div class="header-left">
+        <button class="sidebar-toggle-btn" id="sidebarToggleBtn" title="Alternar Menu">☰</button>
+        <a href="index.html" class="brand-logo">
+          <div class="brand-icon">DO</div>
+          <div class="brand-info">
+            <span class="brand-title">DocsOb</span>
+            <span class="brand-subtitle">Gestão de Vencimento de Documentos</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="header-center"></div>
+
+      <div class="header-right">
+        <button class="notifications-btn" title="Notificações Pendentes">
+          🔔 <span class="notification-badge">4</span>
+        </button>
+        <div class="user-profile-widget">
+          <div class="user-avatar">MS</div>
+          <div class="user-details">
+            <span class="user-name">Marco Silva</span>
+            <span class="user-role-badge">ADMINISTRADOR</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="body-container">
+
+      <!-- 2. EXPANDABLE SIDEBAR -->
+      <aside class="sidebar" id="appSidebar">
+        <div class="sidebar-menu">
+          <div class="menu-label">Navegação Principal</div>
+          <a href="index.html" class="nav-item"><span class="nav-icon">📊</span><span class="nav-text">Dashboard</span></a>
+          <a href="documentos.html" class="nav-item active"><span class="nav-icon">📄</span><span class="nav-text">Documentos</span></a>
+          <a href="calendario.html" class="nav-item"><span class="nav-icon">📅</span><span class="nav-text">Agenda & Google Sync</span></a>
+          <a href="auditoria.html" class="nav-item"><span class="nav-icon">🛡️</span><span class="nav-text">Trilha de Auditoria</span></a>
+          <div class="admin-menu-group">
+            <div class="menu-label">Administração</div>
+            <a href="usuarios.html" class="nav-item"><span class="nav-icon">👥</span><span class="nav-text">Usuários & Papéis</span></a>
+            <a href="configuracoes.html" class="nav-item"><span class="nav-icon">⚙️</span><span class="nav-text">Configurações</span></a>
+          </div>
+        </div>
+      </aside>
+
+      <!-- 3. MAIN CONTENT -->
+      <main class="main-content">
+
+        <!-- Back Navigation -->
+        <div style="margin-bottom: 16px;">
+          <a href="index.html" class="btn btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+            ← Voltar para a Listagem de Documentos
+          </a>
+        </div>
+
+        <!-- Page Header -->
+        <div class="page-header">
+          <div class="page-title-group">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <h1 id="docTitle">Certidão Negativa Federal - SRFB / PGFN</h1>
+              <span id="docStatusBadge" class="status-badge vencido"><span class="status-dot dot-red"></span> Vencido</span>
+            </div>
+            <p id="docSubhead">Orgão Emissor: Receita Federal do Brasil • Categoria: Fiscal</p>
+          </div>
+
+          <div class="header-actions">
+            <button class="btn btn-secondary" onclick="alert('Formulário de edição aberto.')">✏️ Editar</button>
+            <button class="btn btn-primary" onclick="alert('Renovação protocolada com sucesso!')">🔄 Protocolar Renovação</button>
+          </div>
+        </div>
+
+        <!-- Main Details Grid -->
+        <div class="details-grid">
+
+          <!-- Left Column: Core Info & Attachments -->
+          <div>
+            <div class="info-block-card">
+              <div class="info-block-header">
+                <span>📌 Dados Gerais do Documento</span>
+                <span class="category-tag">Fiscal</span>
+              </div>
+
+              <div class="meta-data-grid">
+                <div class="meta-data-item">
+                  <span class="meta-label">Título / Nome do Documento</span>
+                  <span class="meta-val" id="docMetaTitle">Certidão Negativa Federal - SRFB / PGFN</span>
+                </div>
+
+                <div class="meta-data-item">
+                  <span class="meta-label">Entidade / Órgão Emissor</span>
+                  <span class="meta-val" id="docMetaIssuer">Receita Federal do Brasil</span>
+                </div>
+
+                <div class="meta-data-item">
+                  <span class="meta-label">Data de Emissão</span>
+                  <span class="meta-val">07/02/2026</span>
+                </div>
+
+                <div class="meta-data-item">
+                  <span class="meta-label">Data de Vencimento</span>
+                  <span class="meta-val" style="color: #dc2626;">07/08/2026 (Vencido há 8 dias)</span>
+                </div>
+
+                <div class="meta-data-item">
+                  <span class="meta-label">Antecedência de Alerta</span>
+                  <span class="meta-val">30 Dias Antes</span>
+                </div>
+
+                <div class="meta-data-item">
+                  <span class="meta-label">Responsável pelo Documento</span>
+                  <span class="meta-val">Carlos Silva (carlos.silva@empresa.com.br)</span>
+                </div>
+              </div>
+
+              <div class="notes-callout">
+                <strong>Observações e Instruções para Renovação:</strong><br>
+                Certidão emitida via portal da Receita Federal. Requer validação do sistema da PGFN antes do protocolo de renovação.
+              </div>
+            </div>
+
+            <!-- Attachment Section -->
+            <div class="info-block-card">
+              <div class="info-block-header">
+                <span>📎 Arquivo Anexo (PDF/Imagem)</span>
+                <span style="font-size: 11px; color: var(--text-muted);">Tamanho máximo suportado: 10 MB</span>
+              </div>
+
+              <div class="attachment-box">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                  <span style="font-size: 24px;">📄</span>
+                  <div>
+                    <strong style="font-size: 13px;">CND_Federal_RFB_2026.pdf</strong>
+                    <div style="font-size: 11px; color: var(--text-muted);">2.4 MB • Modificado em 07/02/2026</div>
+                  </div>
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                  <button class="btn btn-secondary btn-icon-only" title="Visualizar Anexo" onclick="alert('Abrindo visualizador de PDF...')">👁️</button>
+                  <button class="btn btn-primary" onclick="alert('Baixando arquivo...')">📥 Download</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Version History & Status Timeline -->
+          <div>
+            <div class="info-block-card">
+              <div class="info-block-header">
+                <span>📜 Histórico de Renovações (Versões)</span>
+                <span class="records-counter">(2 Versões)</span>
+              </div>
+
+              <div class="version-timeline">
+                <div class="version-item" style="border-left: 3px solid #ef4444;">
+                  <div>
+                    <strong style="font-size: 13px; color: var(--text-main);">Versão 2.0 (Atual)</strong>
+                    <div style="font-size: 11px; color: var(--text-muted);">Vencimento: 07/08/2026</div>
+                  </div>
+                  <span class="pill-red" style="font-size: 10px; padding: 2px 6px;">Vencido</span>
+                </div>
+
+                <div class="version-item" style="opacity: 0.85;">
+                  <div>
+                    <strong style="font-size: 13px; color: var(--text-main);">Versão 1.0 (Anterior)</strong>
+                    <div style="font-size: 11px; color: var(--text-muted);">Vencimento: 07/02/2026</div>
+                  </div>
+                  <span class="category-tag">Arquivado</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick Audit Trail Section -->
+            <div class="info-block-card">
+              <div class="info-block-header">
+                <span>🛡️ Trilha de Auditoria Deste Documento</span>
+                <a href="auditoria.html" style="font-size: 11px; color: var(--primary); text-decoration: none; font-weight: 600;">Ver Log Completo →</a>
+              </div>
+
+              <div style="font-size: 12px; display: flex; flex-direction: column; gap: 10px;">
+                <div style="padding-bottom: 8px; border-bottom: 1px solid var(--border-color);">
+                  <div style="font-weight: 600; color: var(--text-main);">Atualização de status automática (RN-001)</div>
+                  <div style="font-size: 11px; color: var(--text-muted);">01/08/2026 às 00:00:01 • Sistema DocsOb</div>
+                </div>
+
+                <div>
+                  <div style="font-weight: 600; color: var(--text-main);">Cadastro do documento</div>
+                  <div style="font-size: 11px; color: var(--text-muted);">07/02/2026 às 10:14:02 • Marco Silva (Admin)</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
+    const appSidebar = document.getElementById('appSidebar');
+    if (sidebarToggleBtn && appSidebar) {
+      sidebarToggleBtn.addEventListener('click', () => {
+        appSidebar.classList.toggle('collapsed');
+      });
+    }
+
+    // Dynamic URL Parameter Parser (e.g., detalhes-documento.html?doc=CND%20Federal)
+    const urlParams = new URLSearchParams(window.location.search);
+    const docParam = urlParams.get('doc');
+    if (docParam) {
+      document.getElementById('docTitle').innerText = docParam;
+      document.getElementById('docMetaTitle').innerText = docParam;
+      document.getElementById('docSubhead').innerText = `Documento selecionado: ${docParam}`;
+    }
+  </script>
+</body>
+</html>

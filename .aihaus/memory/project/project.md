@@ -11,13 +11,13 @@
 ## Purpose
 DocsOb é um sistema de gestão e acompanhamento proativo de datas de vencimento de documentos (certidões, contratos, licenças, apólices de seguro, etc.) para evitar multas e riscos operacionais.
 
-- **source:** docs/PRD.md (commit `0d44a34` / v0.2.0)
+- **source:** docs/PRD.md (commit `c6bf7fd` / v0.2.0)
 
 ## Users and outcomes
 - **Administrador / Gestor:** Diretores e gerentes com acesso total, configurações de notificação da empresa, relatórios, gestão de usuários, documentos arquivados e trilha de auditoria.
 - **Operacional / Analista:** Assistentes e analistas que realizam cadastro, upload, atualização e arquivamento de documentos.
 
-- **source:** docs/PRD.md (commit `0d44a34` / v0.2.0)
+- **source:** docs/PRD.md (commit `c6bf7fd` / v0.2.0)
 
 ## In scope
 - Cadastro de documentos com tipo/categoria obrigatório, data de vencimento e anexo até 10 MB (PDF, PNG, JPG).
@@ -28,7 +28,7 @@ DocsOb é um sistema de gestão e acompanhamento proativo de datas de vencimento
 - Arquivamento de documentos (Soft Delete restrito a Administradores) e exclusão permanente (Hard Delete).
 - Autenticação com 2 perfis de acesso (Administrador e Operacional) em modelo Single-Tenant.
 
-- **source:** docs/PRD.md (commit `0d44a34` / v0.2.0)
+- **source:** docs/PRD.md (commit `c6bf7fd` / v0.2.0)
 
 ## Out of scope
 - Perfil de acesso Leitor/Auditor (revolvido/descontinuado).
@@ -37,7 +37,7 @@ DocsOb é um sistema de gestão e acompanhamento proativo de datas de vencimento
 - Leitura automática de PDF via OCR.
 - Integração via API direta com órgãos emissores.
 
-- **source:** docs/PRD.md (commit `0d44a34` / v0.2.0)
+- **source:** docs/PRD.md (commit `c6bf7fd` / v0.2.0)
 
 ## Definition of Done
 - 100% dos documentos cadastrados geram alertas prévios e eventos no Google Agenda.
@@ -45,7 +45,7 @@ DocsOb é um sistema de gestão e acompanhamento proativo de datas de vencimento
 - Consulta e localização de documentos em menos de 5 segundos.
 - Visibilidade em tempo real no Dashboard.
 
-- **source:** docs/PRD.md (commit `0d44a34` / v0.2.0)
+- **source:** docs/PRD.md (commit `c6bf7fd` / v0.2.0)
 
 ## Current constraints
 - MVP focado em empresa única.
@@ -53,4 +53,4 @@ DocsOb é um sistema de gestão e acompanhamento proativo de datas de vencimento
 - Notificações exclusivamente via e-mail.
 - Arquivos anexos limitados a 10 MB.
 
-- **source:** docs/PRD.md (commit `0d44a34` / v0.2.0)
+- **source:** docs/PRD.md (commit `c6bf7fd` / v0.2.0)

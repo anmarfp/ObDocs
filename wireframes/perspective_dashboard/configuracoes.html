@@ -23,23 +23,7 @@
         </a>
       </div>
 
-      <div class="header-center">
-        <!-- Google Sync Status Card -->
-        <div class="google-sync-card">
-          <svg class="google-icon-svg" viewBox="0 0 24 24">
-            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-          </svg>
-          <div class="sync-status-indicator">
-            <span class="sync-dot"></span>
-            <span>Google Agenda: Sincronizado</span>
-          </div>
-          <span class="sync-timestamp">(Há 5 min)</span>
-          <button class="btn-sync-now" onclick="triggerGoogleSync()">🔄 Sincronizar</button>
-        </div>
-      </div>
+      <div class="header-center"></div>
 
       <div class="header-right">
         <button class="notifications-btn" title="Notificações Pendentes">
@@ -65,14 +49,10 @@
           <a href="documentos.html" class="nav-item"><span class="nav-icon">📄</span><span class="nav-text">Documentos</span></a>
           <a href="calendario.html" class="nav-item"><span class="nav-icon">📅</span><span class="nav-text">Agenda & Google Sync</span></a>
           <a href="auditoria.html" class="nav-item"><span class="nav-icon">🛡️</span><span class="nav-text">Trilha de Auditoria</span></a>
-          <div class="menu-label">Administração</div>
-          <a href="configuracoes.html#usuarios" class="nav-item" onclick="activateTab('usuariosTab', document.getElementById('tabItemUsers'))"><span class="nav-icon">👥</span><span class="nav-text">Usuários & Papéis</span></a>
-          <a href="configuracoes.html" class="nav-item active" onclick="activateTab('regrasTab', document.getElementById('tabItemRules'))"><span class="nav-icon">⚙️</span><span class="nav-text">Configurações Empresa</span></a>
-        </div>
-        <div class="sidebar-footer">
-          <div class="company-mode-card">
-            <div class="company-mode-header"><span>🏢 Regra Ativa de Alertas</span></div>
-            <div class="company-mode-status" id="sidebarActiveRuleText">● Notificar Todos os Admins</div>
+          <div class="admin-menu-group">
+            <div class="menu-label">Administração</div>
+            <a href="usuarios.html" class="nav-item"><span class="nav-icon">👥</span><span class="nav-text">Usuários & Papéis</span></a>
+            <a href="configuracoes.html" class="nav-item active"><span class="nav-icon">⚙️</span><span class="nav-text">Configurações</span></a>
           </div>
         </div>
       </aside>
@@ -81,12 +61,8 @@
       <main class="main-content">
         <div class="page-header">
           <div class="page-title-group">
-            <h1>Configurações da Empresa & Gestão de Usuários</h1>
-            <p>Parâmetros globais de envio de alertas de vencimento (RN-004), gestão de papéis RBAC e integração Google Agenda</p>
-          </div>
-          <div class="header-actions">
-            <button class="btn btn-secondary" onclick="openNewUserModal()">➕ Novo Usuário</button>
-            <button class="btn btn-primary" onclick="saveGlobalSettings()">💾 Salvar Configurações</button>
+            <h1>Configurações</h1>
+            <p>Parâmetros globais de envio de alertas de vencimento (RN-004), integração Google Agenda e segurança</p>
           </div>
         </div>
 
@@ -94,9 +70,6 @@
         <div class="nav-tabs">
           <div class="tab-item active" id="tabItemRules" onclick="activateTab('regrasTab', this)">
             <span>🏢 Regras Globais de Alerta (RN-004)</span>
-          </div>
-          <div class="tab-item" id="tabItemUsers" onclick="activateTab('usuariosTab', this)">
-            <span>👥 Gestão de Usuários & RBAC</span>
           </div>
           <div class="tab-item" id="tabItemGoogle" onclick="activateTab('googleTab', this)">
             <span>🌐 Integração Google Agenda</span>
@@ -208,176 +181,15 @@
               </div>
 
             </div>
+
+            <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end;">
+              <button class="btn btn-primary" onclick="saveGlobalSettings()">💾 Salvar Regras de Alerta</button>
+            </div>
           </div>
 
         </div>
 
-        <!-- TAB 2: GESTÃO DE USUÁRIOS & RBAC -->
-        <div class="tab-content-panel" id="usuariosTab">
-          
-          <!-- RBAC Matrix Legend Cards -->
-          <div class="rbac-grid-summary">
-            
-            <div class="rbac-role-card admin-card">
-              <div class="rbac-role-header">
-                <span class="rbac-role-title" style="color: #6b21a8;">👑 Papel ADMINISTRADOR</span>
-                <span class="rbac-badge-admin">ACESSO TOTAL</span>
-              </div>
-              <p style="font-size: 12px; color: var(--text-muted); line-height: 1.4; margin-bottom: 8px;">
-                Permissão total de leitura, criação, edição e exclusão. Pode configurar regras globais (RN-004), gerenciar usuários, visualizar documentos arquivados (soft delete) e executar hard delete.
-              </p>
-              <div style="font-size: 11px; font-weight: 700; color: #6b21a8;">1 Usuário Ativo</div>
-            </div>
-
-            <div class="rbac-role-card operacional-card">
-              <div class="rbac-role-header">
-                <span class="rbac-role-title" style="color: #0369a1;">👤 Papel OPERACIONAL</span>
-                <span class="rbac-badge-op">ACESSO RESTRITO</span>
-              </div>
-              <p style="font-size: 12px; color: var(--text-muted); line-height: 1.4; margin-bottom: 8px;">
-                Visualiza e cadastra documentos, realiza uploads de minutas/anexos, altera status para <em>"Em Renovação" (🔵)</em>. Não tem acesso a documentos arquivados ou excluídos nem a configurações da empresa.
-              </p>
-              <div style="font-size: 11px; font-weight: 700; color: #0369a1;">4 Usuários Ativos</div>
-            </div>
-
-          </div>
-
-          <!-- User Table Card -->
-          <section class="table-card">
-            <div class="table-header-info">
-              <div class="table-title">
-                <span>👥 Usuários Cadastrados no DocsOb</span>
-                <span class="records-counter">(5 usuários ativos / 1 inativo)</span>
-              </div>
-              <div class="table-actions">
-                <button class="btn btn-primary" onclick="openNewUserModal()">➕ Adicionar Usuário</button>
-              </div>
-            </div>
-
-            <div class="table-wrapper">
-              <table class="data-dense-table" id="usersTable">
-                <thead>
-                  <tr>
-                    <th>Usuário</th>
-                    <th>Cargo / Departamento</th>
-                    <th>Papel RBAC</th>
-                    <th>Status</th>
-                    <th>Último Acesso</th>
-                    <th style="text-align: right;">Ações</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  
-                  <tr>
-                    <td>
-                      <div class="user-profile-widget" style="padding: 0;">
-                        <div class="user-avatar" style="background: linear-gradient(135deg, #7c3aed, #4c1d95);">MS</div>
-                        <div class="user-details">
-                          <span class="user-name">Marco Silva</span>
-                          <span style="font-size: 11px; color: var(--text-muted);">marco.silva@empresa.com.br</span>
-                        </div>
-                      </div>
-                    </td>
-                    <td><strong>Diretor Operacional / Compliance</strong><br><span style="font-size: 11px; color: var(--text-muted);">Diretoria</span></td>
-                    <td><span class="rbac-badge-admin">ADMINISTRADOR</span></td>
-                    <td><span class="user-status-active">● Ativo</span></td>
-                    <td style="font-size: 12px;">Hoje às 16:04 (IP: 192.168.1.45)</td>
-                    <td style="text-align: right;">
-                      <button class="action-btn" title="Editar Usuário" onclick="openEditUserModal('Marco Silva', 'marco.silva@empresa.com.br', 'ADMINISTRADOR')">✏️</button>
-                      <button class="action-btn" title="Redefinir Senha" onclick="alert('Link de redefinição de senha enviado para marco.silva@empresa.com.br.')">🔑 Senha</button>
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td>
-                      <div class="user-profile-widget" style="padding: 0;">
-                        <div class="user-avatar" style="background: linear-gradient(135deg, #0284c7, #2563eb);">AC</div>
-                        <div class="user-details">
-                          <span class="user-name">Ana Costa</span>
-                          <span style="font-size: 11px; color: var(--text-muted);">ana.costa@empresa.com.br</span>
-                        </div>
-                      </div>
-                    </td>
-                    <td><strong>Analista Fiscal Senior</strong><br><span style="font-size: 11px; color: var(--text-muted);">Dept. Fiscal</span></td>
-                    <td><span class="rbac-badge-op">OPERACIONAL</span></td>
-                    <td><span class="user-status-active">● Ativo</span></td>
-                    <td style="font-size: 12px;">Hoje às 14:20 (IP: 192.168.1.88)</td>
-                    <td style="text-align: right;">
-                      <button class="action-btn" title="Editar Usuário" onclick="openEditUserModal('Ana Costa', 'ana.costa@empresa.com.br', 'OPERACIONAL')">✏️</button>
-                      <button class="action-btn" title="Redefinir Senha" onclick="alert('Link de redefinição enviado para ana.costa@empresa.com.br.')">🔑 Senha</button>
-                      <button class="action-btn btn-delete" title="Desativar Acesso" onclick="toggleUserStatus(this)">🚫</button>
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td>
-                      <div class="user-profile-widget" style="padding: 0;">
-                        <div class="user-avatar" style="background: linear-gradient(135deg, #059669, #10b981);">CE</div>
-                        <div class="user-details">
-                          <span class="user-name">Carlos Eduardo</span>
-                          <span style="font-size: 11px; color: var(--text-muted);">carlos.eduardo@empresa.com.br</span>
-                        </div>
-                      </div>
-                    </td>
-                    <td><strong>Coordenador Jurídico</strong><br><span style="font-size: 11px; color: var(--text-muted);">Dept. Jurídico</span></td>
-                    <td><span class="rbac-badge-op">OPERACIONAL</span></td>
-                    <td><span class="user-status-active">● Ativo</span></td>
-                    <td style="font-size: 12px;">Ontem às 17:45 (IP: 192.168.1.92)</td>
-                    <td style="text-align: right;">
-                      <button class="action-btn" title="Editar Usuário" onclick="openEditUserModal('Carlos Eduardo', 'carlos.eduardo@empresa.com.br', 'OPERACIONAL')">✏️</button>
-                      <button class="action-btn" title="Redefinir Senha">🔑 Senha</button>
-                      <button class="action-btn btn-delete" title="Desativar Acesso" onclick="toggleUserStatus(this)">🚫</button>
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td>
-                      <div class="user-profile-widget" style="padding: 0;">
-                        <div class="user-avatar" style="background: linear-gradient(135deg, #d97706, #f59e0b);">FL</div>
-                        <div class="user-details">
-                          <span class="user-name">Fernanda Lima</span>
-                          <span style="font-size: 11px; color: var(--text-muted);">fernanda.lima@empresa.com.br</span>
-                        </div>
-                      </div>
-                    </td>
-                    <td><strong>Gerente de RH & DP</strong><br><span style="font-size: 11px; color: var(--text-muted);">Recursos Humanos</span></td>
-                    <td><span class="rbac-badge-op">OPERACIONAL</span></td>
-                    <td><span class="user-status-active">● Ativo</span></td>
-                    <td style="font-size: 12px;">08/08/2026 às 11:10</td>
-                    <td style="text-align: right;">
-                      <button class="action-btn" title="Editar Usuário" onclick="openEditUserModal('Fernanda Lima', 'fernanda.lima@empresa.com.br', 'OPERACIONAL')">✏️</button>
-                      <button class="action-btn" title="Redefinir Senha">🔑 Senha</button>
-                      <button class="action-btn btn-delete" title="Desativar Acesso" onclick="toggleUserStatus(this)">🚫</button>
-                    </td>
-                  </tr>
-
-                  <tr style="opacity: 0.7;">
-                    <td>
-                      <div class="user-profile-widget" style="padding: 0;">
-                        <div class="user-avatar" style="background: #94a3b8;">RA</div>
-                        <div class="user-details">
-                          <span class="user-name" style="text-decoration: line-through;">Roberto Alves</span>
-                          <span style="font-size: 11px; color: var(--text-muted);">roberto.alves@empresa.com.br</span>
-                        </div>
-                      </div>
-                    </td>
-                    <td><strong>Auditor Externo (Consultoria)</strong><br><span style="font-size: 11px; color: var(--text-muted);">Compliance</span></td>
-                    <td><span class="rbac-badge-op">OPERACIONAL</span></td>
-                    <td><span class="user-status-inactive">○ Inativo</span></td>
-                    <td style="font-size: 12px;">15/07/2026 (Acesso revogado)</td>
-                    <td style="text-align: right;">
-                      <button class="action-btn" title="Reativar Usuário" onclick="toggleUserStatus(this)">🔄 Reativar</button>
-                    </td>
-                  </tr>
-
-                </tbody>
-              </table>
-            </div>
-          </section>
-
-        </div>
-
-        <!-- TAB 3: INTEGRAÇÃO GOOGLE AGENDA -->
+        <!-- TAB 2: INTEGRAÇÃO GOOGLE AGENDA -->
         <div class="tab-content-panel" id="googleTab">
           <div class="settings-card">
             <div class="settings-card-header">
@@ -429,10 +241,14 @@
               </div>
 
             </div>
+
+            <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end;">
+              <button class="btn btn-primary" onclick="saveGlobalSettings()">💾 Salvar Configurações da Agenda</button>
+            </div>
           </div>
         </div>
 
-        <!-- TAB 4: SEGURANÇA E RETENÇÃO DE LOGS -->
+        <!-- TAB 3: SEGURANÇA E RETENÇÃO DE LOGS -->
         <div class="tab-content-panel" id="securityTab">
           <div class="settings-card">
             <div class="settings-card-header">
@@ -456,8 +272,9 @@
               </div>
             </div>
 
-            <div style="margin-top: 20px;">
-              <button class="btn btn-secondary" onclick="window.location.href='auditoria.html'">🛡️ Abrir Tela Dedicada de Trilha de Auditoria (RF-013)</button>
+            <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+              <button class="btn btn-secondary" onclick="window.location.href='auditoria.html'">🛡️ Abrir Trilha de Auditoria (RF-013)</button>
+              <button class="btn btn-primary" onclick="saveGlobalSettings()">💾 Salvar Parâmetros de Segurança</button>
             </div>
           </div>
         </div>
@@ -572,7 +389,8 @@
     function selectRuleCard(cardId, statusText) {
       document.querySelectorAll('.radio-card').forEach(card => card.classList.remove('selected'));
       document.getElementById(cardId).classList.add('selected');
-      document.getElementById('sidebarActiveRuleText').innerText = statusText;
+      const sidebarText = document.getElementById('sidebarActiveRuleText');
+      if (sidebarText) sidebarText.innerText = statusText;
     }
 
     // Save Settings Feedback

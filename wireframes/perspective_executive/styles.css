@@ -28,8 +28,9 @@ body {
   background-color: var(--bg-main);
   color: var(--text-main);
   display: flex;
-  height: 100vh;
+  height: 111.1vh;
   overflow: hidden;
+  zoom: 90%;
 }
 
 /* Sidebar Container */

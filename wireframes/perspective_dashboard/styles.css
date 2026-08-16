@@ -65,6 +65,7 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  zoom: 90%;
 }
 
 /* APP SHELL LAYOUT */
@@ -326,6 +327,12 @@ body {
   justify-content: space-between;
   transition: width 0.3s ease;
   flex-shrink: 0;
+  position: sticky;
+  top: 64px;
+  height: calc(111.1vh - 64px);
+  max-height: calc(111.1vh - 64px);
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 .sidebar.collapsed {
@@ -333,19 +340,29 @@ body {
 }
 
 .sidebar-menu {
-  padding: 16px 12px;
+  padding: 10px 10px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.admin-menu-group {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: 8px;
 }
 
 .menu-label {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
   color: var(--text-light);
   letter-spacing: 0.5px;
-  padding: 12px 12px 6px 12px;
+  padding: 8px 10px 4px 10px;
 }
 
 .sidebar.collapsed .menu-label {
@@ -355,13 +372,13 @@ body {
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px 14px;
+  gap: 10px;
+  padding: 8px 12px;
   color: #cbd5e1;
   text-decoration: none;
   border-radius: var(--radius-sm);
   font-weight: 500;
-  font-size: 14px;
+  font-size: 13px;
   transition: all 0.2s;
 }
 
@@ -378,8 +395,8 @@ body {
 }
 
 .nav-icon {
-  font-size: 18px;
-  width: 24px;
+  font-size: 16px;
+  width: 20px;
   text-align: center;
   display: flex;
   align-items: center;
@@ -391,16 +408,17 @@ body {
 }
 
 .sidebar-footer {
-  padding: 16px;
+  padding: 10px 12px;
   border-top: 1px solid #1e293b;
   background-color: #0b1120;
+  flex-shrink: 0;
 }
 
 .company-mode-card {
   background-color: #1e293b;
   border: 1px solid #334155;
   border-radius: var(--radius-sm);
-  padding: 10px;
+  padding: 8px 10px;
   font-size: 11px;
 }
 
