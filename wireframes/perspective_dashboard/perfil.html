@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DocsOb - Perfil do Usuário</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="app-shell">
+
+    <!-- 1. TOP HEADER -->
+    <header class="top-header">
+      <div class="header-left">
+        <button class="sidebar-toggle-btn" id="sidebarToggleBtn" title="Alternar Menu">☰</button>
+        <a href="index.html" class="brand-logo">
+          <div class="brand-icon">DO</div>
+          <div class="brand-info">
+            <span class="brand-title">DocsOb</span>
+            <span class="brand-subtitle">Gestão de Vencimento de Documentos</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="header-center"></div>
+
+      <div class="header-right">
+        <!-- NOTIFICATIONS CONTAINER WITH FLOATING DROPDOWN -->
+        <div class="notifications-container">
+          <button class="notifications-btn" id="notificationsBtn" onclick="toggleNotificationsDropdown(event)" title="Notificações Pendentes">
+            🔔 <span class="notification-badge">5</span>
+          </button>
+
+          <div class="notifications-dropdown" id="notificationsDropdown">
+            <div class="notifications-dropdown-header">
+              <span class="notifications-dropdown-title">🔔 Notificações Recentes</span>
+              <span class="notifications-dropdown-unread-count">5 Não Lidas</span>
+            </div>
+
+            <div class="notifications-list-mini">
+              <a href="detalhes-documento.html?doc=Certid%C3%A3o%20Negativa%20Federal" class="notification-item-mini unread">
+                <div class="notification-icon-badge vencido">🔴</div>
+                <div class="notification-content-mini">
+                  <span class="notification-title-mini">Certidão Negativa Federal Vencida</span>
+                  <span class="notification-desc-mini">O documento venceu há 8 dias (07/08/2026). Protocolar renovação.</span>
+                  <span class="notification-time-mini">Há 10 minutos</span>
+                </div>
+              </a>
+
+              <a href="detalhes-documento.html?doc=Licen%C3%A7a%20Ambiental%20de%20Opera%C3%A7%C3%A3o" class="notification-item-mini unread">
+                <div class="notification-icon-badge alerta">⚠️</div>
+                <div class="notification-content-mini">
+                  <span class="notification-title-mini">Licença Ambiental vence em 5 dias</span>
+                  <span class="notification-desc-mini">Vencimento previsto para 21/08/2026. Órgão: SEMAD.</span>
+                  <span class="notification-time-mini">Há 2 horas</span>
+                </div>
+              </a>
+
+              <a href="detalhes-documento.html?doc=Alvar%C3%A1%20de%20Funcionamento" class="notification-item-mini unread">
+                <div class="notification-icon-badge sucesso">✅</div>
+                <div class="notification-content-mini">
+                  <span class="notification-title-mini">Alvará de Funcionamento Renovado</span>
+                  <span class="notification-desc-mini">Nova versão 2026/2027 validada pela Prefeitura.</span>
+                  <span class="notification-time-mini">Hoje às 14:15</span>
+                </div>
+              </a>
+
+              <a href="calendario.html" class="notification-item-mini unread">
+                <div class="notification-icon-badge info">📅</div>
+                <div class="notification-content-mini">
+                  <span class="notification-title-mini">Sincronização com Google Agenda</span>
+                  <span class="notification-desc-mini">3 novos eventos de vencimento adicionados à agenda.</span>
+                  <span class="notification-time-mini">Ontem às 18:30</span>
+                </div>
+              </a>
+
+              <a href="detalhes-documento.html?doc=Outorga%20de%20Uso%20de%20%C3%81gua" class="notification-item-mini unread">
+                <div class="notification-icon-badge alerta">⚠️</div>
+                <div class="notification-content-mini">
+                  <span class="notification-title-mini">Outorga de Uso de Água vence em 15 dias</span>
+                  <span class="notification-desc-mini">Vencimento em 31/08/2026. Responsável: Carlos Silva.</span>
+                  <span class="notification-time-mini">14/08/2026 às 11:00</span>
+                </div>
+              </a>
+            </div>
+
+            <div class="notifications-dropdown-footer">
+              <a href="notificacoes.html" class="btn-view-all-notifications">
+                Ver todas as notificações →
+              </a>
+            </div>
+          </div>
+        </div>
+        
+        <!-- USER PROFILE CONTAINER WITH FLOATING DROPDOWN -->
+        <div class="user-profile-container">
+          <div class="user-profile-widget" id="userProfileBtn" onclick="toggleProfileDropdown(event)">
+            <div class="user-avatar" id="headerAvatar">MS</div>
+            <div class="user-details">
+              <span class="user-name" id="headerUserName">Marco Silva</span>
+              <span class="user-role-badge">ADMINISTRADOR</span>
+            </div>
+            <span class="dropdown-chevron">▼</span>
+          </div>
+
+          <div class="user-profile-dropdown" id="userProfileDropdown">
+            <div class="dropdown-header-info">
+              <div class="dropdown-avatar" id="dropdownAvatar">MS</div>
+              <div class="dropdown-user-text">
+                <span class="dropdown-user-name" id="dropdownUserName">Marco Silva</span>
+                <span class="dropdown-user-email" id="dropdownUserEmail">marco.silva@empresa.com.br</span>
+                <span class="user-role-badge" style="width: fit-content; margin-top: 2px;">ADMINISTRADOR</span>
+              </div>
+            </div>
+            <div class="dropdown-menu-list">
+              <a href="perfil.html" class="dropdown-item">
+                <span class="dropdown-item-icon">👤</span>
+                <span>Ver perfil</span>
+              </a>
+              <button class="dropdown-item logout-item" onclick="handleLogout()">
+                <span class="dropdown-item-icon">🚪</span>
+                <span>Sair</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </header>
+
+    <div class="body-container">
+
+      <!-- 2. EXPANDABLE SIDEBAR -->
+      <aside class="sidebar" id="appSidebar">
+        <div class="sidebar-menu">
+          <div class="menu-label">Navegação Principal</div>
+          <a href="index.html" class="nav-item"><span class="nav-icon">📊</span><span class="nav-text">Dashboard</span></a>
+          <a href="documentos.html" class="nav-item"><span class="nav-icon">📄</span><span class="nav-text">Documentos</span></a>
+          <a href="calendario.html" class="nav-item"><span class="nav-icon">📅</span><span class="nav-text">Agenda & Google Sync</span></a>
+          <a href="notificacoes.html" class="nav-item"><span class="nav-icon">🔔</span><span class="nav-text">Notificações</span></a>
+          <a href="auditoria.html" class="nav-item"><span class="nav-icon">🛡️</span><span class="nav-text">Trilha de Auditoria</span></a>
+          <div class="admin-menu-group">
+            <div class="menu-label">Administração</div>
+            <a href="configuracoes.html#usuarios" class="nav-item"><span class="nav-icon">👥</span><span class="nav-text">Usuários & Papéis</span></a>
+            <a href="configuracoes.html" class="nav-item"><span class="nav-icon">⚙️</span><span class="nav-text">Configurações</span></a>
+          </div>
+        </div>
+      </aside>
+
+      <!-- 3. MAIN CONTENT -->
+      <main class="main-content">
+        <div class="page-header">
+          <div class="page-title-group">
+            <h1>Perfil do Usuário</h1>
+            <p>Gerencie suas informações pessoais, dados de contato e permissões de acesso RBAC</p>
+          </div>
+          <div class="header-actions">
+            <a href="index.html" class="btn btn-secondary">← Voltar ao Dashboard</a>
+          </div>
+        </div>
+
+        <!-- PROFILE CONTAINER GRID -->
+        <div class="profile-container">
+
+          <!-- LEFT CARD: AVATAR & USER SUMMARY -->
+          <div class="profile-card profile-avatar-wrapper">
+            <div class="profile-avatar-large" id="mainProfileAvatar">
+              MS
+              <label for="avatarFileInput" class="avatar-edit-badge" title="Alterar Foto de Perfil">📷</label>
+              <input type="file" id="avatarFileInput" accept="image/*" style="display: none;" onchange="handleAvatarChange(event)">
+            </div>
+            
+            <h2 class="profile-user-name" id="cardProfileName">Marco Silva</h2>
+            <div class="profile-user-title">Diretor de Operações / Administrador</div>
+            
+            <div style="margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;">
+              <span class="user-role-badge" style="font-size: 11px; padding: 4px 10px;">ADMINISTRADOR</span>
+              <span class="status-badge regular" style="font-size: 11px; padding: 2px 8px;"><span class="status-dot dot-green"></span> Conta Ativa</span>
+            </div>
+
+            <hr style="width: 100%; border: none; border-top: 1px solid var(--border-color); margin: 20px 0;">
+
+            <div style="width: 100%; text-align: left; font-size: 13px; color: var(--text-muted);">
+              <div style="margin-bottom: 10px; display: flex; justify-content: space-between;">
+                <span>ID do Usuário:</span>
+                <strong style="color: var(--text-main);">USR-001</strong>
+              </div>
+              <div style="margin-bottom: 10px; display: flex; justify-content: space-between;">
+                <span>Data de Cadastro:</span>
+                <strong style="color: var(--text-main);">15/01/2026</strong>
+              </div>
+              <div style="margin-bottom: 10px; display: flex; justify-content: space-between;">
+                <span>Último Acesso:</span>
+                <strong style="color: var(--text-main);">Hoje às 19:45</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between;">
+                <span>Google Sync:</span>
+                <strong style="color: #166534;">🟢 Sincronizado</strong>
+              </div>
+            </div>
+
+            <button class="btn btn-secondary" style="width: 100%; margin-top: 24px;" onclick="alert('Solicitação de redefinição de senha enviada para marco.silva@empresa.com.br!')">🔑 Redefinir Senha</button>
+          </div>
+
+          <!-- RIGHT COLUMN: DETAILED PROFILE FORM & RBAC INFO -->
+          <div style="display: flex; flex-direction: column; gap: 20px;">
+
+            <!-- CARD 1: INFORMAÇÕES PESSOAIS & CONTATO -->
+            <div class="profile-card">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="font-size: 16px; font-weight: 700; color: var(--text-main);">Informações Pessoais & Contato</h3>
+              </div>
+
+              <form id="profileForm" onsubmit="handleSaveProfile(event)">
+                <div class="profile-info-grid">
+                  
+                  <div class="info-group">
+                    <label class="info-label" for="inputNome">Nome Completo</label>
+                    <input type="text" id="inputNome" class="form-control-input" value="Marco Silva" required style="padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); font-size: 14px; background: #ffffff;">
+                  </div>
+
+                  <div class="info-group">
+                    <label class="info-label" for="inputEmail">E-mail Corporativo</label>
+                    <input type="email" id="inputEmail" class="form-control-input" value="marco.silva@empresa.com.br" required style="padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); font-size: 14px; background: #ffffff;">
+                  </div>
+
+                  <div class="info-group">
+                    <label class="info-label" for="inputCelular">Número de Celular</label>
+                    <input type="tel" id="inputCelular" class="form-control-input" value="(11) 98765-4321" required style="padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); font-size: 14px; background: #ffffff;">
+                  </div>
+
+                  <div class="info-group">
+                    <label class="info-label" for="inputCargo">Cargo / Função</label>
+                    <input type="text" id="inputCargo" class="form-control-input" value="Diretor de Operações" style="padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); font-size: 14px; background: #ffffff;">
+                  </div>
+
+                </div>
+
+                <div id="formActionsRow" style="display: flex; margin-top: 20px; justify-content: flex-end;">
+                  <button type="submit" class="btn btn-primary">💾 Salvar Alterações</button>
+                </div>
+              </form>
+            </div>
+
+            <!-- CARD 2: CONTROLE DE ACESSO (RBAC) & PERMISSÕES -->
+            <div class="profile-card">
+              <h3 style="font-size: 16px; font-weight: 700; color: var(--text-main); margin-bottom: 16px;">Controle de Acesso & Permissões (RBAC)</h3>
+              
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;">
+                
+                <div style="padding: 14px; background: var(--bg-main); border: 1px solid var(--border-color); border-radius: var(--radius-md);">
+                  <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Papel de Usuário (Role)</div>
+                  <div style="font-size: 15px; font-weight: 700; color: var(--primary); margin-top: 4px;">Administrador</div>
+                  <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Acesso irrestrito a todos os módulos, gestão de usuários e configurações globais.</p>
+                </div>
+
+                <div style="padding: 14px; background: var(--bg-main); border: 1px solid var(--border-color); border-radius: var(--radius-md);">
+                  <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Regra de Notificação Ativa</div>
+                  <div style="font-size: 15px; font-weight: 700; color: var(--text-main); margin-top: 4px;">Notificar Administradores</div>
+                  <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Recebe alertas por e-mail de vencimento de todos os documentos cadastrados.</p>
+                </div>
+
+                <div style="padding: 14px; background: var(--bg-main); border: 1px solid var(--border-color); border-radius: var(--radius-md);">
+                  <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Permissões Especiais</div>
+                  <div style="font-size: 13px; font-weight: 600; color: var(--text-main); margin-top: 4px;">
+                    ✅ Arquivar (Soft Delete)<br>
+                    ✅ Excluir (Hard Delete)<br>
+                    ✅ Ver Trilha de Auditoria
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </main>
+
+    </div>
+
+  </div>
+
+  <script>
+    // TOGGLE SIDEBAR
+    const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
+    const appSidebar = document.getElementById('appSidebar');
+
+    sidebarToggleBtn.addEventListener('click', () => {
+      appSidebar.classList.toggle('collapsed');
+    });
+
+    // NOTIFICATIONS DROPDOWN LOGIC
+    function toggleNotificationsDropdown(event) {
+      event.stopPropagation();
+      const dropdown = document.getElementById('notificationsDropdown');
+      const profileDropdown = document.getElementById('userProfileDropdown');
+      if (profileDropdown && profileDropdown.classList.contains('show')) {
+        profileDropdown.classList.remove('show');
+      }
+      if (dropdown) {
+        dropdown.classList.toggle('show');
+      }
+    }
+
+    // PROFILE DROPDOWN FLOATING BOX LOGIC
+    function toggleProfileDropdown(event) {
+      event.stopPropagation();
+      const profileDropdown = document.getElementById('userProfileDropdown');
+      const notifDropdown = document.getElementById('notificationsDropdown');
+      if (notifDropdown && notifDropdown.classList.contains('show')) {
+        notifDropdown.classList.remove('show');
+      }
+      if (profileDropdown) {
+        profileDropdown.classList.toggle('show');
+      }
+    }
+
+    document.addEventListener('click', (event) => {
+      const notifDropdown = document.getElementById('notificationsDropdown');
+      const profileDropdown = document.getElementById('userProfileDropdown');
+      const notifBtn = document.getElementById('notificationsBtn');
+      const profileBtn = document.getElementById('userProfileBtn');
+
+      if (notifDropdown && notifDropdown.classList.contains('show')) {
+        if (!notifDropdown.contains(event.target) && (!notifBtn || !notifBtn.contains(event.target))) {
+          notifDropdown.classList.remove('show');
+        }
+      }
+
+      if (profileDropdown && profileDropdown.classList.contains('show')) {
+        if (!profileDropdown.contains(event.target) && (!profileBtn || !profileBtn.contains(event.target))) {
+          profileDropdown.classList.remove('show');
+        }
+      }
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        const notifDropdown = document.getElementById('notificationsDropdown');
+        const profileDropdown = document.getElementById('userProfileDropdown');
+        if (notifDropdown) notifDropdown.classList.remove('show');
+        if (profileDropdown) profileDropdown.classList.remove('show');
+      }
+    });
+
+    function handleLogout() {
+      if (confirm('Deseja realmente encerrar sua sessão no DocsOb?')) {
+        alert('Sessão encerrada com sucesso!');
+        window.location.href = 'index.html';
+      }
+    }
+
+    // PROFILE FORM SAVE LOGIC
+    function handleSaveProfile(event) {
+      event.preventDefault();
+      const nome = document.getElementById('inputNome').value;
+      const email = document.getElementById('inputEmail').value;
+      
+      // Update UI elements
+      document.getElementById('cardProfileName').textContent = nome;
+      document.getElementById('headerUserName').textContent = nome;
+      document.getElementById('dropdownUserName').textContent = nome;
+      document.getElementById('dropdownUserEmail').textContent = email;
+
+      // Update initials avatar if name changed
+      const nameParts = nome.trim().split(' ');
+      let initials = nameParts[0].charAt(0).toUpperCase();
+      if (nameParts.length > 1) {
+        initials += nameParts[nameParts.length - 1].charAt(0).toUpperCase();
+      }
+      document.getElementById('headerAvatar').textContent = initials;
+      document.getElementById('dropdownAvatar').textContent = initials;
+      
+      const mainAvatar = document.getElementById('mainProfileAvatar');
+      if (mainAvatar && !mainAvatar.querySelector('img')) {
+        mainAvatar.childNodes[0].nodeValue = initials;
+      }
+
+      alert('Perfil do usuário atualizado com sucesso!');
+    }
+
+    function handleAvatarChange(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const imgUrl = e.target.result;
+          const mainAvatar = document.getElementById('mainProfileAvatar');
+          
+          mainAvatar.style.background = `url(${imgUrl}) center/cover no-repeat`;
+          mainAvatar.childNodes[0].nodeValue = '';
+
+          const headerAvatar = document.getElementById('headerAvatar');
+          headerAvatar.style.background = `url(${imgUrl}) center/cover no-repeat`;
+          headerAvatar.textContent = '';
+
+          const dropdownAvatar = document.getElementById('dropdownAvatar');
+          dropdownAvatar.style.background = `url(${imgUrl}) center/cover no-repeat`;
+          dropdownAvatar.textContent = '';
+
+          alert('Foto de perfil alterada com sucesso!');
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+  </script>
+
+</body>
+</html>
