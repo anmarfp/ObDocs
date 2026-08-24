@@ -111,14 +111,102 @@
       <div class="header-center"></div>
 
       <div class="header-right">
-        <button class="notifications-btn" title="Notificações Pendentes">
-          🔔 <span class="notification-badge">4</span>
-        </button>
-        <div class="user-profile-widget">
-          <div class="user-avatar">MS</div>
-          <div class="user-details">
-            <span class="user-name">Marco Silva</span>
-            <span class="user-role-badge">ADMINISTRADOR</span>
+        <!-- NOTIFICATIONS CONTAINER WITH FLOATING DROPDOWN -->
+        <div class="notifications-container">
+          <button class="notifications-btn" id="notificationsBtn" onclick="toggleNotificationsDropdown(event)" title="Notificações Pendentes">
+            🔔 <span class="notification-badge">5</span>
+          </button>
+
+          <div class="notifications-dropdown" id="notificationsDropdown">
+            <div class="notifications-dropdown-header">
+              <span class="notifications-dropdown-title">🔔 Notificações Recentes</span>
+              <span class="notifications-dropdown-unread-count">5 Não Lidas</span>
+            </div>
+
+            <div class="notifications-list-mini">
+              <a href="detalhes-documento.html?doc=Certid%C3%A3o%20Negativa%20Federal" class="notification-item-mini unread">
+                <div class="notification-icon-badge vencido">🔴</div>
+                <div class="notification-content-mini">
+                  <span class="notification-title-mini">Certidão Negativa Federal Vencida</span>
+                  <span class="notification-desc-mini">O documento venceu há 8 dias (07/08/2026). Protocolar renovação.</span>
+                  <span class="notification-time-mini">Há 10 minutos</span>
+                </div>
+              </a>
+
+              <a href="detalhes-documento.html?doc=Licen%C3%A7a%20Ambiental%20de%20Opera%C3%A7%C3%A3o" class="notification-item-mini unread">
+                <div class="notification-icon-badge alerta">⚠️</div>
+                <div class="notification-content-mini">
+                  <span class="notification-title-mini">Licença Ambiental vence em 5 dias</span>
+                  <span class="notification-desc-mini">Vencimento previsto para 21/08/2026. Órgão: SEMAD.</span>
+                  <span class="notification-time-mini">Há 2 horas</span>
+                </div>
+              </a>
+
+              <a href="detalhes-documento.html?doc=Alvar%C3%A1%20de%20Funcionamento" class="notification-item-mini unread">
+                <div class="notification-icon-badge sucesso">✅</div>
+                <div class="notification-content-mini">
+                  <span class="notification-title-mini">Alvará de Funcionamento Renovado</span>
+                  <span class="notification-desc-mini">Nova versão 2026/2027 validada pela Prefeitura.</span>
+                  <span class="notification-time-mini">Hoje às 14:15</span>
+                </div>
+              </a>
+
+              <a href="calendario.html" class="notification-item-mini unread">
+                <div class="notification-icon-badge info">📅</div>
+                <div class="notification-content-mini">
+                  <span class="notification-title-mini">Sincronização com Google Agenda</span>
+                  <span class="notification-desc-mini">3 novos eventos de vencimento adicionados à agenda.</span>
+                  <span class="notification-time-mini">Ontem às 18:30</span>
+                </div>
+              </a>
+
+              <a href="detalhes-documento.html?doc=Outorga%20de%20Uso%20de%20%C3%81gua" class="notification-item-mini unread">
+                <div class="notification-icon-badge alerta">⚠️</div>
+                <div class="notification-content-mini">
+                  <span class="notification-title-mini">Outorga de Uso de Água vence em 15 dias</span>
+                  <span class="notification-desc-mini">Vencimento em 31/08/2026. Responsável: Carlos Silva.</span>
+                  <span class="notification-time-mini">14/08/2026 às 11:00</span>
+                </div>
+              </a>
+            </div>
+
+            <div class="notifications-dropdown-footer">
+              <a href="notificacoes.html" class="btn-view-all-notifications">
+                Ver todas as notificações →
+              </a>
+            </div>
+          </div>
+        </div>
+        <!-- USER PROFILE CONTAINER WITH FLOATING DROPDOWN -->
+        <div class="user-profile-container">
+          <div class="user-profile-widget" id="userProfileBtn" onclick="toggleProfileDropdown(event)">
+            <div class="user-avatar">MS</div>
+            <div class="user-details">
+              <span class="user-name">Marco Silva</span>
+              <span class="user-role-badge">ADMINISTRADOR</span>
+            </div>
+            <span class="dropdown-chevron">▼</span>
+          </div>
+
+          <div class="user-profile-dropdown" id="userProfileDropdown">
+            <div class="dropdown-header-info">
+              <div class="dropdown-avatar">MS</div>
+              <div class="dropdown-user-text">
+                <span class="dropdown-user-name">Marco Silva</span>
+                <span class="dropdown-user-email">marco.silva@empresa.com.br</span>
+                <span class="user-role-badge" style="width: fit-content; margin-top: 2px;">ADMINISTRADOR</span>
+              </div>
+            </div>
+            <div class="dropdown-menu-list">
+              <a href="perfil.html" class="dropdown-item">
+                <span class="dropdown-item-icon">👤</span>
+                <span>Ver perfil</span>
+              </a>
+              <button class="dropdown-item logout-item" onclick="handleLogout()">
+                <span class="dropdown-item-icon">🚪</span>
+                <span>Sair</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -133,6 +221,7 @@
           <a href="index.html" class="nav-item"><span class="nav-icon">📊</span><span class="nav-text">Dashboard</span></a>
           <a href="documentos.html" class="nav-item active"><span class="nav-icon">📄</span><span class="nav-text">Documentos</span></a>
           <a href="calendario.html" class="nav-item"><span class="nav-icon">📅</span><span class="nav-text">Agenda & Google Sync</span></a>
+          <a href="notificacoes.html" class="nav-item"><span class="nav-icon">🔔</span><span class="nav-text">Notificações</span></a>
           <a href="auditoria.html" class="nav-item"><span class="nav-icon">🛡️</span><span class="nav-text">Trilha de Auditoria</span></a>
           <div class="admin-menu-group">
             <div class="menu-label">Administração</div>
@@ -291,6 +380,16 @@
           </div>
         </div>
 
+        <!-- Isolated Lifecycle Action Buttons (Fundo da Página) -->
+        <div style="display: flex; align-items: center; justify-content: flex-end; gap: 12px; margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-color, #e2e8f0);">
+          <button class="btn btn-secondary" onclick="archiveDocumentFromDetails()" style="display: inline-flex; align-items: center; gap: 6px;">
+            📦 Arquivar documento
+          </button>
+          <button class="btn btn-danger" onclick="deleteDocumentFromDetails()" style="display: inline-flex; align-items: center; gap: 6px; background-color: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; transition: background 0.2s;">
+            🗑️ Excluir permanentemente
+          </button>
+        </div>
+
       </main>
     </div>
   </div>
@@ -311,6 +410,81 @@
       document.getElementById('docTitle').innerText = docParam;
       document.getElementById('docMetaTitle').innerText = docParam;
       document.getElementById('docSubhead').innerText = `Documento selecionado: ${docParam}`;
+    }
+
+    function archiveDocumentFromDetails() {
+      if (confirm('Deseja arquivar este documento? Ele ficará oculto para usuários operacionais e visível apenas para Administradores.')) {
+        alert('Documento arquivado com sucesso!');
+        window.location.href = 'documentos.html';
+      }
+    }
+
+    function deleteDocumentFromDetails() {
+      if (confirm('ATENÇÃO: Deseja realmente excluir permanentemente este documento? Esta ação não poderá ser desfeita.')) {
+        alert('Documento excluído permanentemente.');
+        window.location.href = 'documentos.html';
+      }
+    }
+
+    // NOTIFICATIONS DROPDOWN LOGIC
+    function toggleNotificationsDropdown(event) {
+      event.stopPropagation();
+      const dropdown = document.getElementById('notificationsDropdown');
+      const profileDropdown = document.getElementById('userProfileDropdown');
+      if (profileDropdown && profileDropdown.classList.contains('show')) {
+        profileDropdown.classList.remove('show');
+      }
+      if (dropdown) {
+        dropdown.classList.toggle('show');
+      }
+    }
+
+    // PROFILE DROPDOWN FLOATING BOX LOGIC
+    function toggleProfileDropdown(event) {
+      event.stopPropagation();
+      const profileDropdown = document.getElementById('userProfileDropdown');
+      const notifDropdown = document.getElementById('notificationsDropdown');
+      if (notifDropdown && notifDropdown.classList.contains('show')) {
+        notifDropdown.classList.remove('show');
+      }
+      if (profileDropdown) {
+        profileDropdown.classList.toggle('show');
+      }
+    }
+
+    document.addEventListener('click', (event) => {
+      const notifDropdown = document.getElementById('notificationsDropdown');
+      const profileDropdown = document.getElementById('userProfileDropdown');
+      const notifBtn = document.getElementById('notificationsBtn');
+      const profileBtn = document.getElementById('userProfileBtn');
+
+      if (notifDropdown && notifDropdown.classList.contains('show')) {
+        if (!notifDropdown.contains(event.target) && (!notifBtn || !notifBtn.contains(event.target))) {
+          notifDropdown.classList.remove('show');
+        }
+      }
+
+      if (profileDropdown && profileDropdown.classList.contains('show')) {
+        if (!profileDropdown.contains(event.target) && (!profileBtn || !profileBtn.contains(event.target))) {
+          profileDropdown.classList.remove('show');
+        }
+      }
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        const notifDropdown = document.getElementById('notificationsDropdown');
+        const profileDropdown = document.getElementById('userProfileDropdown');
+        if (notifDropdown) notifDropdown.classList.remove('show');
+        if (profileDropdown) profileDropdown.classList.remove('show');
+      }
+    });
+
+    function handleLogout() {
+      if (confirm('Deseja realmente encerrar sua sessão no DocsOb?')) {
+        alert('Sessão encerrada com sucesso!');
+        window.location.href = 'index.html';
+      }
     }
   </script>
 </body>

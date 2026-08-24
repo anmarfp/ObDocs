@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DocsOb - Central de Notificações</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="app-shell">
+
+    <!-- 1. TOP HEADER -->
+    <header class="top-header">
+      <div class="header-left">
+        <button class="sidebar-toggle-btn" id="sidebarToggleBtn" title="Alternar Menu">☰</button>
+        <a href="index.html" class="brand-logo">
+          <div class="brand-icon">DO</div>
+          <div class="brand-info">
+            <span class="brand-title">DocsOb</span>
+            <span class="brand-subtitle">Gestão de Vencimento de Documentos</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="header-center"></div>
+
+      <div class="header-right">
+        
+        <!-- NOTIFICATIONS CONTAINER WITH FLOATING DROPDOWN -->
+        <div class="notifications-container">
+          <button class="notifications-btn" id="notificationsBtn" onclick="toggleNotificationsDropdown(event)" title="Notificações Pendentes">
+            🔔 <span class="notification-badge">5</span>
+          </button>
+
+          <div class="notifications-dropdown" id="notificationsDropdown">
+            <div class="notifications-dropdown-header">
+              <span class="notifications-dropdown-title">🔔 Notificações Recentes</span>
+              <span class="notifications-dropdown-unread-count">5 Não Lidas</span>
+            </div>
+
+            <div class="notifications-list-mini">
+              <a href="detalhes-documento.html?doc=Certid%C3%A3o%20Negativa%20Federal" class="notification-item-mini unread">
+                <div class="notification-icon-badge vencido">🔴</div>
+                <div class="notification-content-mini">
+                  <span class="notification-title-mini">Certidão Negativa Federal Vencida</span>
+                  <span class="notification-desc-mini">O documento venceu há 8 dias (07/08/2026). Protocolar renovação.</span>
+                  <span class="notification-time-mini">Há 10 minutos</span>
+                </div>
+              </a>
+
+              <a href="detalhes-documento.html?doc=Licen%C3%A7a%20Ambiental%20de%20Opera%C3%A7%C3%A3o" class="notification-item-mini unread">
+                <div class="notification-icon-badge alerta">⚠️</div>
+                <div class="notification-content-mini">
+                  <span class="notification-title-mini">Licença Ambiental vence em 5 dias</span>
+                  <span class="notification-desc-mini">Vencimento previsto para 21/08/2026. Órgão: SEMAD.</span>
+                  <span class="notification-time-mini">Há 2 horas</span>
+                </div>
+              </a>
+
+              <a href="detalhes-documento.html?doc=Alvar%C3%A1%20de%20Funcionamento" class="notification-item-mini unread">
+                <div class="notification-icon-badge sucesso">✅</div>
+                <div class="notification-content-mini">
+                  <span class="notification-title-mini">Alvará de Funcionamento Renovado</span>
+                  <span class="notification-desc-mini">Nova versão 2026/2027 validada pela Prefeitura.</span>
+                  <span class="notification-time-mini">Hoje às 14:15</span>
+                </div>
+              </a>
+
+              <a href="calendario.html" class="notification-item-mini unread">
+                <div class="notification-icon-badge info">📅</div>
+                <div class="notification-content-mini">
+                  <span class="notification-title-mini">Sincronização com Google Agenda</span>
+                  <span class="notification-desc-mini">3 novos eventos de vencimento adicionados à agenda.</span>
+                  <span class="notification-time-mini">Ontem às 18:30</span>
+                </div>
+              </a>
+
+              <a href="detalhes-documento.html?doc=Outorga%20de%20Uso%20de%20%C3%81gua" class="notification-item-mini unread">
+                <div class="notification-icon-badge alerta">⚠️</div>
+                <div class="notification-content-mini">
+                  <span class="notification-title-mini">Outorga de Uso de Água vence em 15 dias</span>
+                  <span class="notification-desc-mini">Vencimento em 31/08/2026. Responsável: Carlos Silva.</span>
+                  <span class="notification-time-mini">14/08/2026 às 11:00</span>
+                </div>
+              </a>
+            </div>
+
+            <div class="notifications-dropdown-footer">
+              <a href="notificacoes.html" class="btn-view-all-notifications">
+                Ver todas as notificações →
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- USER PROFILE CONTAINER WITH FLOATING DROPDOWN -->
+        <div class="user-profile-container">
+          <div class="user-profile-widget" id="userProfileBtn" onclick="toggleProfileDropdown(event)">
+            <div class="user-avatar" id="headerAvatar">MS</div>
+            <div class="user-details">
+              <span class="user-name" id="headerUserName">Marco Silva</span>
+              <span class="user-role-badge">ADMINISTRADOR</span>
+            </div>
+            <span class="dropdown-chevron">▼</span>
+          </div>
+
+          <div class="user-profile-dropdown" id="userProfileDropdown">
+            <div class="dropdown-header-info">
+              <div class="dropdown-avatar" id="dropdownAvatar">MS</div>
+              <div class="dropdown-user-text">
+                <span class="dropdown-user-name" id="dropdownUserName">Marco Silva</span>
+                <span class="dropdown-user-email" id="dropdownUserEmail">marco.silva@empresa.com.br</span>
+                <span class="user-role-badge" style="width: fit-content; margin-top: 2px;">ADMINISTRADOR</span>
+              </div>
+            </div>
+            <div class="dropdown-menu-list">
+              <a href="perfil.html" class="dropdown-item">
+                <span class="dropdown-item-icon">👤</span>
+                <span>Ver perfil</span>
+              </a>
+              <button class="dropdown-item logout-item" onclick="handleLogout()">
+                <span class="dropdown-item-icon">🚪</span>
+                <span>Sair</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </header>
+
+    <div class="body-container">
+
+      <!-- 2. EXPANDABLE SIDEBAR -->
+      <aside class="sidebar" id="appSidebar">
+        <div class="sidebar-menu">
+          <div class="menu-label">Navegação Principal</div>
+          <a href="index.html" class="nav-item"><span class="nav-icon">📊</span><span class="nav-text">Dashboard</span></a>
+          <a href="documentos.html" class="nav-item"><span class="nav-icon">📄</span><span class="nav-text">Documentos</span></a>
+          <a href="calendario.html" class="nav-item"><span class="nav-icon">📅</span><span class="nav-text">Agenda & Google Sync</span></a>
+          <a href="notificacoes.html" class="nav-item active"><span class="nav-icon">🔔</span><span class="nav-text">Notificações</span></a>
+          <a href="auditoria.html" class="nav-item"><span class="nav-icon">🛡️</span><span class="nav-text">Trilha de Auditoria</span></a>
+          <div class="admin-menu-group">
+            <div class="menu-label">Administração</div>
+            <a href="usuarios.html" class="nav-item"><span class="nav-icon">👥</span><span class="nav-text">Usuários & Papéis</span></a>
+            <a href="configuracoes.html" class="nav-item"><span class="nav-icon">⚙️</span><span class="nav-text">Configurações</span></a>
+          </div>
+        </div>
+      </aside>
+
+      <!-- 3. MAIN CONTENT -->
+      <main class="main-content">
+        <div class="page-header">
+          <div class="page-title-group">
+            <h1>Central de Notificações</h1>
+            <p>Histórico completo de alertas de vencimento, renovações e avisos do sistema (95 notificações)</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-secondary" onclick="markAllAsRead()">✓ Marcar todas como lidas</button>
+          </div>
+        </div>
+
+        <!-- CONTROLS & FILTERS ROW -->
+        <div class="table-controls" style="background: white; padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: 20px;">
+          <div style="display: flex; gap: 12px; flex-wrap: wrap; flex: 1;">
+            <div style="position: relative; flex: 1; min-width: 260px;">
+              <input type="text" id="notificationSearchInput" placeholder="🔍 Pesquisar por título, documento ou palavra-chave..." style="width: 100%; padding: 9px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); font-size: 13px;" onkeyup="filterNotificationsTable()">
+            </div>
+            
+            <select id="notificationFilterSelect" style="padding: 9px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); font-size: 13px; background: white;" onchange="filterNotificationsTable()">
+              <option value="todos">Todas as Notificações (95)</option>
+              <option value="nao-lidas" selected>Não Lidas (5)</option>
+              <option value="vencidos">Documentos Vencidos (18)</option>
+              <option value="alertas">Alertas de Vencimento (42)</option>
+              <option value="sucesso">Renovações Concluídas (20)</option>
+              <option value="sistema">Sistema & Segurança (10)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- NOTIFICATIONS TABLE (PAGE 1 OF 5 - 20 ROWS) -->
+        <div class="notifications-table-container">
+          <table class="data-table" id="notificationsTable" style="width: 100%; border-collapse: collapse;">
+            <thead>
+              <tr style="background: var(--bg-main); text-align: left; font-size: 12px; border-bottom: 1px solid var(--border-color);">
+                <th style="padding: 12px 16px; width: 40px; text-align: center;">•</th>
+                <th style="padding: 12px 16px; width: 60px;">Tipo</th>
+                <th style="padding: 12px 16px;">Notificação / Alerta</th>
+                <th style="padding: 12px 16px;">Documento Relacionado</th>
+                <th style="padding: 12px 16px;">Categoria</th>
+                <th style="padding: 12px 16px; width: 150px;">Data & Hora</th>
+                <th style="padding: 12px 16px; width: 120px; text-align: right;">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Row 1 (Unread) -->
+              <tr class="notification-row-unread" style="border-bottom: 1px solid var(--border-color);">
+                <td style="text-align: center; padding: 14px 16px;"><span class="notification-unread-dot" title="Não Lida"></span></td>
+                <td style="padding: 14px 16px;"><span class="status-badge vencido">🔴 Vencido</span></td>
+                <td style="padding: 14px 16px;">
+                  <strong style="color: var(--text-main); font-size: 13px;">Certidão Negativa Federal Vencida</strong>
+                  <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">O documento venceu há 8 dias (07/08/2026). Protocolar renovação urgente.</div>
+                </td>
+                <td style="padding: 14px 16px;"><a href="detalhes-documento.html?doc=Certid%C3%A3o%20Negativa%20Federal" style="color: var(--primary); text-decoration: none; font-size: 13px; font-weight: 600;">Certidão Negativa Federal - SRFB</a></td>
+                <td style="padding: 14px 16px;"><span class="category-tag">Fiscal</span></td>
+                <td style="padding: 14px 16px; font-size: 12px; color: var(--text-muted);">16/08/2026 às 19:35</td>
+                <td style="padding: 14px 16px; text-align: right;">
+                  <button class="btn btn-secondary btn-icon-only" title="Marcar como Lida" onclick="toggleReadState(this)">✓</button>
+                  <a href="detalhes-documento.html?doc=Certid%C3%A3o%20Negativa%20Federal" class="btn btn-secondary btn-icon-only" title="Ver Documento">👁️</a>
+                </td>
+              </tr>
+
+              <!-- Row 2 (Unread) -->
+              <tr class="notification-row-unread" style="border-bottom: 1px solid var(--border-color);">
+                <td style="text-align: center; padding: 14px 16px;"><span class="notification-unread-dot" title="Não Lida"></span></td>
+                <td style="padding: 14px 16px;"><span class="status-badge alerta">⚠️ Alerta</span></td>
+                <td style="padding: 14px 16px;">
+                  <strong style="color: var(--text-main); font-size: 13px;">Licença Ambiental vence em 5 dias</strong>
+                  <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Vencimento em 21/08/2026. Órgão emissor: SEMAD.</div>
+                </td>
+                <td style="padding: 14px 16px;"><a href="detalhes-documento.html?doc=Licen%C3%A7a%20Ambiental%20de%20Opera%C3%A7%C3%A3o" style="color: var(--primary); text-decoration: none; font-size: 13px; font-weight: 600;">Licença Ambiental de Operação</a></td>
+                <td style="padding: 14px 16px;"><span class="category-tag">Ambiental</span></td>
+                <td style="padding: 14px 16px; font-size: 12px; color: var(--text-muted);">16/08/2026 às 17:45</td>
+                <td style="padding: 14px 16px; text-align: right;">
+                  <button class="btn btn-secondary btn-icon-only" title="Marcar como Lida" onclick="toggleReadState(this)">✓</button>
+                  <a href="detalhes-documento.html?doc=Licen%C3%A7a%20Ambiental%20de%20Opera%C3%A7%C3%A3o" class="btn btn-secondary btn-icon-only" title="Ver Documento">👁️</a>
+                </td>
+              </tr>
+
+              <!-- Row 3 (Unread) -->
+              <tr class="notification-row-unread" style="border-bottom: 1px solid var(--border-color);">
+                <td style="text-align: center; padding: 14px 16px;"><span class="notification-unread-dot" title="Não Lida"></span></td>
+                <td style="padding: 14px 16px;"><span class="status-badge regular" style="background: #dcfce7; color: #166534;">✅ Sucesso</span></td>
+                <td style="padding: 14px 16px;">
+                  <strong style="color: var(--text-main); font-size: 13px;">Alvará de Funcionamento Renovado com Sucesso</strong>
+                  <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Nova versão 2026/2027 validada e anexada ao sistema pela Prefeitura.</div>
+                </td>
+                <td style="padding: 14px 16px;"><a href="detalhes-documento.html?doc=Alvar%C3%A1%20de%20Funcionamento" style="color: var(--primary); text-decoration: none; font-size: 13px; font-weight: 600;">Alvará de Funcionamento Municipal</a></td>
+                <td style="padding: 14px 16px;"><span class="category-tag">Licença</span></td>
+                <td style="padding: 14px 16px; font-size: 12px; color: var(--text-muted);">16/08/2026 às 14:15</td>
+                <td style="padding: 14px 16px; text-align: right;">
+                  <button class="btn btn-secondary btn-icon-only" title="Marcar como Lida" onclick="toggleReadState(this)">✓</button>
+                  <a href="detalhes-documento.html?doc=Alvar%C3%A1%20de%20Funcionamento" class="btn btn-secondary btn-icon-only" title="Ver Documento">👁️</a>
+                </td>
+              </tr>
+
+              <!-- Row 4 (Unread) -->
+              <tr class="notification-row-unread" style="border-bottom: 1px solid var(--border-color);">
+                <td style="text-align: center; padding: 14px 16px;"><span class="notification-unread-dot" title="Não Lida"></span></td>
+                <td style="padding: 14px 16px;"><span class="status-badge regular" style="background: #e0f2fe; color: #0369a1;">📅 Agenda</span></td>
+                <td style="padding: 14px 16px;">
+                  <strong style="color: var(--text-main); font-size: 13px;">Sincronização com Google Agenda Concluída</strong>
+                  <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">3 novos eventos de vencimento sincronizados automaticamente na agenda corporativa.</div>
+                </td>
+                <td style="padding: 14px 16px;"><a href="calendario.html" style="color: var(--primary); text-decoration: none; font-size: 13px; font-weight: 600;">Agenda DocsOb & Google Sync</a></td>
+                <td style="padding: 14px 16px;"><span class="category-tag">Sistema</span></td>
+                <td style="padding: 14px 16px; font-size: 12px; color: var(--text-muted);">16/08/2026 às 12:00</td>
+                <td style="padding: 14px 16px; text-align: right;">
+                  <button class="btn btn-secondary btn-icon-only" title="Marcar como Lida" onclick="toggleReadState(this)">✓</button>
+                  <a href="calendario.html" class="btn btn-secondary btn-icon-only" title="Ver Agenda">👁️</a>
+                </td>
+              </tr>
+
+              <!-- Row 5 (Unread) -->
+              <tr class="notification-row-unread" style="border-bottom: 1px solid var(--border-color);">
+                <td style="text-align: center; padding: 14px 16px;"><span class="notification-unread-dot" title="Não Lida"></span></td>
+                <td style="padding: 14px 16px;"><span class="status-badge alerta">⚠️ Alerta</span></td>
+                <td style="padding: 14px 16px;">
+                  <strong style="color: var(--text-main); font-size: 13px;">Outorga de Uso de Água vence em 15 dias</strong>
+                  <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Vencimento em 31/08/2026. Responsável: Carlos Silva.</div>
+                </td>
+                <td style="padding: 14px 16px;"><a href="detalhes-documento.html?doc=Outorga%20de%20Uso%20de%20%C3%81gua" style="color: var(--primary); text-decoration: none; font-size: 13px; font-weight: 600;">Outorga de Uso de Recursos Hídricos</a></td>
+                <td style="padding: 14px 16px;"><span class="category-tag">Ambiental</span></td>
+                <td style="padding: 14px 16px; font-size: 12px; color: var(--text-muted);">16/08/2026 às 10:30</td>
+                <td style="padding: 14px 16px; text-align: right;">
+                  <button class="btn btn-secondary btn-icon-only" title="Marcar como Lida" onclick="toggleReadState(this)">✓</button>
+                  <a href="detalhes-documento.html?doc=Outorga%20de%20Uso%20de%20%C3%81gua" class="btn btn-secondary btn-icon-only" title="Ver Documento">👁️</a>
+                </td>
+              </tr>
+
+              <!-- Row 6 (Read) -->
+              <tr style="border-bottom: 1px solid var(--border-color); opacity: 0.85;">
+                <td style="text-align: center; padding: 14px 16px;"><span class="notification-read-icon" title="Lida"></span></td>
+                <td style="padding: 14px 16px;"><span class="status-badge vencido">🔴 Vencido</span></td>
+                <td style="padding: 14px 16px;">
+                  <strong style="color: var(--text-main); font-size: 13px;">Registro de AVCB do Corpo de Bombeiros Vencido</strong>
+                  <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Vistoria vencida em 10/08/2026. Renovação em andamento.</div>
+                </td>
+                <td style="padding: 14px 16px;"><a href="detalhes-documento.html?doc=AVCB%20Corpo%20de%20Bombeiros" style="color: var(--primary); text-decoration: none; font-size: 13px;">AVCB - Auto de Vistoria do Corpo de Bombeiros</a></td>
+                <td style="padding: 14px 16px;"><span class="category-tag">Segurança</span></td>
+                <td style="padding: 14px 16px; font-size: 12px; color: var(--text-muted);">15/08/2026 às 18:20</td>
+                <td style="padding: 14px 16px; text-align: right;">
+                  <a href="detalhes-documento.html?doc=AVCB%20Corpo%20de%20Bombeiros" class="btn btn-secondary btn-icon-only" title="Ver Documento">👁️</a>
+                </td>
+              </tr>
+
+              <!-- Row 7 (Read) -->
+              <tr style="border-bottom: 1px solid var(--border-color); opacity: 0.85;">
+                <td style="text-align: center; padding: 14px 16px;"><span class="notification-read-icon" title="Lida"></span></td>
+                <td style="padding: 14px 16px;"><span class="status-badge regular" style="background: #dcfce7; color: #166534;">✅ Sucesso</span></td>
+                <td style="padding: 14px 16px;">
+                  <strong style="color: var(--text-main); font-size: 13px;">Certidão Negativa CNDT Atualizada</strong>
+                  <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Nova certidão emitida via Portal da Justiça do Trabalho.</div>
+                </td>
+                <td style="padding: 14px 16px;"><a href="detalhes-documento.html?doc=CNDT%20Trabalhista" style="color: var(--primary); text-decoration: none; font-size: 13px;">CNDT - Certidão Trabalhista</a></td>
+                <td style="padding: 14px 16px;"><span class="category-tag">Trabalhista</span></td>
+                <td style="padding: 14px 16px; font-size: 12px; color: var(--text-muted);">15/08/2026 às 16:10</td>
+                <td style="padding: 14px 16px; text-align: right;">
+                  <a href="detalhes-documento.html?doc=CNDT%20Trabalhista" class="btn btn-secondary btn-icon-only" title="Ver Documento">👁️</a>
+                </td>
+              </tr>
+
+              <!-- Row 8 (Read) -->
+              <tr style="border-bottom: 1px solid var(--border-color); opacity: 0.85;">
+                <td style="text-align: center; padding: 14px 16px;"><span class="notification-read-icon" title="Lida"></span></td>
+                <td style="padding: 14px 16px;"><span class="status-badge regular" style="background: #f3e8ff; color: #6b21a8;">⚙️ Sistema</span></td>
+                <td style="padding: 14px 16px;">
+                  <strong style="color: var(--text-main); font-size: 13px;">Novo Usuário Cadastrado</strong>
+                  <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Usuário "Carlos Silva" incluído no grupo de acesso Operacional.</div>
+                </td>
+                <td style="padding: 14px 16px;"><a href="usuarios.html" style="color: var(--primary); text-decoration: none; font-size: 13px;">Gestão de Usuários & RBAC</a></td>
+                <td style="padding: 14px 16px;"><span class="category-tag">Gestão</span></td>
+                <td style="padding: 14px 16px; font-size: 12px; color: var(--text-muted);">15/08/2026 às 11:45</td>
+                <td style="padding: 14px 16px; text-align: right;">
+                  <a href="usuarios.html" class="btn btn-secondary btn-icon-only" title="Ver Usuários">👁️</a>
+                </td>
+              </tr>
+
+              <!-- Row 9 (Read) -->
+              <tr style="border-bottom: 1px solid var(--border-color); opacity: 0.85;">
+                <td style="text-align: center; padding: 14px 16px;"><span class="notification-read-icon" title="Lida"></span></td>
+                <td style="padding: 14px 16px;"><span class="status-badge regular" style="background: #f3e8ff; color: #6b21a8;">⚙️ Sistema</span></td>
+                <td style="padding: 14px 16px;">
+                  <strong style="color: var(--text-main); font-size: 13px;">Relatório Semanal de Auditabilidade Gerado</strong>
+                  <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Resumo semanal de alterações de documentos disponível na trilha de auditoria.</div>
+                </td>
+                <td style="padding: 14px 16px;"><a href="auditoria.html" style="color: var(--primary); text-decoration: none; font-size: 13px;">Trilha de Auditoria</a></td>
+                <td style="padding: 14px 16px;"><span class="category-tag">Auditoria</span></td>
+                <td style="padding: 14px 16px; font-size: 12px; color: var(--text-muted);">14/08/2026 às 09:00</td>
+                <td style="padding: 14px 16px; text-align: right;">
+                  <a href="auditoria.html" class="btn btn-secondary btn-icon-only" title="Ver Auditoria">👁️</a>
+                </td>
+              </tr>
+
+              <!-- Row 10 (Read) -->
+              <tr style="border-bottom: 1px solid var(--border-color); opacity: 0.85;">
+                <td style="text-align: center; padding: 14px 16px;"><span class="notification-read-icon" title="Lida"></span></td>
+                <td style="padding: 14px 16px;"><span class="status-badge alerta">⚠️ Alerta</span></td>
+                <td style="padding: 14px 16px;">
+                  <strong style="color: var(--text-main); font-size: 13px;">Licença de Instalação (LI) vence em 30 dias</strong>
+                  <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Vencimento previsto para 13/09/2026. Lembrete automático agendado.</div>
+                </td>
+                <td style="padding: 14px 16px;"><a href="detalhes-documento.html?doc=Licen%C3%A7a%20de%20Instala%C3%A7%C3%A3o" style="color: var(--primary); text-decoration: none; font-size: 13px;">Licença de Instalação Ambiental</a></td>
+                <td style="padding: 14px 16px;"><span class="category-tag">Ambiental</span></td>
+                <td style="padding: 14px 16px; font-size: 12px; color: var(--text-muted);">14/08/2026 às 08:30</td>
+                <td style="padding: 14px 16px; text-align: right;">
+                  <a href="detalhes-documento.html?doc=Licen%C3%A7a%20de%20Instala%C3%A7%C3%A3o" class="btn btn-secondary btn-icon-only" title="Ver Documento">👁️</a>
+                </td>
+              </tr>
+
+              <!-- Row 11 (Read) -->
+              <tr style="border-bottom: 1px solid var(--border-color); opacity: 0.85;">
+                <td style="text-align: center; padding: 14px 16px;"><span class="notification-read-icon" title="Lida"></span></td>
+                <td style="padding: 14px 16px;"><span class="status-badge regular" style="background: #fee2e2; color: #991b1b;">🛡️ Segurança</span></td>
+                <td style="padding: 14px 16px;">
+                  <strong style="color: var(--text-main); font-size: 13px;">Tentativa de Login Mal-sucedida Detectada</strong>
+                  <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">IP 192.168.1.45 bloqueado temporariamente por 3 falhas de senha.</div>
+                </td>
+                <td style="padding: 14px 16px;"><a href="auditoria.html" style="color: var(--primary); text-decoration: none; font-size: 13px;">Log de Segurança</a></td>
+                <td style="padding: 14px 16px;"><span class="category-tag">Segurança</span></td>
+                <td style="padding: 14px 16px; font-size: 12px; color: var(--text-muted);">13/08/2026 às 22:15</td>
+                <td style="padding: 14px 16px; text-align: right;">
+                  <a href="auditoria.html" class="btn btn-secondary btn-icon-only" title="Ver Log">👁️</a>
+                </td>
+              </tr>
+
+              <!-- Row 12 (Read) -->
+              <tr style="border-bottom: 1px solid var(--border-color); opacity: 0.85;">
+                <td style="text-align: center; padding: 14px 16px;"><span class="notification-read-icon" title="Lida"></span></td>
+                <td style="padding: 14px 16px;"><span class="status-badge alerta">⚠️ Alerta</span></td>
+                <td style="padding: 14px 16px;">
+                  <strong style="color: var(--text-main); font-size: 13px;">Certificado Digital e-CNPJ A1 vence em 10 dias</strong>
+                  <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Vencimento em 23/08/2026. Solicitada renovação junto à Certificadora.</div>
+                </td>
+                <td style="padding: 14px 16px;"><a href="detalhes-documento.html?doc=Certificado%20Digital%20e-CNPJ" style="color: var(--primary); text-decoration: none; font-size: 13px;">Certificado Digital e-CNPJ A1</a></td>
+                <td style="padding: 14px 16px;"><span class="category-tag">Fiscal</span></td>
+                <td style="padding: 14px 16px; font-size: 12px; color: var(--text-muted);">13/08/2026 às 15:40</td>
+                <td style="padding: 14px 16px; text-align: right;">
+                  <a href="detalhes-documento.html?doc=Certificado%20Digital%20e-CNPJ" class="btn btn-secondary btn-icon-only" title="Ver Documento">👁️</a>
+                </td>
+              </tr>
+
+              <!-- Row 13 (Read) -->
+              <tr style="border-bottom: 1px solid var(--border-color); opacity: 0.85;">
+                <td style="text-align: center; padding: 14px 16px;"><span class="notification-read-icon" title="Lida"></span></td>
+                <td style="padding: 14px 16px;"><span class="status-badge regular" style="background: #dcfce7; color: #166534;">✅ Sucesso</span></td>
+                <td style="padding: 14px 16px;">
+                  <strong style="color: var(--text-main); font-size: 13px;">Protocolo de Renovação Emitido</strong>
+                  <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Protocolo nº 2026/8849-A aceito pela Vigilância Sanitária Municipal.</div>
+                </td>
+                <td style="padding: 14px 16px;"><a href="detalhes-documento.html?doc=Alvar%C3%A1%20Sanit%C3%A1rio" style="color: var(--primary); text-decoration: none; font-size: 13px;">Alvará Sanitário de Funcionamento</a></td>
+                <td style="padding: 14px 16px;"><span class="category-tag">Sanitário</span></td>
+                <td style="padding: 14px 16px; font-size: 12px; color: var(--text-muted);">13/08/2026 às 14:00</td>
+                <td style="padding: 14px 16px; text-align: right;">
+                  <a href="detalhes-documento.html?doc=Alvar%C3%A1%20Sanit%C3%A1rio" class="btn btn-secondary btn-icon-only" title="Ver Documento">👁️</a>
+                </td>
+              </tr>
+
+              <!-- Row 14 (Read) -->
+              <tr style="border-bottom: 1px solid var(--border-color); opacity: 0.85;">
+                <td style="text-align: center; padding: 14px 16px;"><span class="notification-read-icon" title="Lida"></span></td>
+                <td style="padding: 14px 16px;"><span class="status-badge regular" style="background: #f3e8ff; color: #6b21a8;">⚙️ Sistema</span></td>
+                <td style="padding: 14px 16px;">
+                  <strong style="color: var(--text-main); font-size: 13px;">Documento Arquivado</strong>
+                  <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">"Apólice de Seguro Operacional 2025" arquivada por Marco Silva.</div>
+                </td>
+                <td style="padding: 14px 16px;"><a href="documentos.html" style="color: var(--primary); text-decoration: none; font-size: 13px;">Apólice de Seguro Operacional</a></td>
+                <td style="padding: 14px 16px;"><span class="category-tag">Contrato</span></td>
+                <td style="padding: 14px 16px; font-size: 12px; color: var(--text-muted);">12/08/2026 às 17:20</td>
+                <td style="padding: 14px 16px; text-align: right;">
+                  <a href="documentos.html" class="btn btn-secondary btn-icon-only" title="Ver Listagem">👁️</a>
+                </td>
+              </tr>
+
+              <!-- Row 15 (Read) -->
+              <tr style="border-bottom: 1px solid var(--border-color); opacity: 0.85;">
+                <td style="text-align: center; padding: 14px 16px;"><span class="notification-read-icon" title="Lida"></span></td>
+                <td style="padding: 14px 16px;"><span class="status-badge alerta">⚠️ Alerta</span></td>
+                <td style="padding: 14px 16px;">
+                  <strong style="color: var(--text-main); font-size: 13px;">Certidão Negativa Estadual (SEFAZ) vence em 20 dias</strong>
+                  <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Vencimento em 01/09/2026. Emissão via SEFAZ-SP.</div>
+                </td>
+                <td style="padding: 14px 16px;"><a href="detalhes-documento.html?doc=Certid%C3%A3o%20Estadual%20SEFAZ" style="color: var(--primary); text-decoration: none; font-size: 13px;">Certidão Negativa ICMS - SEFAZ</a></td>
+                <td style="padding: 14px 16px;"><span class="category-tag">Fiscal</span></td>
+                <td style="padding: 14px 16px; font-size: 12px; color: var(--text-muted);">12/08/2026 às 10:05</td>
+                <td style="padding: 14px 16px; text-align: right;">
+                  <a href="detalhes-documento.html?doc=Certid%C3%A3o%20Estadual%20SEFAZ" class="btn btn-secondary btn-icon-only" title="Ver Documento">👁️</a>
+                </td>
+              </tr>
+
+              <!-- Row 16 (Read) -->
+              <tr style="border-bottom: 1px solid var(--border-color); opacity: 0.85;">
+                <td style="text-align: center; padding: 14px 16px;"><span class="notification-read-icon" title="Lida"></span></td>
+                <td style="padding: 14px 16px;"><span class="status-badge regular" style="background: #f3e8ff; color: #6b21a8;">⚙️ Sistema</span></td>
+                <td style="padding: 14px 16px;">
+                  <strong style="color: var(--text-main); font-size: 13px;">Regras de Acesso RBAC Atualizadas</strong>
+                  <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Permissões do papel "Financeiro" ajustadas pelo Administrador.</div>
+                </td>
+                <td style="padding: 14px 16px;"><a href="usuarios.html" style="color: var(--primary); text-decoration: none; font-size: 13px;">Matriz de Permissões RBAC</a></td>
+                <td style="padding: 14px 16px;"><span class="category-tag">Segurança</span></td>
+                <td style="padding: 14px 16px; font-size: 12px; color: var(--text-muted);">11/08/2026 às 16:50</td>
+                <td style="padding: 14px 16px; text-align: right;">
+                  <a href="usuarios.html" class="btn btn-secondary btn-icon-only" title="Ver RBAC">👁️</a>
+                </td>
+              </tr>
+
+              <!-- Row 17 (Read) -->
+              <tr style="border-bottom: 1px solid var(--border-color); opacity: 0.85;">
+                <td style="text-align: center; padding: 14px 16px;"><span class="notification-read-icon" title="Lida"></span></td>
+                <td style="padding: 14px 16px;"><span class="status-badge vencido">🔴 Vencido</span></td>
+                <td style="padding: 14px 16px;">
+                  <strong style="color: var(--text-main); font-size: 13px;">Licença Sanitária de Funcionamento Vencida</strong>
+                  <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Vencimento em 05/08/2026. Documentação pendente de envio.</div>
+                </td>
+                <td style="padding: 14px 16px;"><a href="detalhes-documento.html?doc=Licen%C3%A7a%20Sanit%C3%A1ria" style="color: var(--primary); text-decoration: none; font-size: 13px;">Licença Sanitária de Funcionamento</a></td>
+                <td style="padding: 14px 16px;"><span class="category-tag">Sanitário</span></td>
+                <td style="padding: 14px 16px; font-size: 12px; color: var(--text-muted);">11/08/2026 às 09:12</td>
+                <td style="padding: 14px 16px; text-align: right;">
+                  <a href="detalhes-documento.html?doc=Licen%C3%A7a%20Sanit%C3%A1ria" class="btn btn-secondary btn-icon-only" title="Ver Documento">👁️</a>
+                </td>
+              </tr>
+
+              <!-- Row 18 (Read) -->
+              <tr style="border-bottom: 1px solid var(--border-color); opacity: 0.85;">
+                <td style="text-align: center; padding: 14px 16px;"><span class="notification-read-icon" title="Lida"></span></td>
+                <td style="padding: 14px 16px;"><span class="status-badge regular" style="background: #dcfce7; color: #166534;">✅ Sucesso</span></td>
+                <td style="padding: 14px 16px;">
+                  <strong style="color: var(--text-main); font-size: 13px;">Certidão Negativa Municipal (IPTU/ISS) Emitida</strong>
+                  <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Certidão com validade até 10/11/2026.</div>
+                </td>
+                <td style="padding: 14px 16px;"><a href="detalhes-documento.html?doc=Certid%C3%A3o%20Municipal" style="color: var(--primary); text-decoration: none; font-size: 13px;">Certidão Negativa Municipal</a></td>
+                <td style="padding: 14px 16px;"><span class="category-tag">Fiscal</span></td>
+                <td style="padding: 14px 16px; font-size: 12px; color: var(--text-muted);">10/08/2026 às 14:30</td>
+                <td style="padding: 14px 16px; text-align: right;">
+                  <a href="detalhes-documento.html?doc=Certid%C3%A3o%20Municipal" class="btn btn-secondary btn-icon-only" title="Ver Documento">👁️</a>
+                </td>
+              </tr>
+
+              <!-- Row 19 (Read) -->
+              <tr style="border-bottom: 1px solid var(--border-color); opacity: 0.85;">
+                <td style="text-align: center; padding: 14px 16px;"><span class="notification-read-icon" title="Lida"></span></td>
+                <td style="padding: 14px 16px;"><span class="status-badge regular" style="background: #f3e8ff; color: #6b21a8;">⚙️ Sistema</span></td>
+                <td style="padding: 14px 16px;">
+                  <strong style="color: var(--text-main); font-size: 13px;">Backup Quinzenal Concluído</strong>
+                  <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Exportação de metadados e arquivos armazenados com sucesso.</div>
+                </td>
+                <td style="padding: 14px 16px;"><a href="configuracoes.html" style="color: var(--primary); text-decoration: none; font-size: 13px;">Configurações do Sistema</a></td>
+                <td style="padding: 14px 16px;"><span class="category-tag">Sistema</span></td>
+                <td style="padding: 14px 16px; font-size: 12px; color: var(--text-muted);">10/08/2026 às 03:00</td>
+                <td style="padding: 14px 16px; text-align: right;">
+                  <a href="configuracoes.html" class="btn btn-secondary btn-icon-only" title="Ver Configurações">👁️</a>
+                </td>
+              </tr>
+
+              <!-- Row 20 (Read) -->
+              <tr style="border-bottom: 1px solid var(--border-color); opacity: 0.85;">
+                <td style="text-align: center; padding: 14px 16px;"><span class="notification-read-icon" title="Lida"></span></td>
+                <td style="padding: 14px 16px;"><span class="status-badge regular" style="background: #e0f2fe; color: #0369a1;">📄 Registro</span></td>
+                <td style="padding: 14px 16px;">
+                  <strong style="color: var(--text-main); font-size: 13px;">Registro de Marca no INPI - Notificação de Acompanhamento</strong>
+                  <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Publicação na Revista de Propriedade Industrial (RPI) sem oposições.</div>
+                </td>
+                <td style="padding: 14px 16px;"><a href="detalhes-documento.html?doc=Marca%20INPI" style="color: var(--primary); text-decoration: none; font-size: 13px;">Registro de Marca DocsOb - INPI</a></td>
+                <td style="padding: 14px 16px;"><span class="category-tag">Jurídico</span></td>
+                <td style="padding: 14px 16px; font-size: 12px; color: var(--text-muted);">09/08/2026 às 11:15</td>
+                <td style="padding: 14px 16px; text-align: right;">
+                  <a href="detalhes-documento.html?doc=Marca%20INPI" class="btn btn-secondary btn-icon-only" title="Ver Documento">👁️</a>
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+
+        <!-- PAGINATION BAR (Página 1 de 5 - 20 itens por página) -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; flex-wrap: wrap; gap: 12px; background: white; padding: 12px 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+          <div style="font-size: 13px; color: var(--text-muted);">
+            Exibindo <strong>1–20</strong> de <strong>95</strong> notificações (Página 1 de 5)
+          </div>
+
+          <div style="display: flex; gap: 6px; align-items: center;">
+            <button class="btn btn-secondary" disabled style="opacity: 0.5; cursor: not-allowed;">← Anterior</button>
+            <button class="btn btn-primary" style="padding: 6px 12px;">1</button>
+            <button class="btn btn-secondary" style="padding: 6px 12px;" onclick="alert('Esta é uma demonstração de protótipo (Página 1 ativa).')">2</button>
+            <button class="btn btn-secondary" style="padding: 6px 12px;" onclick="alert('Esta é uma demonstração de protótipo (Página 1 ativa).')">3</button>
+            <button class="btn btn-secondary" style="padding: 6px 12px;" onclick="alert('Esta é uma demonstração de protótipo (Página 1 ativa).')">4</button>
+            <button class="btn btn-secondary" style="padding: 6px 12px;" onclick="alert('Esta é uma demonstração de protótipo (Página 1 ativa).')">5</button>
+            <button class="btn btn-secondary" onclick="alert('Esta é uma demonstração de protótipo (Página 1 ativa).')">Próximo →</button>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script>
+    // SIDEBAR TOGGLE
+    const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
+    const appSidebar = document.getElementById('appSidebar');
+    if (sidebarToggleBtn && appSidebar) {
+      sidebarToggleBtn.addEventListener('click', () => {
+        appSidebar.classList.toggle('collapsed');
+      });
+    }
+
+    // NOTIFICATIONS DROPDOWN LOGIC
+    function toggleNotificationsDropdown(event) {
+      event.stopPropagation();
+      const dropdown = document.getElementById('notificationsDropdown');
+      const profileDropdown = document.getElementById('userProfileDropdown');
+      if (profileDropdown && profileDropdown.classList.contains('show')) {
+        profileDropdown.classList.remove('show');
+      }
+      if (dropdown) {
+        dropdown.classList.toggle('show');
+      }
+    }
+
+    // USER PROFILE DROPDOWN LOGIC
+    function toggleProfileDropdown(event) {
+      event.stopPropagation();
+      const profileDropdown = document.getElementById('userProfileDropdown');
+      const notifDropdown = document.getElementById('notificationsDropdown');
+      if (notifDropdown && notifDropdown.classList.contains('show')) {
+        notifDropdown.classList.remove('show');
+      }
+      if (profileDropdown) {
+        profileDropdown.classList.toggle('show');
+      }
+    }
+
+    // CLOSE DROPDOWNS ON OUTSIDE CLICK OR ESC KEY
+    document.addEventListener('click', (event) => {
+      const notifDropdown = document.getElementById('notificationsDropdown');
+      const profileDropdown = document.getElementById('userProfileDropdown');
+      const notifBtn = document.getElementById('notificationsBtn');
+      const profileBtn = document.getElementById('userProfileBtn');
+
+      if (notifDropdown && notifDropdown.classList.contains('show')) {
+        if (!notifDropdown.contains(event.target) && (!notifBtn || !notifBtn.contains(event.target))) {
+          notifDropdown.classList.remove('show');
+        }
+      }
+
+      if (profileDropdown && profileDropdown.classList.contains('show')) {
+        if (!profileDropdown.contains(event.target) && (!profileBtn || !profileBtn.contains(event.target))) {
+          profileDropdown.classList.remove('show');
+        }
+      }
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        const notifDropdown = document.getElementById('notificationsDropdown');
+        const profileDropdown = document.getElementById('userProfileDropdown');
+        if (notifDropdown) notifDropdown.classList.remove('show');
+        if (profileDropdown) profileDropdown.classList.remove('show');
+      }
+    });
+
+    function handleLogout() {
+      if (confirm('Deseja realmente encerrar sua sessão no DocsOb?')) {
+        alert('Sessão encerrada com sucesso!');
+        window.location.href = 'index.html';
+      }
+    }
+
+    // PAGE LOGIC FOR NOTIFICATIONS TABLE
+    function filterNotificationsTable() {
+      const query = document.getElementById('notificationSearchInput').value.toLowerCase();
+      const filter = document.getElementById('notificationFilterSelect').value;
+      const rows = document.querySelectorAll('#notificationsTable tbody tr');
+
+      rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        const isUnread = row.classList.contains('notification-row-unread');
+        const isVencido = row.innerText.includes('Vencid');
+        const isAlerta = row.innerText.includes('Alerta');
+        const isSucesso = row.innerText.includes('Sucesso');
+        const isSistema = row.innerText.includes('Sistema') || row.innerText.includes('Segurança');
+
+        let matchesFilter = true;
+        if (filter === 'nao-lidas') matchesFilter = isUnread;
+        else if (filter === 'vencidos') matchesFilter = isVencido;
+        else if (filter === 'alertas') matchesFilter = isAlerta;
+        else if (filter === 'sucesso') matchesFilter = isSucesso;
+        else if (filter === 'sistema') matchesFilter = isSistema;
+
+        const matchesQuery = text.includes(query);
+
+        if (matchesFilter && matchesQuery) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+
+    function toggleReadState(btn) {
+      const row = btn.closest('tr');
+      if (row.classList.contains('notification-row-unread')) {
+        row.classList.remove('notification-row-unread');
+        row.style.opacity = '0.85';
+        const dot = row.querySelector('.notification-unread-dot');
+        if (dot) {
+          dot.className = 'notification-read-icon';
+          dot.title = 'Lida';
+        }
+        btn.style.display = 'none';
+      }
+    }
+
+    function markAllAsRead() {
+      const unreadRows = document.querySelectorAll('#notificationsTable tbody tr.notification-row-unread');
+      unreadRows.forEach(row => {
+        row.classList.remove('notification-row-unread');
+        row.style.opacity = '0.85';
+        const dot = row.querySelector('.notification-unread-dot');
+        if (dot) {
+          dot.className = 'notification-read-icon';
+          dot.title = 'Lida';
+        }
+        const btn = row.querySelector('button');
+        if (btn) btn.style.display = 'none';
+      });
+      alert('Todas as notificações foram marcadas como lidas!');
+    }
+  </script>
+
+</body>
+</html>
