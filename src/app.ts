@@ -5,6 +5,7 @@ import { documentRouter } from './routes/documentRoutes.js';
 import { userRouter } from './routes/userRoutes.js';
 import { companyRouter } from './routes/companyRoutes.js';
 import { categoryRouter } from './routes/categoryRoutes.js';
+import { auditRouter } from './routes/auditRoutes.js';
 import { authMiddleware } from './middlewares/auth.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import { UPLOADS_DIR } from './services/storageService.js';
@@ -34,6 +35,7 @@ app.use('/api/v1/documents', documentRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/company', companyRouter);
 app.use('/api/v1/categories', categoryRouter);
+app.use('/api/v1/audit-logs', auditRouter);
 
 // Middleware Central de Erros
 app.use(errorHandler);

@@ -724,3 +724,192 @@ export async function deleteDocument(
     next(error);
   }
 }
+
+// Schema de validação para renovação de documento
+const renewDocumentSchema = z.object({
+  issueDate: z
+    .string({ required_error: 'A nova data de emissão é obrigatória.' })
+    .refine((val) => !isNaN(Date.parse(val)), {
+      message: 'Data de emissão inválida.',
+    }),
+  expirationDate: z
+    .string()
+    .optional()
+    .nullable()
+    .transform((val) => (!val || val.trim() === '' ? null : val.trim()))
+    .refine((val) => val === null || !isNaN(Date.parse(val)), {
+      message: 'Data de vencimento inválida.',
+    }),
+  notes: z
+    .string()
+    .optional()
+    .nullable()
+    .transform((val) => (!val || val.trim() === '' ? null : val.trim())),
+});
+
+/**
+ * Renova um documento arquivando a versão vigente na tabela document_versions
+ * e atualizando o documento com novas datas, anexo e recálculo de status (RF-003, RN-002, RN-008).
+ */
+export async function renewDocument(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    if (!req.user) {
+      res.status(401).json({ error: 'UNAUTHORIZED', message: 'Usuário não autenticado.' });
+      return;
+    }
+
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+
+    const document = await prisma.document.findUnique({
+      where: { id },
+    });
+
+    if (!document) {
+      if (req.file) await deleteUploadedFile(req.file.filename);
+      res.status(404).json({
+        error: 'DOCUMENT_NOT_FOUND',
+        message: 'Documento não encontrado.',
+      });
+      return;
+    }
+
+    if (document.isArchived && req.user.role === Role.OPERATIONAL) {
+      if (req.file) await deleteUploadedFile(req.file.filename);
+      res.status(404).json({
+        error: 'DOCUMENT_NOT_FOUND',
+        message: 'Documento não encontrado.',
+      });
+      return;
+    }
+
+    const parsed = renewDocumentSchema.parse(req.body);
+    const finalExpirationDate = parsed.expirationDate ? new Date(parsed.expirationDate) : null;
+    const newStatus = calculateDocumentStatus(finalExpirationDate, document.alertLeadDays, false);
+
+    const versionCount = await prisma.documentVersion.count({
+      where: { documentId: document.id },
+    });
+    const versionNumber = versionCount + 1;
+
+    // 1. Arquiva snapshot da versão anterior no histórico imutável
+    await prisma.documentVersion.create({
+      data: {
+        documentId: document.id,
+        versionNumber,
+        issueDate: document.issueDate,
+        expirationDate: document.expirationDate,
+        attachmentUrl: document.attachmentUrl,
+        attachmentFilename: document.attachmentFilename,
+        notes: document.notes,
+        renewedById: req.user.userId,
+      },
+    });
+
+    // 2. Atualiza documento vigente com novos parâmetros
+    const updatedDocument = await prisma.document.update({
+      where: { id: document.id },
+      data: {
+        issueDate: new Date(parsed.issueDate),
+        expirationDate: finalExpirationDate,
+        status: newStatus,
+        notes: parsed.notes !== undefined && parsed.notes !== null ? parsed.notes : document.notes,
+        ...(req.file && {
+          attachmentUrl: `/api/v1/uploads/${req.file.filename}`,
+          attachmentFilename: req.file.originalname,
+          fileSizeBytes: req.file.size,
+          fileMimeType: req.file.mimetype,
+        }),
+      },
+      include: {
+        category: true,
+        createdBy: {
+          select: { id: true, name: true, email: true, role: true },
+        },
+        versions: {
+          orderBy: { versionNumber: 'desc' },
+          include: {
+            renewedBy: {
+              select: { id: true, name: true, email: true },
+            },
+          },
+        },
+      },
+    });
+
+    // 3. Registra na trilha de auditoria (action: RENEW)
+    await prisma.auditLog.create({
+      data: {
+        documentId: document.id,
+        userId: req.user.userId,
+        userName: req.user.name,
+        action: AuditAction.RENEW,
+        diffData: {
+          archivedVersionNumber: { old: null, new: versionNumber },
+          issueDate: { old: document.issueDate, new: new Date(parsed.issueDate) },
+          expirationDate: { old: document.expirationDate, new: finalExpirationDate },
+          status: { old: document.status, new: newStatus },
+          ...(req.file && {
+            attachmentFilename: { old: document.attachmentFilename, new: req.file.originalname },
+          }),
+        },
+      },
+    });
+
+    res.status(200).json({
+      message: 'Documento renovado com sucesso. A versão anterior foi arquivada no histórico.',
+      document: updatedDocument,
+      previousVersionNumber: versionNumber,
+    });
+  } catch (error) {
+    if (req.file) {
+      await deleteUploadedFile(req.file.filename);
+    }
+    next(error);
+  }
+}
+
+/**
+ * Retorna o histórico de todas as versões anteriores de um documento.
+ */
+export async function getDocumentVersions(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    if (!req.user) {
+      res.status(401).json({ error: 'UNAUTHORIZED', message: 'Usuário não autenticado.' });
+      return;
+    }
+
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+
+    const document = await prisma.document.findUnique({
+      where: { id },
+      select: { id: true, title: true, isArchived: true },
+    });
+
+    if (!document || (document.isArchived && req.user.role === Role.OPERATIONAL)) {
+      res.status(404).json({ error: 'DOCUMENT_NOT_FOUND', message: 'Documento não encontrado.' });
+      return;
+    }
+
+    const versions = await prisma.documentVersion.findMany({
+      where: { documentId: id },
+      orderBy: { versionNumber: 'desc' },
+      include: {
+        renewedBy: {
+          select: { id: true, name: true, email: true },
+        },
+      },
+    });
+
+    res.status(200).json({ documentId: id, versions });
+  } catch (error) {
+    next(error);
+  }
+}

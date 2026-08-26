@@ -9,6 +9,8 @@ import {
   updateDocument,
   toggleArchive,
   deleteDocument,
+  renewDocument,
+  getDocumentVersions,
 } from '../controllers/documentController.js';
 
 export const documentRouter = Router();
@@ -31,5 +33,11 @@ documentRouter.put('/:id', upload.single('attachment'), updateDocument);
 // 5. Alternar status de arquivamento (Soft Delete / Unarchive)
 documentRouter.patch('/:id/archive', toggleArchive);
 
-// 6. Exclusão permanente do documento (Hard Delete restrito a Administradores)
+// 6. Renovação de documento com criação de snapshot histórico e anexo
+documentRouter.post('/:id/renew', upload.single('attachment'), renewDocument);
+
+// 7. Histórico cronológico de versões de um documento
+documentRouter.get('/:id/versions', getDocumentVersions);
+
+// 8. Exclusão permanente do documento (Hard Delete restrito a Administradores)
 documentRouter.delete('/:id', requireRole([Role.ADMIN]), deleteDocument);
