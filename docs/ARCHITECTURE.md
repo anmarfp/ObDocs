@@ -36,8 +36,8 @@ graph TD
     end
 
     subgraph "Camada de Dados & Armazenamento"
-        Database[("Banco de Dados Relacional\n(PostgreSQL / Supabase)")]
-        FileStorage["Storage de Arquivos Anexos\n(S3 / Blob Storage - Máx 10MB)"]
+        Database[("Banco de Dados Relacional\nPostgreSQL Local (Docker/Local) → Nuvem (Supabase/RDS)")]
+        FileStorage["Storage de Arquivos Anexos (Máx 10MB)\nLocal Disk Storage (./uploads) → Nuvem (S3/Supabase)"]
     end
 
     subgraph "Serviços Externos"
@@ -339,21 +339,23 @@ sequenceDiagram
 
 ## 7. Decisões de Arquitetura Tecnológica (ADRs)
 
-1. **Stack do Protótipo & Produção**:
+1. **Stack de Desenvolvimento Local e Produção (Local-First com Portabilidade)**:
    - **Frontend**: Single-Page Application (SPA) responsiva em HTML5, CSS3 Vanilla (Design System com Dark Mode, Glassmorphism, Micro-animações CSS) e JS ES6 Modules.
    - **Backend**: API RESTful Node.js (TypeScript) com Express ou NestJS.
-   - **Banco de Dados**: PostgreSQL com ORM Prisma.
-   - **Storage**: Amazon S3 ou Supabase Storage para armazenamento seguro dos arquivos anexos até 10 MB.
-   - **Notificação**: Serviço de e-mail transacional (Resend / SendGrid / Nodemailer) agendado via Cron Job diário.
+   - **Banco de Dados**: **PostgreSQL Local** (via Docker Compose ou serviço local) gerenciado com **Prisma ORM**. Custo zero no desenvolvimento inicial, garantindo 100% de paridade para migração futura à nuvem (Supabase, Neon, AWS RDS) apenas alterando a variável `DATABASE_URL`.
+   - **Storage de Anexos**: Armazenamento em disco local (`./uploads/` estático/controlado) com limite de 10 MB no desenvolvimento/fase local, estruturado sob uma interface de storage (`IStorageService`) para permitir chaveamento imediato para Amazon S3 / Supabase Storage quando for para a nuvem.
+   - **Notificação**: Serviço de e-mail transacional (Nodemailer / Resend / SendGrid) agendado via Cron Job diário.
    - **Calendário**: Google Calendar API via OAuth2 Service Account.
 
-2. **Estratégia de Testabilidade e Protótipo**:
-   - Desenvolver um **Protótipo Interativo completo (Fase 2)** que simule em tempo real todas as regras de negócio, chaveamento de perfis (Admin vs Operacional), troca da regra de notificação da empresa, formulário condicional, upload fictício de anexo, matriz de cores, visão de calendário e painel de auditoria.
+2. **Estratégia de Custo Zero e Testabilidade**:
+   - Manter o ambiente 100% autossuficiente e executável localmente (banco de dados, uploads e backend), eliminando custos de infraestrutura em nuvem na fase inicial.
+   - Desenvolver o backend desacoplado com migrations automatizadas do Prisma para que a transição para nuvem seja uma operação de deploy sem alterações no código de negócio.
 
 ---
 
-## 8. Próximos Passos (Fase 2 - Prototipagem da UI)
+## 8. Próximos Passos (Fase 3 - Implementação do Backend e Banco de Dados)
 
-Com a arquitetura, modelo ERD, especificações de componentes e fluxos aprovados:
-1. Construir o **Protótipo de UI Interativo** do DocsOb.
-2. Validar visualmente e funcionalmente todas as 7 telas/painéis do MVP com os usuários e stakeholders.
+Com a arquitetura, modelo ERD, especificações e estratégia local-first aprovadas:
+1. Criar a configuração local de ambiente (`docker-compose.yml` e schema do Prisma para PostgreSQL).
+2. Inicializar o backend em Node.js/TypeScript e estruturar o upload local de arquivos.
+3. Conectar a interface UI às rotas da API RESTful.

@@ -15,6 +15,12 @@ Key architectural decisions are recorded in `docs/ARCHITECTURE.md` and `docs/PRD
 
 ## Details
 
+### 2026-08-24 — Estratégia de Banco de Dados e Storage Local-First (ADR-007)
+- **Context:** Necessidade de rodar o banco de dados e armazenamento de arquivos 100% localmente para manter custo zero na fase de desenvolvimento, com migração simplificada para a nuvem no futuro.
+- **Decision:** Utilizar PostgreSQL local (via Docker Compose / serviço local) com Prisma ORM e armazenamento de anexos no disco local (`./uploads/` com interface abstraída `IStorageService`). A migração futura para nuvem (Supabase / AWS RDS / S3) será feita apenas alterando variáveis de ambiente (`DATABASE_URL`), sem necessidade de refatoração do código.
+- **Status:** Accepted
+- **Links:** `docs/ARCHITECTURE.md:340`, `docs/PRD.md:149`
+
 ### 2026-08-23 — UI Prototype Theme and Palette Standardization
 - **Context:** User requested standardizing the wireframe prototype palette across all screens and maintaining only the `perspective_dashboard` workspace.
 - **Decision:** Adopted the 6-tone design palette (`#021024` Dark Navy, `#052659` Deep Navy, `#5483B3` Slate Blue, `#7DA0CA` Soft Blue, `#C1E8FF` Ice Light Blue) and deleted `perspective_executive` & `perspective_timeline` to focus development on `perspective_dashboard`.

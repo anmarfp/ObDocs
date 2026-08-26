@@ -149,9 +149,11 @@ Para garantir uma entrega rápida e funcional, o MVP contemplará:
 | **12. Trilha de Auditoria** | **Sistema de Audit Log detalhado**. | Exibe quem editou, quando editou e o histórico exato de campos alterados (de/para). |
 | **13. Exclusão permanente** | **Hard Delete disponível para Admins**. | Administradores podem excluir permanentemente cadastros inseridos por engano. |
 | **14. Gestão de Usuários e Roles** | **Módulo de Gestão de Usuários (RF-014)**. | Cadastro de usuários com atribuição de papéis (Admin / Operacional) restrito a Administradores. |
+| **15. Infraestrutura & Hospedagem** | **Local-First no MVP (Custo Zero)**. | Banco de dados PostgreSQL e armazenamento de anexos gerenciados localmente no desenvolvimento (Docker/disco local), com arquitetura desacoplada e portabilidade total para nuvem futura (Supabase / AWS / S3). |
 
 ---
 
 ## 9. Próximos Passos
-Com as definições de negócios e especificações operacionais concluídas e atualizadas, a **Fase 1 (Análise e Levantamento de Requisitos)** está 100% consolidada no PRD.
-Aguardando autorização para iniciar a **Fase 2: Design e Arquitetura do Sistema** (Definição da stack tecnológica, modelagem de banco de dados e prototipagem de telas/fluxos).
+Com as definições de negócios, arquitetura e infraestrutura local-first consolidadas:
+1. Concluir validações do protótipo de UI.
+2. Iniciar a **Fase 3: Implementação** com setup do banco PostgreSQL local via Docker/Prisma e desenvolvimento do backend.
