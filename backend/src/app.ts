@@ -6,6 +6,10 @@ import { userRouter } from './routes/userRoutes.js';
 import { companyRouter } from './routes/companyRoutes.js';
 import { categoryRouter } from './routes/categoryRoutes.js';
 import { auditRouter } from './routes/auditRoutes.js';
+import { notificationRouter } from './routes/notificationRoutes.js';
+import { calendarRouter } from './routes/calendarRoutes.js';
+import { dashboardRouter } from './routes/dashboardRoutes.js';
+import { reportRouter } from './routes/reportRoutes.js';
 import { authMiddleware } from './middlewares/auth.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import { UPLOADS_DIR } from './services/storageService.js';
@@ -36,6 +40,10 @@ app.use('/api/v1/users', userRouter);
 app.use('/api/v1/company', companyRouter);
 app.use('/api/v1/categories', categoryRouter);
 app.use('/api/v1/audit-logs', auditRouter);
+app.use('/api/v1/notifications', notificationRouter);
+app.use('/api/v1/calendar', calendarRouter);
+app.use('/api/v1/dashboard', dashboardRouter);
+app.use('/api/v1/reports', reportRouter);
 
 // Middleware Central de Erros
 app.use(errorHandler);

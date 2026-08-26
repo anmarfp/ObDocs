@@ -28,7 +28,8 @@ export function authMiddleware(req: AuthenticatedRequest, res: Response, next: N
   }
 }
 
-export function requireRole(allowedRoles: Role[]) {
+export function requireRole(allowedRoles: Role[] | Role) {
+  const roles = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
   return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
     if (!req.user) {
       res.status(401).json({
@@ -38,7 +39,7 @@ export function requireRole(allowedRoles: Role[]) {
       return;
     }
 
-    if (!allowedRoles.includes(req.user.role)) {
+    if (!roles.includes(req.user.role)) {
       res.status(403).json({
         error: 'FORBIDDEN',
         message: 'Acesso negado. Seu perfil não possui permissão para este recurso.',

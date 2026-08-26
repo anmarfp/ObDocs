@@ -76,7 +76,9 @@ the code or with `memory/project`, the code/markdown wins and the index is stale
 
 - **Directory Structure:**
   - `docs/`: Product Requirements Document (`PRD.md`) and System Architecture Specification (`ARCHITECTURE.md`).
-  - `wireframes/perspective_dashboard/`: Interactive HTML5/CSS3 prototype pages (`index.html`, `documentos.html`, `detalhes-documento.html`, `calendario.html`, `notificacoes.html`, `usuarios.html`, `configuracoes.html`, `auditoria.html`, `perfil.html`, `styles.css`).
+  - `frontend/`: Official web frontend application with HTML5/CSS3/JS (`index.html`, `documentos.html`, `detalhes-documento.html`, `calendario.html`, `notificacoes.html`, `usuarios.html`, `configuracoes.html`, `auditoria.html`, `perfil.html`, `styles.css`, `js/`).
+  - `backend/`: Node.js / TypeScript RESTful API (`src/`, `prisma/`, `tests/`, `package.json`, `tsconfig.json`, `vitest.config.ts`).
+  - `wireframes/perspective_dashboard/`: Initial UI reference prototype.
 - **HTML Table Cell Alignment Rule:** Flex container classes (e.g. `.doc-name-cell`, `.due-date-cell`, `.responsible-cell`, `.table-actions-cell`) must be placed inside inner `<div>` wrapper elements within `<td>` cells, never directly on `<td>` elements, to preserve `display: table-cell` grid alignment.
 - **Design System Tokens:** CSS custom properties driven by Midnight Navy palette (`--bg-main: #021024`, `--bg-card: #052659`, `--primary: #5483B3`, `--primary-light: #C1E8FF`, `--primary-border: #7DA0CA`).
 - **Applicable Workflows:** `feature.md`, `bugfix.md`, `planning.md`, `quick.md`.
