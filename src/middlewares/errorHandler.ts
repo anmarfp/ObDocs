@@ -9,8 +9,6 @@ export function errorHandler(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   next: NextFunction
 ): void {
-  console.error('⚠️ [Erro Não Tratado]:', err);
-
   if (err instanceof ZodError) {
     res.status(400).json({
       error: 'VALIDATION_ERROR',
@@ -44,6 +42,10 @@ export function errorHandler(
       message: err.message,
     });
     return;
+  }
+
+  if (process.env.NODE_ENV !== 'test') {
+    console.error('⚠️ [Erro Não Tratado]:', err);
   }
 
   res.status(err.status || 500).json({

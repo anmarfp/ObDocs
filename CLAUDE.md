@@ -1,17 +1,13 @@
-<!-- AIHAUS:START -->
-# aihaus router
+<!-- AIHAUS-OKF:START -->
+# aihaus-okf router
 
-This repository uses the local `.aihaus/` package.
+This repository uses the local `.aihaus-okf/` engine.
 
-1. Read `.aihaus/MAP.md` and `.aihaus/contracts/harness.md`.
-2. Load one task room and one primary role; do not preload the whole package.
-3. Treat `memory/project/` and task files as truth; indexes are rebuildable.
-4. Before substantive work, you may run
-   `node .aihaus/tools/refresh.mjs --repo . --status --json`; if it reports
-   `memoryGaps` or `staleClaims`, propose a memory refresh to the user.
-5. Use executable evidence for completion claims.
-6. Operational instructions and hooks are not a security sandbox.
+1. Read `.aihaus-okf/routing.md` (the Map) and `.aihaus-okf/conventions.md` (naming).
+2. Use the routing table to load only the room the task needs. Do not preload the whole package.
+3. Treat `.aihaus-okf/memory/project/` and task files as truth; the code index is a rebuildable cache.
+4. Use executable evidence for completion claims.
+5. Operational instructions are not a security sandbox.
 
-Keep project-specific detail out of this router. Put it in the appropriate
-room or `.aihaus/memory/project/` page.
-<!-- AIHAUS:END -->
+Keep project-specific detail out of this router. Put it in the appropriate room or `.aihaus-okf/memory/project/` page.
+<!-- AIHAUS-OKF:END -->

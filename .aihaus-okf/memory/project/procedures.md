@@ -11,10 +11,11 @@ last_reviewed: 2026-08-24
 
 ## Current truth
 
-### 1. Refreshing Memory & Checking Status
-Run the aihaus memory refresh tool to verify project state:
+### 1. Codebase Scan & Status
+Check the codebase index status or project structure:
 ```bash
-node .aihaus/tools/refresh.mjs --repo . --status --json
+node .aihaus-okf/tools/index.mjs status
+node .aihaus-okf/tools/scan.mjs --json
 ```
 
 ### 2. Previewing the Wireframe Prototype
