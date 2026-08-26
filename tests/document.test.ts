@@ -645,6 +645,35 @@ describe('Suíte de Testes Automatizados - Módulo de Documentos, Matriz de Core
         expect(res.status).toBe(200);
         expect(prisma.auditLog.create).not.toHaveBeenCalled();
       });
+
+      it('deve preservar RENEWAL_IN_PROGRESS ao editar outro campo sem encerrar a renovação', async () => {
+        const renewalDocument = {
+          ...sampleDoc,
+          status: DocumentStatus.RENEWAL_IN_PROGRESS,
+        };
+        (prisma.document.findUnique as any).mockResolvedValue(renewalDocument);
+        (prisma.companyConfig.findFirst as any).mockResolvedValue({
+          notificationMode: NotificationMode.ALL_ADMINS,
+        });
+        (prisma.document.update as any).mockImplementation(({ data }) => ({
+          ...renewalDocument,
+          ...data,
+        }));
+        (prisma.auditLog.create as any).mockResolvedValue({ id: 'audit-preserve-renewal' });
+
+        const res = await request(app)
+          .put('/api/v1/documents/doc-uuid-123')
+          .set('Authorization', `Bearer ${adminToken}`)
+          .send({ title: 'Licença em renovação - revisada' });
+
+        expect(res.status).toBe(200);
+        expect(prisma.document.update).toHaveBeenCalledWith(
+          expect.objectContaining({
+            data: expect.objectContaining({ status: DocumentStatus.RENEWAL_IN_PROGRESS }),
+          })
+        );
+        expect(res.body.document.status).toBe(DocumentStatus.RENEWAL_IN_PROGRESS);
+      });
     });
   });
 

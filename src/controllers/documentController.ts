@@ -482,7 +482,7 @@ export async function updateDocument(
     const isRenewal =
       parsed.isRenewalInProgress !== undefined
         ? parsed.isRenewalInProgress
-        : parsed.status === DocumentStatus.RENEWAL_IN_PROGRESS;
+        : existingDoc.status === DocumentStatus.RENEWAL_IN_PROGRESS;
 
     const newStatus =
       parsed.status && parsed.status === DocumentStatus.RENEWAL_IN_PROGRESS
