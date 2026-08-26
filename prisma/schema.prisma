@@ -1,0 +1,153 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  OPERATIONAL
+}
+
+enum NotificationMode {
+  ALL_ADMINS
+  ONLY_RESPONSIBLE
+}
+
+enum DocumentStatus {
+  EXPIRED
+  CRITICAL
+  RENEWAL_IN_PROGRESS
+  REGULAR
+  INDETERMINATE
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  ARCHIVE
+  UNARCHIVE
+  DELETE
+  RENEW
+}
+
+enum SyncStatus {
+  SYNCED
+  ERROR
+}
+
+model CompanyConfig {
+  id               String           @id @default(uuid())
+  notificationMode NotificationMode @default(ALL_ADMINS) @map("notification_mode")
+  updatedAt        DateTime         @updatedAt @map("updated_at")
+  updatedById      String?          @map("updated_by_id")
+  updatedBy        User?            @relation("CompanyConfigUpdater", fields: [updatedById], references: [id])
+
+  @@map("company_config")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  role         Role     @default(OPERATIONAL)
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  createdDocuments Document[]        @relation("DocumentCreator")
+  renewedVersions  DocumentVersion[] @relation("VersionRenewer")
+  auditLogs        AuditLog[]        @relation("UserAuditor")
+  updatedConfigs   CompanyConfig[]   @relation("CompanyConfigUpdater")
+
+  @@map("users")
+}
+
+model DocumentCategory {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  colorHex    String?  @map("color_hex")
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  documents Document[]
+
+  @@map("document_categories")
+}
+
+model Document {
+  id                 String         @id @default(uuid())
+  title              String
+  categoryId         String         @map("category_id")
+  category           DocumentCategory @relation(fields: [categoryId], references: [id])
+  issuingBody        String?        @map("issuing_body")
+  issueDate          DateTime       @map("issue_date")
+  expirationDate     DateTime?      @map("expiration_date")
+  alertLeadDays      Int            @default(30) @map("alert_lead_days")
+  status             DocumentStatus @default(REGULAR)
+  responsibleName    String?        @map("responsible_name")
+  responsibleEmail   String?        @map("responsible_email")
+  attachmentUrl      String?        @map("attachment_url")
+  attachmentFilename String?        @map("attachment_filename")
+  fileSizeBytes      Int?           @map("file_size_bytes")
+  fileMimeType       String?        @map("file_mime_type")
+  notes              String?
+  isArchived         Boolean        @default(false) @map("is_archived")
+  createdById        String         @map("created_by_id")
+  createdBy          User           @relation("DocumentCreator", fields: [createdById], references: [id])
+  createdAt          DateTime       @default(now()) @map("created_at")
+  updatedAt          DateTime       @updatedAt @map("updated_at")
+
+  versions     DocumentVersion[]
+  auditLogs    AuditLog[]
+  gcalSyncLogs GCalSyncLog[]
+
+  @@map("documents")
+}
+
+model DocumentVersion {
+  id                 String    @id @default(uuid())
+  documentId         String    @map("document_id")
+  document           Document  @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  versionNumber      Int       @map("version_number")
+  issueDate          DateTime  @map("issue_date")
+  expirationDate     DateTime? @map("expiration_date")
+  attachmentUrl      String?   @map("attachment_url")
+  attachmentFilename String?   @map("attachment_filename")
+  notes              String?
+  renewedById        String    @map("renewed_by_id")
+  renewedBy          User      @relation("VersionRenewer", fields: [renewedById], references: [id])
+  createdAt          DateTime  @default(now()) @map("created_at")
+
+  @@map("document_versions")
+}
+
+model AuditLog {
+  id         String      @id @default(uuid())
+  documentId String?     @map("document_id")
+  document   Document?   @relation(fields: [documentId], references: [id], onDelete: SetNull)
+  userId     String?     @map("user_id")
+  user       User?       @relation("UserAuditor", fields: [userId], references: [id], onDelete: SetNull)
+  userName   String      @map("user_name")
+  action     AuditAction
+  diffData   Json        @map("diff_data")
+  timestamp  DateTime    @default(now())
+
+  @@map("audit_logs")
+}
+
+model GCalSyncLog {
+  id           String     @id @default(uuid())
+  documentId   String     @map("document_id")
+  document     Document   @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  gcalEventId  String?    @map("gcal_event_id")
+  status       SyncStatus @default(SYNCED)
+  lastSyncedAt DateTime   @default(now()) @map("last_synced_at")
+  errorMessage String?    @map("error_message")
+
+  @@map("gcal_sync_logs")
+}
