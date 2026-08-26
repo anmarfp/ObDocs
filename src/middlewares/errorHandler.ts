@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { ZodError } from 'zod';
+import multer from 'multer';
 
 export function errorHandler(
   err: any,
@@ -18,6 +19,29 @@ export function errorHandler(
         path: e.path.join('.'),
         message: e.message,
       })),
+    });
+    return;
+  }
+
+  if (err instanceof multer.MulterError) {
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      res.status(400).json({
+        error: 'FILE_TOO_LARGE',
+        message: 'O arquivo excede o limite máximo permitido de 10 MB (10.485.760 bytes).',
+      });
+      return;
+    }
+    res.status(400).json({
+      error: 'UPLOAD_ERROR',
+      message: `Erro no upload do arquivo: ${err.message}`,
+    });
+    return;
+  }
+
+  if (err.message && typeof err.message === 'string' && err.message.startsWith('Tipo de arquivo não permitido')) {
+    res.status(400).json({
+      error: 'INVALID_FILE_TYPE',
+      message: err.message,
     });
     return;
   }

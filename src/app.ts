@@ -1,7 +1,10 @@
 import express from 'express';
 import cors from 'cors';
 import { authRouter } from './routes/authRoutes.js';
+import { documentRouter } from './routes/documentRoutes.js';
+import { authMiddleware } from './middlewares/auth.js';
 import { errorHandler } from './middlewares/errorHandler.js';
+import { UPLOADS_DIR } from './services/storageService.js';
 
 export const app = express();
 
@@ -19,8 +22,12 @@ app.get('/api/v1/health', (req, res) => {
   });
 });
 
+// Armazenamento de Arquivos Estáticos Protegido por Autenticação
+app.use('/api/v1/uploads', authMiddleware, express.static(UPLOADS_DIR));
+
 // Rotas da API
 app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/documents', documentRouter);
 
 // Middleware Central de Erros
 app.use(errorHandler);
