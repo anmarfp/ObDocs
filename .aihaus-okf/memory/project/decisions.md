@@ -2,7 +2,7 @@
 type: decision
 owner: architecture
 status: active
-last_reviewed: 2026-08-24
+last_reviewed: 2026-08-27
 ---
 
 # Decisions — ADR Ledger
@@ -13,7 +13,16 @@ last_reviewed: 2026-08-24
 
 Key architectural decisions are recorded in `docs/ARCHITECTURE.md` and `docs/PRD.md`.
 
-## Details
+### 2026-08-27 — Pipeline Multiagente Especializado via Orca CLI e Stack do Frontend (ADR-008)
+- **Context:** Decisão de desenvolver o front-end em **React + TypeScript (Vite)** com componentização moderna, exigindo planejamento rigoroso, auditoria prévia de regras e testes automatizados contínuos.
+- **Decision:** Estabelecer o pipeline multiagente com divisão estrita de responsabilidades:
+  1. **Planner (Antigravity)**: Planeja os passos com prompt rico contextualizado.
+  2. **Reviewer (ChatGPT / Codex)**: Audita de forma adversária contra PRD, Arquitetura e APIs, gerando o prompt validado para implementação.
+  3. **Implementer (Antigravity)**: Escreve o código de produção nos arquivos do projeto.
+  4. **QA (ChatGPT / Codex)**: Escreve as suítes de testes automatizados (unitários, componentes e integração).
+  5. **Orquestrador (Antigravity Main)**: Valida a suíte (`npm test`), gerencia o Kanban e consolida a entrega.
+- **Status:** Accepted
+- **Links:** `procedures.md:34`, `docs/PRD.md`, `docs/ARCHITECTURE.md`
 
 ### 2026-08-24 — Estratégia de Banco de Dados e Storage Local-First (ADR-007)
 - **Context:** Necessidade de rodar o banco de dados e armazenamento de arquivos 100% localmente para manter custo zero na fase de desenvolvimento, com migração simplificada para a nuvem no futuro.
@@ -74,5 +83,6 @@ Key architectural decisions are recorded in `docs/ARCHITECTURE.md` and `docs/PRD
 
 ## Timeline
 
+- 2026-08-27 — Registered ADR-008 for the 4-agent development pipeline (Planner, Reviewer, Implementer, QA) and React + TypeScript frontend decision.
 - 2026-08-24 — Migrated ADR-001 through ADR-006 from legacy .aihaus memory and merged into .aihaus-okf/memory/project/decisions.md.
 - 2026-06-23 — Seeded from the aihaus-okf project template.

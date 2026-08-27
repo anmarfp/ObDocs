@@ -18,6 +18,7 @@ last_reviewed: 2026-08-24
   - 🔴 `EXPIRED`: Current Date > `expiration_date`.
   - 🟡 `CRITICAL`: (`expiration_date` - Current Date) <= `alert_lead_days`.
   - 🟢 `REGULAR`: Current Date < `expiration_date` and outside lead days.
+- **Context-Rich Prompting for Specialist Agents (Planner/Implementer/Reviewer):** When creating agent sessions via Orca CLI, the initial prompt must be exhaustive and structured: provide the project domain (DocsOb), full business rules (RN-001 to RN-009), exact file/schema references (`backend/prisma/schema.prisma`, `backend/src/routes/*`, `frontend/styles.css`), technical constraints (strict TS, 10MB limits, RBAC) and clear verification checkpoints.
 
 ## Details
 

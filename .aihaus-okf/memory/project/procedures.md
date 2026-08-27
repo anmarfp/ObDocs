@@ -2,7 +2,7 @@
 type: procedure
 owner: engineering
 status: active
-last_reviewed: 2026-08-24
+last_reviewed: 2026-08-27
 ---
 
 # Procedures — How-Tos & Runbooks
@@ -34,19 +34,29 @@ node .aihaus-okf/tools/index.mjs status
 node .aihaus-okf/tools/index.mjs build
 ```
 
+### 5. Multi-Agent Development Pipeline (Orca CLI)
+Standard operational flow for development tasks across specialized agents:
+1. **Planner (Antigravity)**: Receives context-rich prompt and drafts technical architecture and execution steps.
+2. **Reviewer (ChatGPT / Codex)**: Performs adversarial audit against PRD/Architecture/API contracts, resolves gaps, and generates the validated implementation prompt.
+3. **Implementer (Antigravity)**: Executes code changes inside owned files matching the prompt.
+4. **QA (ChatGPT / Codex)**: Authors automated test suites (Vitest / React Testing Library / Supertest).
+5. **Orchestrator**: Executes validation (`npm test`), manages Kanban state (`doing -> done`), and delivers completion summary.
+
 ## Details
 
-- Prototype files are vanilla HTML/CSS/JS and require no build step.
+- Multi-agent sessions are managed as dedicated worktrees via Orca CLI (`orca worktree create --name <agent-name> --agent <agent-type>`).
+- Prototype files in `frontend/` serve as visual reference for the React + TypeScript SPA.
 
 ## Open questions
 
-- Test suite runner command (to be established upon backend API setup).
+- End-to-End (E2E) testing framework setup (Playwright) for frontend CI/CD.
 
 ## Links
 
-- project: project.md · environment: environment.md
+- project: project.md · decisions: decisions.md · environment: environment.md
 
 ## Timeline
 
+- 2026-08-27 — Added Procedure 5 for the 4-agent development pipeline (Planner, Reviewer, Implementer, QA).
 - 2026-08-24 — Documented prototype preview, Linear CLI procedures, and code indexing commands.
 - 2026-06-23 — Seeded from the aihaus-okf project template.
