@@ -1,26 +1,37 @@
-import React, { createContext, useState, useEffect, useCallback } from 'react';
-import api, { TOKEN_STORAGE_KEY } from '@/services/api';
-import { User, LoginCredentials, AuthResponse, AuthContextType } from '@/types/auth';
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import { AuthContextType, LoginCredentials, User } from '../types/auth';
+import { authService, TOKEN_STORAGE_KEY, USER_STORAGE_KEY } from '../services/api';
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(() => {
-    return localStorage.getItem(TOKEN_STORAGE_KEY) || sessionStorage.getItem(TOKEN_STORAGE_KEY);
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(() => {
+    try {
+      const savedUser = localStorage.getItem(USER_STORAGE_KEY);
+      return savedUser ? JSON.parse(savedUser) : null;
+    } catch {
+      return null;
+    }
   });
+
+  const [token, setToken] = useState<string | null>(() => {
+    return localStorage.getItem(TOKEN_STORAGE_KEY);
+  });
+
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
+  // Logout handler
   const logout = useCallback(() => {
     localStorage.removeItem(TOKEN_STORAGE_KEY);
-    sessionStorage.removeItem(TOKEN_STORAGE_KEY);
-    setUser(null);
+    localStorage.removeItem(USER_STORAGE_KEY);
     setToken(null);
+    setUser(null);
   }, []);
 
-  const checkAuth = useCallback(async () => {
-    const storedToken = localStorage.getItem(TOKEN_STORAGE_KEY) || sessionStorage.getItem(TOKEN_STORAGE_KEY);
-    if (!storedToken) {
+  // Fetch / refresh user profile with active token
+  const refreshUser = useCallback(async () => {
+    const currentToken = localStorage.getItem(TOKEN_STORAGE_KEY);
+    if (!currentToken) {
       setUser(null);
       setToken(null);
       setIsLoading(false);
@@ -28,46 +39,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     try {
-      const response = await api.get<{ user: User }>('/auth/me');
-      if (response.data?.user) {
-        setUser(response.data.user);
-        setToken(storedToken);
-      } else {
-        logout();
-      }
+      const { user: fetchedUser } = await authService.getMe();
+      setUser(fetchedUser);
+      setToken(currentToken);
+      localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(fetchedUser));
     } catch (error) {
+      console.warn('Falha ao validar sessão do usuário:', error);
       logout();
     } finally {
       setIsLoading(false);
     }
   }, [logout]);
 
-  const login = useCallback(async (credentials: LoginCredentials) => {
-    setIsLoading(true);
-    try {
-      const response = await api.post<AuthResponse>('/auth/login', {
-        email: credentials.email.trim(),
-        password: credentials.password,
-      });
-
-      const { token: receivedToken, user: receivedUser } = response.data;
-      localStorage.setItem(TOKEN_STORAGE_KEY, receivedToken);
-      setToken(receivedToken);
-      setUser(receivedUser);
-    } catch (error) {
-      logout();
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [logout]);
-
-  // Checagem de autenticação no mount
+  // Initial check on mount
   useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
+    refreshUser();
+  }, [refreshUser]);
 
-  // Listener para evento customizado de logout disparado pelo interceptor 401
+  // Listen to global 401 unauthorized events from Axios interceptor
   useEffect(() => {
     const handleUnauthorized = () => {
       logout();
@@ -79,21 +68,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, [logout]);
 
-  const isAuthenticated = !!user && !!token;
+  // Login action
+  const login = async (credentials: LoginCredentials): Promise<void> => {
+    setIsLoading(true);
+    try {
+      const data = await authService.login(credentials);
+      localStorage.setItem(TOKEN_STORAGE_KEY, data.token);
+      localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(data.user));
+      setToken(data.token);
+      setUser(data.user);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  return (
-    <AuthContext.Provider
-      value={{
-        user,
-        token,
-        isAuthenticated,
-        isLoading,
-        login,
-        logout,
-        checkAuth,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
+  const value: AuthContextType = {
+    user,
+    token,
+    isAuthenticated: !!token && !!user,
+    isLoading,
+    login,
+    logout,
+    refreshUser,
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
+
+export const useAuth = (): AuthContextType => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth deve ser utilizado dentro de um AuthProvider');
+  }
+  return context;
 };

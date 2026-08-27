@@ -5,8 +5,9 @@ export interface User {
   name: string;
   email: string;
   role: Role;
-  isActive: boolean;
+  isActive?: boolean;
   createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface LoginCredentials {
@@ -15,17 +16,20 @@ export interface LoginCredentials {
 }
 
 export interface AuthResponse {
-  message?: string;
+  message: string;
   token: string;
   user: User;
 }
 
-export interface AuthContextType {
+export interface AuthState {
   user: User | null;
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+}
+
+export interface AuthContextType extends AuthState {
   login: (credentials: LoginCredentials) => Promise<void>;
   logout: () => void;
-  checkAuth: () => Promise<void>;
+  refreshUser: () => Promise<void>;
 }

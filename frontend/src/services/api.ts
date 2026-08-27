@@ -1,41 +1,61 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import { AuthResponse, LoginCredentials, User } from '../types/auth';
 
-export const TOKEN_STORAGE_KEY = '@docsob:token';
+export const TOKEN_STORAGE_KEY = 'docsob_token';
+export const USER_STORAGE_KEY = 'docsob_user';
 
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api/v1',
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api/v1';
+
+export const api = axios.create({
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
   timeout: 15000,
 });
 
-// Request Interceptor: Injeta Token JWT
+// Request Interceptor: Attach JWT Token
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token = localStorage.getItem(TOKEN_STORAGE_KEY) || sessionStorage.getItem(TOKEN_STORAGE_KEY);
+    const token = localStorage.getItem(TOKEN_STORAGE_KEY);
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => {
+    return Promise.reject(error);
+  }
 );
 
-// Response Interceptor: Trata 401 e erros de autorização
+// Response Interceptor: Handle Global 401 Unauthorized
 api.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
-    if (error.response && error.response.status === 401) {
-      const isLoginRequest = error.config?.url?.includes('/auth/login');
-      if (!isLoginRequest) {
+    if (error.response?.status === 401) {
+      // Clear credentials if token is invalid or expired
+      const isLoginEndpoint = error.config?.url?.includes('/auth/login');
+      if (!isLoginEndpoint) {
         localStorage.removeItem(TOKEN_STORAGE_KEY);
-        sessionStorage.removeItem(TOKEN_STORAGE_KEY);
+        localStorage.removeItem(USER_STORAGE_KEY);
         window.dispatchEvent(new CustomEvent('docsob:unauthorized'));
       }
     }
     return Promise.reject(error);
   }
 );
+
+// API Service Methods
+export const authService = {
+  login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
+    const response = await api.post<AuthResponse>('/auth/login', credentials);
+    return response.data;
+  },
+
+  getMe: async (): Promise<{ user: User }> => {
+    const response = await api.get<{ user: User }>('/auth/me');
+    return response.data;
+  },
+};
 
 export default api;

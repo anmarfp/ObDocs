@@ -1,63 +1,56 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
-import { ProtectedRoute } from '@/components/layout/ProtectedRoute';
-import { AppShell } from '@/components/layout/AppShell';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
+import ProtectedRoute from './components/auth/ProtectedRoute';
+import AppShell from './components/layout/AppShell';
 
-import { LoginPage } from '@/pages/LoginPage';
-import { UnauthorizedPage } from '@/pages/UnauthorizedPage';
-import { DashboardPage } from '@/pages/DashboardPage';
-import { DocumentosPage } from '@/pages/DocumentosPage';
-import { CalendarioPage } from '@/pages/CalendarioPage';
-import { UsuariosPage } from '@/pages/UsuariosPage';
-import { ConfiguracoesPage } from '@/pages/ConfiguracoesPage';
-import { AuditoriaPage } from '@/pages/AuditoriaPage';
+// Pages
+import LoginPage from './pages/auth/LoginPage';
+import DashboardPage from './pages/dashboard/DashboardPage';
+import DocumentsPage from './pages/documents/DocumentsPage';
+import CalendarPage from './pages/calendar/CalendarPage';
+import NotificationsPage from './pages/notifications/NotificationsPage';
+import AuditPage from './pages/audit/AuditPage';
+import UsersPage from './pages/users/UsersPage';
+import SettingsPage from './pages/settings/SettingsPage';
+import ProfilePage from './pages/profile/ProfilePage';
+import NotFoundPage from './pages/NotFoundPage';
 
 export const App: React.FC = () => {
   return (
-    <Routes>
-      {/* Rotas Públicas */}
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/unauthorized" element={<UnauthorizedPage />} />
+    <BrowserRouter>
+      <AuthProvider>
+        <Routes>
+          {/* Public Auth Route */}
+          <Route path="/login" element={<LoginPage />} />
 
-      {/* Rotas Protegidas (Exigem Autenticação) */}
-      <Route element={<ProtectedRoute />}>
-        <Route element={<AppShell />}>
-          {/* Acessíveis a ADMIN e OPERATIONAL */}
-          <Route path="/" element={<DashboardPage />} />
-          <Route path="/documentos" element={<DocumentosPage />} />
-          <Route path="/calendario" element={<CalendarioPage />} />
+          {/* Protected Application Routes */}
+          <Route element={<ProtectedRoute />}>
+            <Route element={<AppShell />}>
+              <Route index element={<DashboardPage />} />
+              <Route path="documentos" element={<DocumentsPage />} />
+              <Route path="calendario" element={<CalendarPage />} />
+              <Route path="notificacoes" element={<NotificationsPage />} />
+              <Route path="perfil" element={<ProfilePage />} />
 
-          {/* Acessíveis Apenas a ADMIN (RBAC) */}
-          <Route
-            path="/usuarios"
-            element={
-              <ProtectedRoute allowedRoles={['ADMIN']}>
-                <UsuariosPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/configuracoes"
-            element={
-              <ProtectedRoute allowedRoles={['ADMIN']}>
-                <ConfiguracoesPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/auditoria"
-            element={
-              <ProtectedRoute allowedRoles={['ADMIN']}>
-                <AuditoriaPage />
-              </ProtectedRoute>
-            }
-          />
-        </Route>
-      </Route>
+              {/* Admin Exclusive RBAC Routes */}
+              <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
+                <Route path="auditoria" element={<AuditPage />} />
+                <Route path="usuarios" element={<UsersPage />} />
+                <Route path="configuracoes" element={<SettingsPage />} />
+              </Route>
 
-      {/* Rota Fallback */}
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+              {/* 404 Catch-All inside shell */}
+              <Route path="*" element={<NotFoundPage />} />
+            </Route>
+          </Route>
+
+          {/* Global Fallback */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </AuthProvider>
+    </BrowserRouter>
   );
 };
+
 export default App;
