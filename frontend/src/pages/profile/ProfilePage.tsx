@@ -1,12 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { User, Mail, Shield, Calendar, KeyRound } from 'lucide-react';
+import { ResetPasswordModal } from '@/features/users/components/ResetPasswordModal';
+import { ToastContainer } from '@/features/documents/components/Toast';
+import { useToast } from '@/features/documents/hooks/useToast';
 
 export const ProfilePage: React.FC = () => {
   const { user } = useAuth();
+  const { toasts, removeToast, toastSuccess, toastError } = useToast();
+  const [resetModalOpen, setResetModalOpen] = useState(false);
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
+      <ToastContainer toasts={toasts} onDismiss={removeToast} />
+
       <div>
         <h1 className="text-2xl font-bold text-navy-950 tracking-tight">Meu Perfil</h1>
         <p className="text-sm text-slate-500 mt-1">
@@ -23,9 +30,13 @@ export const ProfilePage: React.FC = () => {
             <h2 className="text-xl font-bold text-navy-950">{user?.name}</h2>
             <p className="text-sm text-slate-500">{user?.email}</p>
             <div className="mt-2">
-              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider ${
-                user?.role === 'ADMIN' ? 'bg-navy-100 text-navy-900 border border-navy-400' : 'bg-slate-100 text-slate-700'
-              }`}>
+              <span
+                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider ${
+                  user?.role === 'ADMIN'
+                    ? 'bg-navy-100 text-navy-900 border border-navy-400'
+                    : 'bg-slate-100 text-slate-700'
+                }`}
+              >
                 {user?.role === 'ADMIN' ? 'Administrador' : 'Operacional'}
               </span>
             </div>
@@ -66,17 +77,35 @@ export const ProfilePage: React.FC = () => {
           </div>
         </div>
 
-        <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-          <button
-            type="button"
-            className="btn-secondary"
-            onClick={() => alert('Troca de senha disponível no módulo de usuários para Fase 2.')}
-          >
-            <KeyRound className="w-4 h-4 mr-2 text-slate-500" />
-            Alterar Senha
-          </button>
-        </div>
+        {user?.role === 'ADMIN' && (
+          <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
+            <button
+              type="button"
+              className="btn-secondary"
+              onClick={() => setResetModalOpen(true)}
+            >
+              <KeyRound className="w-4 h-4 mr-2 text-slate-500" />
+              Alterar Minha Senha
+            </button>
+          </div>
+        )}
       </div>
+
+      {user && (
+        <ResetPasswordModal
+          isOpen={resetModalOpen}
+          user={{
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            isActive: true,
+          }}
+          onClose={() => setResetModalOpen(false)}
+          onSuccess={(msg) => toastSuccess('Sucesso', msg)}
+          onError={toastError}
+        />
+      )}
     </div>
   );
 };
