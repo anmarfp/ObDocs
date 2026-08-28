@@ -3,7 +3,7 @@ import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-li
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import api from '@/services/api';
-import { AuthContext } from '@/contexts/AuthContext';
+import * as AuthModule from '@/contexts/AuthContext';
 import type { AuthContextType, User } from '@/types/auth';
 import type { CompanyConfig } from '@/features/documents/types/document.types';
 import type { UserItem } from '@/features/users/types/user.types';
@@ -62,11 +62,8 @@ function authValue(): AuthContextType {
 }
 
 function renderWithAuth(node: React.ReactNode) {
-  return render(
-    <AuthContext.Provider value={authValue()}>
-      <MemoryRouter>{node}</MemoryRouter>
-    </AuthContext.Provider>
-  );
+  vi.spyOn(AuthModule, 'useAuth').mockReturnValue(authValue());
+  return render(<MemoryRouter>{node}</MemoryRouter>);
 }
 
 const config: CompanyConfig = {

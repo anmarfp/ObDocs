@@ -3,7 +3,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import api from '@/services/api';
-import { AuthContext } from '@/contexts/AuthContext';
+import * as AuthModule from '@/contexts/AuthContext';
 import type { AuthContextType, Role, User } from '@/types/auth';
 import type { AuditLogItem, AuditLogsResponse } from '@/features/audit/types/audit.types';
 import type { CalendarEventItem } from '@/features/calendar/types/calendar.types';
@@ -47,11 +47,8 @@ function authValue(role: Role = 'ADMIN'): AuthContextType {
 }
 
 function renderWithAuth(node: React.ReactNode, role: Role = 'ADMIN') {
-  return render(
-    <AuthContext.Provider value={authValue(role)}>
-      <MemoryRouter>{node}</MemoryRouter>
-    </AuthContext.Provider>
-  );
+  vi.spyOn(AuthModule, 'useAuth').mockReturnValue(authValue(role));
+  return render(<MemoryRouter>{node}</MemoryRouter>);
 }
 
 const event: CalendarEventItem = {

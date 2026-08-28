@@ -3,8 +3,16 @@ import path from 'path';
 import fs from 'fs';
 import crypto from 'crypto';
 
-export const UPLOADS_DIR = path.resolve(process.cwd(), 'uploads');
-export const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB (10.485.760 bytes)
+// Respeita UPLOAD_DIR via variável de ambiente ou usa ./uploads local
+export const UPLOADS_DIR = process.env.UPLOAD_DIR
+  ? path.resolve(process.env.UPLOAD_DIR)
+  : path.resolve(process.cwd(), 'uploads');
+
+// Respeita MAX_FILE_SIZE_BYTES via variável de ambiente (padrão 10 MB = 10.485.760 bytes)
+export const MAX_FILE_SIZE = process.env.MAX_FILE_SIZE_BYTES
+  ? parseInt(process.env.MAX_FILE_SIZE_BYTES, 10) || 10 * 1024 * 1024
+  : 10 * 1024 * 1024;
+
 export const ALLOWED_MIME_TYPES = [
   'application/pdf',
   'image/png',

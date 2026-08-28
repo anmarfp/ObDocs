@@ -1,0 +1,17 @@
+node_modules
+dist
+coverage
+.env
+.env.local
+.env.*.local
+*.log
+uploads/*
+!uploads/.gitkeep
+.git
+.gitignore
+tests
+**/*.test.ts
+**/*.spec.ts
+vitest.config.*
+vitest.e2e.config.*
+README.md

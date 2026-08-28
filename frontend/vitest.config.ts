@@ -5,5 +5,5 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   resolve: { alias: { '@': path.resolve(__dirname, './src') } },
-  test: { environment: 'jsdom', setupFiles: './tests/setup.ts', poolOptions: { threads: { singleThread: true } } },
+  test: { environment: 'jsdom', setupFiles: './tests/setup.ts', fileParallelism: false },
 });

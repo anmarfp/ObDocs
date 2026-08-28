@@ -34,7 +34,7 @@ async function main() {
         isActive: true,
       },
     });
-    console.log(`✅ Usuário Administrador criado: ${adminEmail} (Senha: Admin123!@#)`);
+    console.log(`✅ Usuário Administrador criado: ${adminEmail}`);
   }
 
   // 3. Usuário Operacional de Demonstração
@@ -54,7 +54,7 @@ async function main() {
         isActive: true,
       },
     });
-    console.log(`✅ Usuário Operacional criado: ${opEmail} (Senha: Operacional123!@#)`);
+    console.log(`✅ Usuário Operacional criado: ${opEmail}`);
   }
 
   // 4. Categorias Padrão de Documentos

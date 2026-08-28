@@ -3,7 +3,7 @@ import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-li
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import api from '@/services/api';
-import { AuthContext } from '@/contexts/AuthContext';
+import * as AuthModule from '@/contexts/AuthContext';
 import type { AuthContextType, Role, User } from '@/types/auth';
 import type { DashboardMetrics } from '@/features/dashboard/types/dashboard.types';
 import type { Document } from '@/features/documents/types/document.types';
@@ -65,11 +65,8 @@ function authValue(role: Role = 'ADMIN'): AuthContextType {
 }
 
 function renderWithAuth(node: React.ReactNode, role: Role = 'ADMIN') {
-  return render(
-    <AuthContext.Provider value={authValue(role)}>
-      <MemoryRouter>{node}</MemoryRouter>
-    </AuthContext.Provider>
-  );
+  vi.spyOn(AuthModule, 'useAuth').mockReturnValue(authValue(role));
+  return render(<MemoryRouter>{node}</MemoryRouter>);
 }
 
 function makeDocument(overrides: Partial<Document>): Document {
