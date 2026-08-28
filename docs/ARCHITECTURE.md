@@ -1,72 +1,68 @@
-# Especificação de Arquitetura do Sistema - DocsOb
+# Especificação de Arquitetura do Sistema — DocsOb
 
 | Informação | Detalhe |
 | :--- | :--- |
-| **Projeto** | DocsOb - Gestão de Vencimento de Documentos |
-| **Fase Atual** | Fase 2: Design e Arquitetura do Sistema |
-| **Status** | Aprovado para Implementação |
-| **Versão** | 1.0.0 |
-| **Data** | 2026-08-07 |
-| **Documento Relacionado** | [PRD.md](file:///C:/Users/contadoc_/orca/workspaces/DocsOb/Criar-o-prot%C3%B3tipo-da-UI/docs/PRD.md) |
+| **Projeto** | DocsOb — Gestão de Vencimento de Documentos |
+| **Fase Atual** | Concluído e Validado (Fases 1 a 4 Concluídas) |
+| **Status** | Implementado, Validado e Operacional |
+| **Versão** | 1.1.0 |
+| **Última Atualização** | 2026-08-27 |
+| **Documento Relacionado** | [PRD.md](./PRD.md) |
 
 ---
 
 ## 1. Visão Geral da Arquitetura
 
-O sistema **DocsOb** é construído sob uma arquitetura desacoplada e moderna (Client-Server / RESTful API), projetada para responder com alta performance (tempo de resposta < 2s), garantindo auditoria imutável, sincronização proativa de prazos e controle estrito de acessos baseado em perfis (RBAC).
+O sistema **DocsOb** é construído sob uma arquitetura desacoplada e conteinerizada (Client-Server / RESTful API / Local-First), projetada para responder com alta performance (tempo de resposta < 200ms), garantindo auditoria imutável, sincronização de prazos e controle estrito de acessos baseado em perfis (RBAC).
 
 ```mermaid
-graph TD
-    subgraph "Camada de Apresentação (Frontend Web)"
-        UI["App Web Responsivo (React / HTML5 + CSS3 + JS)"]
-        Dashboard["Módulo Dashboard & Matriz de Cores"]
-        FormDoc["Módulo Cadastro & Renovação"]
-        CalendarView["Módulo Calendário & Sync"]
-        AuditView["Módulo Audit Log"]
-        UserMgmt["Módulo Gestão de Usuários (Admin)"]
+flowchart TD
+    subgraph Client ["Camada de Apresentação (Navegador Web)"]
+        Browser["Usuário (Browser Web)"]
     end
 
-    subgraph "Camada de Serviços / Backend (REST API)"
-        AuthService["Serviço de Autenticação & RBAC (JWT)"]
-        DocService["Serviço de Gestão de Documentos"]
-        RuleEngine["Motor de Status & Alertas (Cron meias-noites)"]
-        AuditService["Serviço de Trilha de Auditoria (Audit Log)"]
-        NotificationService["Serviço de E-mail (SMTP / Resend)"]
-        GCalService["Serviço de Integração Google Calendar API"]
+    subgraph DockerEnv ["Ambiente Containerizado (Docker Compose)"]
+        subgraph FrontendBox ["Frontend Container (Porta 80 / Host 3000)"]
+            Nginx["Nginx Alpine (Reverse Proxy & Static Server)"]
+            SPA["React 18 SPA (Vite / Tailwind Midnight Navy / Lucide / Recharts)"]
+        end
+
+        subgraph BackendBox ["Backend Container (Porta 3001)"]
+            Express["Express 4 REST API (Node.js 20 / TypeScript)"]
+            AuthModule["Módulo de Autenticação & RBAC (JWT + BCrypt)"]
+            DocModule["Módulo de Documentos & Versionamento"]
+            AuditModule["Módulo de Trilha de Auditoria (Audit Logs)"]
+            StatusModule["Motor de Status & Cron Diário (00:00)"]
+            ReportModule["Módulo de Relatórios (CSV / JSON)"]
+            GCalModule["Módulo de Sincronização de Calendário"]
+            Storage["Storage de Arquivos (Local Disk /app/uploads)"]
+            Prisma["Prisma ORM 6"]
+        end
+
+        subgraph DBBox ["Database Container (Porta 5432)"]
+            PostgreSQL[("PostgreSQL 16 Alpine\n(Schema Relacional + Índices)")]
+            PGVolume["Volume Persistente (postgres_data)"]
+        end
     end
 
-    subgraph "Camada de Dados & Armazenamento"
-        Database[("Banco de Dados Relacional\nPostgreSQL Local (Docker/Local) → Nuvem (Supabase/RDS)")]
-        FileStorage["Storage de Arquivos Anexos (Máx 10MB)\nLocal Disk Storage (./uploads) → Nuvem (S3/Supabase)"]
-    end
-
-    subgraph "Serviços Externos"
-        GCal["Google Calendar API (OAuth 2.0)"]
-        EmailGateway["Provedor de E-mail (Resend / SendGrid)"]
-    end
-
-    UI --> AuthService
-    UI --> DocService
-    UI --> AuditService
-    UI --> UserMgmt
-
-    DocService --> Database
-    DocService --> FileStorage
-    DocService --> GCalService
-    DocService --> AuditService
-
-    RuleEngine --> Database
-    RuleEngine --> NotificationService
-
-    GCalService --> GCal
-    NotificationService --> EmailGateway
+    Browser -->|HTTP :3000| Nginx
+    Nginx -->|Serve SPA / Fallback index.html| SPA
+    Nginx -->|Proxy /api/v1/*| Express
+    Express --> AuthModule
+    Express --> DocModule
+    Express --> AuditModule
+    Express --> StatusModule
+    Express --> ReportModule
+    Express --> GCalModule
+    DocModule --> Storage
+    Express --> Prisma
+    Prisma --> PostgreSQL
+    PostgreSQL --> PGVolume
 ```
 
 ---
 
-## 2. Modelo de Dados (ERD - Entidade e Relacionamento)
-
-### 2.1 Diagrama Entidade-Relacionamento (Mermaid ERD)
+## 2. Modelo de Dados (ERD — Entidade e Relacionamento)
 
 ```mermaid
 erDiagram
@@ -126,6 +122,8 @@ erDiagram
         date expiration_date
         string attachment_url
         string attachment_filename
+        int file_size_bytes
+        string file_mime_type
         text notes
         uuid renewed_by_id FK
         datetime created_at
@@ -153,8 +151,9 @@ erDiagram
     USER ||--o{ DOCUMENT : "cadastrou"
     USER ||--o{ DOCUMENT_VERSION : "renovou"
     USER ||--o{ AUDIT_LOG : "executou_acao"
+    USER ||--o{ COMPANY_CONFIG : "alterou_configuracao"
     DOCUMENT_CATEGORY ||--o{ DOCUMENT : "classifica"
-    DOCUMENT ||--o{ DOCUMENT_VERSION : "possui_historico"
+    DOCUMENT ||--o{ DOCUMENT_VERSION : "possui_versoes"
     DOCUMENT ||--o{ AUDIT_LOG : "registra_alteracoes"
     DOCUMENT ||--o{ GCAL_SYNC_LOG : "sincroniza_evento"
 ```
@@ -163,37 +162,41 @@ erDiagram
 
 ## 3. Dicionário de Dados e Estrutura de Tabelas
 
-### 3.1 Tabela: `company_config` (Configurações Globais da Empresa)
-- `id` (UUID, PK): Identificador único da empresa.
-- `notification_mode` (VARCHAR(30), NOT NULL): Define o comportamento de notificações e de formulário:
-  - `'ALL_ADMINS'`: Todos os Administradores recebem alertas. O campo "Responsável" fica **oculto** na UI e nulo no banco.
-  - `'ONLY_RESPONSIBLE'`: Apenas o e-mail do Responsável cadastrado no documento recebe os alertas. Campo "Responsável" é **obrigatório**.
-- `updated_at` (TIMESTAMP, NOT NULL): Data e hora da última alteração de configuração.
-- `updated_by_id` (UUID, FK -> `users.id`): ID do Administrador que alterou a regra.
-
----
+### 3.1 Tabela: `company_configs` (Configuração Global da Empresa)
+- `id` (UUID, PK): Identificador único da configuração.
+- `notification_mode` (VARCHAR(30), NOT NULL):
+  - `'ALL_ADMINS'`: Todos os Administradores recebem alertas. O campo "Responsável" é **oculto** na UI e nulo no banco.
+  - `'ONLY_RESPONSIBLE'`: Apenas o e-mail do Responsável cadastrado no documento recebe alertas. O campo "Responsável" é **obrigatório**.
+- `updated_at` (TIMESTAMP, NOT NULL): Data e hora da última alteração.
+- `updated_by_id` (UUID, FK -> `users.id`): ID do Administrador que atualizou.
 
 ### 3.2 Tabela: `users` (Usuários e Controle de Acesso)
-- `id` (UUID, PK): Identificador do usuário.
-- `name` (VARCHAR(150), NOT NULL): Nome completo do usuário.
-- `email` (VARCHAR(150), UNIQUE, NOT NULL): E-mail corporativo.
-- `password_hash` (VARCHAR(255), NOT NULL): Hash bcrypt/argon2 da senha.
+- `id` (UUID, PK): Identificador único do usuário.
+- `name` (VARCHAR(150), NOT NULL): Nome completo.
+- `email` (VARCHAR(150), UNIQUE, NOT NULL): E-mail institucional normalizado em minúsculas.
+- `password_hash` (VARCHAR(255), NOT NULL): Hash seguro gerado via BCrypt (salt rounds 10).
 - `role` (VARCHAR(20), NOT NULL): Papel de acesso:
-  - `'ADMIN'`: Acesso total, incluindo audit log, visualização de arquivados, gestão de usuários e configurações.
-  - `'OPERATIONAL'`: Acesso a cadastro, edição, renovação e arquivamento (não visualiza arquivados, não gerencia usuários nem configurações).
-- `is_active` (BOOLEAN, DEFAULT TRUE): Status da conta (Ativo / Inativo).
+  - `'ADMIN'`: Acesso irrestrito (Auditoria, Gestão de Usuários, Configurações, Documentos Arquivados, Hard Delete).
+  - `'OPERATIONAL'`: Acesso a cadastro, edição, renovação, upload e consulta de calendário.
+- `is_active` (BOOLEAN, DEFAULT TRUE): Status da conta (bloqueia login quando `false`).
+- `created_at` (TIMESTAMP, DEFAULT NOW()): Data de cadastro.
+- `updated_at` (TIMESTAMP, DEFAULT NOW()): Data da última alteração.
+
+### 3.3 Tabela: `document_categories` (Categorias de Documentos)
+- `id` (UUID, PK): Identificador único da categoria.
+- `name` (VARCHAR(100), UNIQUE, NOT NULL): Nome da categoria (ex: Fiscal, Trabalhista, Licenças, Contratos).
+- `color_hex` (VARCHAR(7), NOT NULL): Cor hexadecimal para identificação visual em badges.
+- `description` (VARCHAR(255), NULLABLE): Descrição detalhada da categoria.
 - `created_at` (TIMESTAMP, DEFAULT NOW()): Data de cadastro.
 
----
-
-### 3.3 Tabela: `documents` (Cadastro Principal de Documentos)
+### 3.4 Tabela: `documents` (Cadastro Principal de Documentos)
 - `id` (UUID, PK): Identificador do documento.
-- `title` (VARCHAR(200), NOT NULL): Nome ou título do documento.
-- `category_id` (UUID, FK -> `document_categories.id`, NOT NULL): Categoria/Tipo (ex: Fiscal, Trabalhista, Licença).
-- `issuing_body` (VARCHAR(150), NULLABLE): Orgão ou entidade emissora.
-- `issue_date` (DATE, NOT NULL): Data de emissão do documento.
-- `expiration_date` (DATE, NULLABLE): Data de vencimento. (Null = Indeterminado).
-- `alert_lead_days` (INT, DEFAULT 30): Antecedência em dias para disparar os alertas (ex: 60, 30, 15 ou 7).
+- `title` (VARCHAR(200), NOT NULL): Nome/título do documento.
+- `category_id` (UUID, FK -> `document_categories.id`, NOT NULL): Categoria associada.
+- `issuing_body` (VARCHAR(150), NULLABLE): Entidade ou órgão emissor.
+- `issue_date` (DATE, NOT NULL): Data de emissão.
+- `expiration_date` (DATE, NULLABLE): Data de vencimento (NULL = Validade Indeterminada / Permanente).
+- `alert_lead_days` (INT, DEFAULT 30): Antecedência em dias para disparar alertas críticos.
 - `status` (VARCHAR(30), NOT NULL): Status visual calculado:
   - `'EXPIRED'` (🔴 Vencido)
   - `'CRITICAL'` (🟡 Alerta Crítico)
@@ -202,160 +205,184 @@ erDiagram
   - `'INDETERMINATE'` (⚪ Validade Permanente)
 - `responsible_name` (VARCHAR(150), NULLABLE): Nome do responsável (condicional).
 - `responsible_email` (VARCHAR(150), NULLABLE): E-mail do responsável (condicional).
-- `attachment_url` (VARCHAR(500), NULLABLE): URL/Path do anexo no storage.
-- `attachment_filename` (VARCHAR(255), NULLABLE): Nome original do arquivo.
-- `file_size_bytes` (INT, CHECK <= 10485760): Tamanho do arquivo em bytes (máximo 10 MB).
-- `file_mime_type` (VARCHAR(100)): Tipo do arquivo (`application/pdf`, `image/png`, `image/jpeg`).
-- `notes` (TEXT, NULLABLE): Observações e instruções de renovação.
-- `is_archived` (BOOLEAN, DEFAULT FALSE): Soft delete (Documento arquivado).
-- `created_by_id` (UUID, FK -> `users.id`): Usuário que criou o registro.
+- `attachment_url` (VARCHAR(500), NULLABLE): Caminho relativo do arquivo no storage.
+- `attachment_filename` (VARCHAR(255), NULLABLE): Nome original do arquivo anexado.
+- `file_size_bytes` (INT, NULLABLE): Tamanho em bytes (limite de 10 MB = 10.485.760 bytes).
+- `file_mime_type` (VARCHAR(100), NULLABLE): MIME type (`application/pdf`, `image/png`, `image/jpeg`).
+- `notes` (TEXT, NULLABLE): Instruções e observações de renovação.
+- `is_archived` (BOOLEAN, DEFAULT FALSE): Soft delete (documento arquivado).
+- `created_by_id` (UUID, FK -> `users.id`): Usuário criador do registro.
 - `created_at` (TIMESTAMP, DEFAULT NOW()): Data de criação.
 - `updated_at` (TIMESTAMP, DEFAULT NOW()): Data da última atualização.
 
----
-
-### 3.4 Tabela: `document_versions` (Histórico de Renovações)
-- `id` (UUID, PK): Identificador da versão anterior.
-- `document_id` (UUID, FK -> `documents.id`, NOT NULL): Referência ao documento original.
-- `version_number` (INT, NOT NULL): Número da versão (1, 2, 3...).
+### 3.5 Tabela: `document_versions` (Histórico de Renovações)
+- `id` (UUID, PK): Identificador da versão histórica.
+- `document_id` (UUID, FK -> `documents.id`, NOT NULL): Documento de referência.
+- `version_number` (INT, NOT NULL): Número sequencial da versão arquivada (1, 2, 3...).
 - `issue_date` (DATE, NOT NULL): Data de emissão da versão antiga.
 - `expiration_date` (DATE, NOT NULL): Data de vencimento da versão antiga.
-- `attachment_url` (VARCHAR(500)): Link do anexo histórico.
-- `notes` (TEXT): Observações da renovação.
+- `attachment_url` (VARCHAR(500), NULLABLE): Link do anexo histórico.
+- `attachment_filename` (VARCHAR(255), NULLABLE): Nome do anexo histórico.
+- `file_size_bytes` (INT, NULLABLE): Tamanho do arquivo histórico.
+- `file_mime_type` (VARCHAR(100), NULLABLE): MIME type do arquivo histórico.
+- `notes` (TEXT, NULLABLE): Observações registradas na renovação.
 - `renewed_by_id` (UUID, FK -> `users.id`): Usuário que efetuou a renovação.
-- `created_at` (TIMESTAMP, DEFAULT NOW()): Data do registro da renovação.
+- `created_at` (TIMESTAMP, DEFAULT NOW()): Data do registro da versão.
 
----
-
-### 3.5 Tabela: `audit_logs` (Trilha de Auditoria - RN-008)
-- `id` (UUID, PK): Identificador do registro de auditoria.
-- `document_id` (UUID, FK -> `documents.id`, NOT NULL): Documento auditado.
+### 3.6 Tabela: `audit_logs` (Trilha de Auditoria Imutável — RN-008)
+- `id` (UUID, PK): Identificador do log.
+- `document_id` (UUID, FK -> `documents.id`, NULLABLE): Documento auditado (NULL se exclusão definitiva).
 - `user_id` (UUID, FK -> `users.id`, NOT NULL): Autor da ação.
 - `user_name` (VARCHAR(150), NOT NULL): Nome do usuário no momento da ação.
 - `action` (VARCHAR(30), NOT NULL): `'CREATE'`, `'UPDATE'`, `'ARCHIVE'`, `'UNARCHIVE'`, `'DELETE'`, `'RENEW'`.
-- `diff_data` (JSONB, NOT NULL): Objeto JSON com as diferenças detalhadas:
-  ```json
-  {
-    "expiration_date": { "old": "2026-08-01", "new": "2027-08-01" },
-    "status": { "old": "EXPIRED", "new": "REGULAR" }
-  }
-  ```
-- `timestamp` (TIMESTAMP, DEFAULT NOW()): Data e hora exata da ação.
+- `diff_data` (JSONB, NOT NULL): Objeto JSON detalhado com valores anteriores (`old`) e novos (`new`).
+- `timestamp` (TIMESTAMP, DEFAULT NOW()): Timestamp exato da operação.
+
+### 3.7 Tabela: `gcal_sync_logs` (Logs de Sincronização de Calendário)
+- `id` (UUID, PK): Identificador do log de sincronização.
+- `document_id` (UUID, FK -> `documents.id`, NULLABLE): Documento associado ao evento.
+- `gcal_event_id` (VARCHAR(255), NULLABLE): Identificador do evento gerado.
+- `status` (VARCHAR(30), NOT NULL): `'SYNCED'` ou `'ERROR'`.
+- `last_synced_at` (TIMESTAMP, DEFAULT NOW()): Data e hora da sincronização.
+- `error_message` (TEXT, NULLABLE): Detalhes de eventuais falhas.
 
 ---
 
 ## 4. Matriz de Cores e Lógica de Cálculo de Status (RN-001)
 
-O cálculo do status visual deve ser reavaliado dinamicamente no frontend e processado via rotina batch diária (cron job à meia-noite):
+A lógica de cálculo do status visual é unificada no serviço `statusService.ts` e executada de forma atômica:
 
 ```
 SE expiration_date É NULL OU tipo É "Sem Vencimento":
-    Status = ⚪ INDETERMINATE (Indeterminado)
-SENÃO SE status_manual É "Em Renovação":
+    Status = ⚪ INDETERMINATE (Validade Permanente)
+SENÃO SE status_manual É "RENEWAL_IN_PROGRESS" (Em Renovação):
     Status = 🔵 RENEWAL_IN_PROGRESS (Em Renovação)
 SENÃO SE DataAtual > expiration_date:
     Status = 🔴 EXPIRED (Vencido)
-SENÃO SE (expiration_date - DataAtual) <= alert_lead_days:
+SENÃO SE (expiration_date - DataAtual em dias) <= alert_lead_days:
     Status = 🟡 CRITICAL (Alerta Crítico)
 SENÃO:
     Status = 🟢 REGULAR (Em Dia)
 ```
 
+- **Recálculo em Tempo Real**: Executado a cada mutação (criação, edição, renovação).
+- **Recálculo Batch Agendado**: Executado automaticamente diariamente à meia-noite (`00:00:00`) via `cronService.ts`, atualizando todos os registros e disparando os alertas de e-mail pertinentes.
+
 ---
 
-## 5. Matriz de Controle de Acesso Baseado em Papéis (RBAC - RF-014)
+## 5. Matriz de Controle de Acesso Baseado em Papéis (RBAC — RF-014)
 
-| Funcionalidade / Recurso | Administrador (`ADMIN`) | Operacional (`OPERATIONAL`) |
-| :--- | :---: | :---: |
-| Cadastrar e Editar Documentos | ✅ Sim | ✅ Sim |
-| Anexar Arquivos (até 10 MB) | ✅ Sim | ✅ Sim |
-| Sinalizar "Em Renovação" / Renovar Documento | ✅ Sim | ✅ Sim |
-| Arquivar Documento (Soft Delete) | ✅ Sim | ✅ Sim |
-| Visualizar Documentos Arquivados | ✅ Sim | ❌ Não (Filtro oculto) |
-| Excluir Permanentemente (Hard Delete) | ✅ Sim | ❌ Não |
-| Visualizar Trilha de Auditoria (Audit Log) | ✅ Sim | ❌ Não |
-| Alterar Configurações da Empresa (RN-004) | ✅ Sim | ❌ Não |
-| Gerenciar Usuários (Criar, Editar Roles, Inativar) | ✅ Sim | ❌ Não |
+| Funcionalidade / Recurso | Rota de API | Administrador (`ADMIN`) | Operacional (`OPERATIONAL`) |
+| :--- | :--- | :---: | :---: |
+| Autenticação e Consulta de Perfil | `POST /auth/login`, `GET /auth/me` | ✅ Permitido | ✅ Permitido |
+| Listar e Filtrar Documentos | `GET /documents` | ✅ Permitido (com arquivados) | ✅ Permitido (sem arquivados) |
+| Criar e Editar Documentos | `POST /documents`, `PUT /documents/:id` | ✅ Permitido | ✅ Permitido |
+| Download de Anexos | `GET /documents/:id/attachment` | ✅ Permitido | ✅ Permitido |
+| Renovar Documento | `POST /documents/:id/renew` | ✅ Permitido | ✅ Permitido |
+| Arquivar Documento (Soft Delete) | `PATCH /documents/:id/archive` | ✅ Permitido | ✅ Permitido |
+| Excluir Permanentemente (Hard Delete) | `DELETE /documents/:id` | ✅ Permitido | ❌ 403 Forbidden |
+| Gestão de Categorias | `POST /categories`, `DELETE /categories/:id` | ✅ Permitido | ❌ 403 Forbidden |
+| Visualizar Trilha de Auditoria | `GET /audit-logs`, `GET /audit-logs/:id` | ✅ Permitido | ❌ 403 Forbidden |
+| Exportar Relatórios (CSV/JSON) | `GET /reports/export`, `GET /reports/summary` | ✅ Permitido | ✅ Permitido |
+| Visualizar Calendário | `GET /calendar/events` | ✅ Permitido | ✅ Permitido |
+| Sincronizar Agenda & Logs | `POST /calendar/sync`, `GET /calendar/sync-logs` | ✅ Permitido | ❌ 403 Forbidden (Logs) |
+| Gestão de Usuários (CRUD/Status/Senha) | `/users/*` | ✅ Permitido | ❌ 403 Forbidden |
+| Configurações da Empresa | `GET /company/config`, `PUT /company/config` | ✅ Permitido | ❌ 403 Forbidden |
+| Recálculo / Digest Manual | `/notifications/*` | ✅ Permitido | ❌ 403 Forbidden |
 
 ---
 
 ## 6. Fluxos de Trabalho Principais
 
-### 6.1 Fluxo de Cadastro e Validação Condicional (RN-004)
+### 6.1 Cadastro com Validação Condicional de Responsável (RN-004)
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor User as Usuário (Admin/Operacional)
-    participant UI as Interface Web
-    participant API as Service API
-    participant DB as Banco de Dados
-    participant GCal as Google Calendar API
+    actor User as Usuário (Admin / Operacional)
+    participant UI as Frontend React (AppShell)
+    participant API as Backend Express API
+    participant DB as PostgreSQL 16
+    participant Storage as Storage de Anexos
 
-    User->>UI: Abre formulário "Novo Documento"
+    User->>UI: Abre modal "Novo Documento"
     UI->>API: GET /api/v1/company/config
-    API-->>UI: Retorna notification_mode ('ALL_ADMINS' ou 'ONLY_RESPONSIBLE')
+    API-->>UI: Retorna { notificationMode: 'ALL_ADMINS' | 'ONLY_RESPONSIBLE' }
     alt Mode == 'ALL_ADMINS'
-        UI->>UI: Oculta campo "Responsável" no formulário
+        UI->>UI: Oculta campos de Responsável (Nome / E-mail)
     else Mode == 'ONLY_RESPONSIBLE'
-        UI->>UI: Exibe campo "Responsável" (Obrigatório: nome + email)
+        UI->>UI: Exibe campos de Responsável (Obrigatórios)
     end
-    User->>UI: Preenche dados + Seleciona Anexo (<=10MB) + Submete
-    UI->>API: POST /api/v1/documents (multipart/form-data)
-    API->>API: Valida tamanho e extensão do arquivo
-    API->>API: Calcula status visual (RN-001)
-    API->>DB: INSERT INTO documents & INSERT INTO audit_logs
-    API->>GCal: Cria evento no Google Agenda com data de vencimento
-    GCal-->>API: Event ID retornado
-    API->>DB: INSERT INTO gcal_sync_logs
-    API-->>UI: Sucesso 201 Created
-    UI-->>User: Exibe documento no Dashboard com Matriz de Cor
+    User->>UI: Preenche formulário + Anexa PDF/PNG/JPG (<=10MB) + Submete
+    UI->>API: POST /api/v1/documents (multipart/form-data com Bearer JWT)
+    API->>API: Valida MIME Type, Magic Bytes e Tamanho do arquivo
+    API->>Storage: Salva arquivo físico em /app/uploads
+    API->>API: Calcula Status visual inicial (RN-001)
+    API->>DB: Inicia transação: INSERT INTO documents & INSERT INTO audit_logs (Action: 'CREATE')
+    DB-->>API: Transação confirmada
+    API-->>UI: Retorna 201 Created com objeto do documento
+    UI-->>User: Exibe toast de sucesso e atualiza tabela/dashboard em tempo real
 ```
 
----
-
-### 6.2 Fluxo de Renovação com Histórico e Audit Log (RN-002 & RN-008)
+### 6.2 Renovação de Documento com Histórico de Versão (RN-002 & RN-008)
 
 ```mermaid
 sequenceDiagram
     autonumber
     actor User as Usuário
-    participant UI as Interface Web
-    participant API as Service API
-    participant DB as Banco de Dados
+    participant UI as Frontend React
+    participant API as Backend Express API
+    participant DB as PostgreSQL 16
+    participant Storage as Storage de Anexos
 
-    User->>UI: Clica em "Renovar Documento"
-    UI->>User: Exibe modal (Nova Data de Emissão, Nova Data de Vencimento, Novo Anexo)
-    User->>UI: Confirma Renovação
-    UI->>API: POST /api/v1/documents/{id}/renew
-    API->>DB: Copia dados da versão atual -> INSERT INTO document_versions
-    API->>DB: UPDATE documents com novas datas, novo anexo, incrementa versão e recarrega status para REGULAR
-    API->>DB: INSERT INTO audit_logs (Action: 'RENEW', diff_data)
-    API-->>UI: Retorna documento atualizado
-    UI-->>User: Atualiza tela com selo "Versão 2" e histórico acessível
+    User->>UI: Clica em "Renovar" no documento
+    UI->>User: Exibe modal de renovação (Novas datas de emissão/vencimento e novo anexo)
+    User->>UI: Preenche novas datas + Anexa novo arquivo + Confirma
+    UI->>API: POST /api/v1/documents/:id/renew (multipart/form-data)
+    API->>Storage: Salva novo arquivo anexo
+    API->>DB: Transação atômica:
+    Note over API,DB: 1. INSERT INTO document_versions (dados da versão anterior)\n2. UPDATE documents (novas datas, novo anexo, status recalculado para REGULAR)\n3. INSERT INTO audit_logs (Action: 'RENEW', diff_data completo)
+    DB-->>API: Commit da transação
+    API-->>UI: Retorna documento atualizado com versão incrementada
+    UI-->>User: Atualiza visual com badge de versão e disponibiliza aba de histórico
 ```
 
 ---
 
 ## 7. Decisões de Arquitetura Tecnológica (ADRs)
 
-1. **Stack de Desenvolvimento Local e Produção (Local-First com Portabilidade)**:
-   - **Frontend**: Single-Page Application (SPA) responsiva em HTML5, CSS3 Vanilla (Design System com Dark Mode, Glassmorphism, Micro-animações CSS) e JS ES6 Modules.
-   - **Backend**: API RESTful Node.js (TypeScript) com Express ou NestJS.
-   - **Banco de Dados**: **PostgreSQL Local** (via Docker Compose ou serviço local) gerenciado com **Prisma ORM**. Custo zero no desenvolvimento inicial, garantindo 100% de paridade para migração futura à nuvem (Supabase, Neon, AWS RDS) apenas alterando a variável `DATABASE_URL`.
-   - **Storage de Anexos**: Armazenamento em disco local (`./uploads/` estático/controlado) com limite de 10 MB no desenvolvimento/fase local, estruturado sob uma interface de storage (`IStorageService`) para permitir chaveamento imediato para Amazon S3 / Supabase Storage quando for para a nuvem.
-   - **Notificação**: Serviço de e-mail transacional (Nodemailer / Resend / SendGrid) agendado via Cron Job diário.
-   - **Calendário**: Google Calendar API via OAuth2 Service Account.
+### ADR-001: Arquitetura Monorepo Modular Local-First
+- **Decisão**: Adotar estrutura monorepo com pastas independentes `backend/` e `frontend/`, scripts cross-platform no `package.json` raiz e orquestração Docker Compose unificada.
+- **Racional**: Permite que desenvolvedores e operadores executem o sistema completo com 1 único comando (`docker compose up --build`), garantindo ambiente isolado, paridade de desenvolvimento/produção e facilidade de testes E2E.
 
-2. **Estratégia de Custo Zero e Testabilidade**:
-   - Manter o ambiente 100% autossuficiente e executável localmente (banco de dados, uploads e backend), eliminando custos de infraestrutura em nuvem na fase inicial.
-   - Desenvolver o backend desacoplado com migrations automatizadas do Prisma para que a transição para nuvem seja uma operação de deploy sem alterações no código de negócio.
+### ADR-002: Containerização Multi-Stage e Nginx SPA Proxy
+- **Decisão**: O frontend é compilado via multi-stage build no Dockerfile e servido por container Nginx Alpine ultra-leve, que atua simultaneamente como servidor de estáticos (com SPA Fallback para `index.html`) e Reverse Proxy redirecionando chamadas `/api/v1/*` para o container do backend.
+- **Racional**: Elimina problemas de CORS, unifica a porta de entrada da aplicação (`http://localhost:80` ou `3000`), reduz o tamanho final da imagem e protege os headers HTTP com gzip e security policies.
+
+### ADR-003: Abstração de Armazenamento de Arquivos (`IStorageService`)
+- **Decisão**: Implementar o armazenamento de arquivos anexos desacoplado através de uma interface de serviço (`IStorageService` e `LocalStorageService`).
+- **Racional**: Garante custo zero no MVP armazenando arquivos no disco local montado em volume `/app/uploads`, permitindo migração futura imediata para Amazon S3 ou Supabase Storage apenas criando uma nova implementação da interface.
+
+### ADR-004: Trilha de Auditoria com Diff Estruturado em JSON
+- **Decisão**: Registrar todas as mutações na tabela `audit_logs` contendo autor, ação e um payload JSONB com o diff explícito (`old` vs `new`).
+- **Racional**: Atende integralmente a regra RN-008 e viabiliza a renderização de componentes de comparação visual no frontend sem necessidade de recálculos complexos.
+
+### ADR-005: Suíte de Testes Automatizados em Três Camadas
+- **Decisão**: Estruturar a garantia de qualidade em 3 esteiras:
+  1. **Testes Unitários / Integração Backend (Vitest)**: 140 casos cobrindo controllers, services, middlewares e regras de negócio.
+  2. **Testes Unitários Frontend (Vitest + React Testing Library)**: 28 casos cobrindo autenticação, formulários, RBAC e modais.
+  3. **Testes E2E HTTP Integrados (Vitest + Docker Runner)**: 19 casos cobrindo os cenários TC-01 a TC-08 contra containers reais em portas dinâmicas com teardown garantido.
+- **Racional**: 100% de confiabilidade nas entregas, prevenindo regressões em upgrades e refatorações.
 
 ---
 
-## 8. Próximos Passos (Fase 3 - Implementação do Backend e Banco de Dados)
+## 8. Status de Implementação e Verificação das Fases
 
-Com a arquitetura, modelo ERD, especificações e estratégia local-first aprovadas:
-1. Criar a configuração local de ambiente (`docker-compose.yml` e schema do Prisma para PostgreSQL).
-2. Inicializar o backend em Node.js/TypeScript e estruturar o upload local de arquivos.
-3. Conectar a interface UI às rotas da API RESTful.
+Todas as 4 fases do projeto foram concluídas com sucesso:
+
+| Fase | Descrição | Status | Evidência de Conclusão |
+| :--- | :--- | :---: | :--- |
+| **Fase 1** | Levantamento de Requisitos e PRD | ✅ Concluído | [PRD.md](./PRD.md) aprovado com matriz de regras de negócio. |
+| **Fase 2** | Arquitetura e Modelagem de Dados | ✅ Concluído | [ARCHITECTURE.md](./ARCHITECTURE.md), Schema Prisma e ERD. |
+| **Fase 3** | Implementação Full-Stack | ✅ Concluído | Backend REST API, Frontend SPA React, Design System Midnight Navy. |
+| **Fase 4** | Dockerização, Scripts e Testes E2E | ✅ Concluído | Docker Compose unificado, scripts `run-e2e.mjs`, **187/187 testes passando**. |
