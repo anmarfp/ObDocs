@@ -1,7 +1,7 @@
 ---
 id: T-260830-bbinpu
 title: "DOC-28 (2/5): fluxo de conexão OAuth (endpoints + botão no frontend)"
-status: backlog
+status: doing
 owner: "-"
 workflow: feature
 created: 2026-08-30
