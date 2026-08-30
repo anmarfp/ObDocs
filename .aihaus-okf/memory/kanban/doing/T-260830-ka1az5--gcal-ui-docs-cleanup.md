@@ -1,7 +1,7 @@
 ---
 id: T-260830-ka1az5
 title: "DOC-28 (5/5): remover banner de simulação, ajustar UI e atualizar PRD/ARCHITECTURE"
-status: backlog
+status: doing
 owner: "-"
 workflow: feature
 created: 2026-08-30
