@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { google } from 'googleapis';
 import { prisma } from '../lib/prisma.js';
 import { AuthenticatedRequest } from '../types/index.js';
-import { generateToken, verifyToken } from '../utils/jwt.js';
+import { signOAuthState, verifyOAuthState } from '../utils/jwt.js';
 
 /**
  * Fluxo de conexão OAuth por usuário com o Google Agenda (ADR-009 / DOC-28, subtarefa 2).
@@ -60,16 +60,13 @@ export async function getGoogleAuthUrl(
 
     // `state` carrega o userId autenticado assinado com o mesmo segredo JWT da
     // aplicação, para que o callback (que não recebe Bearer token, pois é o
-    // navegador sendo redirecionado pelo Google) possa confiar nele. Reconstrói
-    // um payload "limpo": `req.user` é o token JÁ decodificado (carrega `iat`/
-    // `exp` do jsonwebtoken) e `generateToken` rejeita assinar um payload que já
-    // tenha `exp`, pois define `expiresIn` de novo.
-    const state = generateToken({
-      userId: req.user!.userId,
-      email: req.user!.email,
-      role: req.user!.role,
-      name: req.user!.name,
-    });
+    // navegador sendo redirecionado pelo Google) possa confiar nele.
+    // Deliberadamente NÃO reaproveita `generateToken` (o token de login): um
+    // `state` de OAuth trafega em canais baseados em URL (query string, logs de
+    // acesso do próprio Google e do servidor, histórico do navegador) muito mais
+    // expostos que um header `Authorization`, então usa `signOAuthState`, que
+    // assina só o `userId` com validade de minutos, não dias.
+    const state = signOAuthState(req.user!.userId);
 
     const oauth2Client = createOAuth2Client();
     const url = oauth2Client.generateAuthUrl({
@@ -106,7 +103,7 @@ export async function handleGoogleAuthCallback(req: Request, res: Response): Pro
 
     let userId: string;
     try {
-      userId = verifyToken(state).userId;
+      userId = verifyOAuthState(state);
     } catch {
       redirectTo('error');
       return;

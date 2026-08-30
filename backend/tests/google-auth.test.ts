@@ -43,7 +43,7 @@ vi.mock('../src/lib/prisma.js', () => ({
 
 import { prisma } from '../src/lib/prisma.js';
 import { app } from '../src/app.js';
-import { generateToken, verifyToken } from '../src/utils/jwt.js';
+import { generateToken, signOAuthState, verifyOAuthState } from '../src/utils/jwt.js';
 
 describe('Google Calendar OAuth - fluxo de conexão (DOC-28, subtarefa 2)', () => {
   const adminToken = generateToken({
@@ -119,8 +119,7 @@ describe('Google Calendar OAuth - fluxo de conexão (DOC-28, subtarefa 2)', () =
         state: expect.any(String),
       }));
 
-      const decodedState = verifyToken(callArgs.state);
-      expect(decodedState.userId).toBe('admin-1');
+      expect(verifyOAuthState(callArgs.state)).toBe('admin-1');
     });
 
     it('também permite o perfil OPERATIONAL', async () => {
@@ -133,7 +132,7 @@ describe('Google Calendar OAuth - fluxo de conexão (DOC-28, subtarefa 2)', () =
 
       expect(res.status).toBe(200);
       const [callArgs] = mockGenerateAuthUrl.mock.calls[0];
-      expect(verifyToken(callArgs.state).userId).toBe('operational-1');
+      expect(verifyOAuthState(callArgs.state)).toBe('operational-1');
     });
   });
 
@@ -157,11 +156,23 @@ describe('Google Calendar OAuth - fluxo de conexão (DOC-28, subtarefa 2)', () =
       expect(mockGetToken).not.toHaveBeenCalled();
     });
 
+    it('rejeita um token de login normal (Bearer) usado como state, mesmo assinado com o mesmo segredo', async () => {
+      // Prova que `state` é um propósito distinto de `generateToken`: um token de
+      // login válido não deve ser aceito como state só por compartilhar o segredo.
+      configureGoogleEnv();
+
+      const res = await request(app)
+        .get('/api/v1/calendar/google/callback')
+        .query({ code: 'auth-code', state: adminToken });
+
+      expect(res.status).toBe(302);
+      expect(res.headers.location).toBe('http://localhost:5173/configuracoes?google=error');
+      expect(mockGetToken).not.toHaveBeenCalled();
+    });
+
     it('troca o code por tokens e cria o registro em GoogleOAuthToken na primeira conexão', async () => {
       configureGoogleEnv();
-      const state = generateToken({
-        userId: 'admin-1', email: 'admin1@docsob.com', name: 'Admin Um', role: Role.ADMIN,
-      });
+      const state = signOAuthState('admin-1');
       (prisma.googleOAuthToken.findUnique as any).mockResolvedValue(null);
       (prisma.googleOAuthToken.upsert as any).mockResolvedValue({ id: 'token-1' });
       mockGetToken.mockResolvedValue({
@@ -192,9 +203,7 @@ describe('Google Calendar OAuth - fluxo de conexão (DOC-28, subtarefa 2)', () =
 
     it('ao reconectar, preserva o refreshToken existente quando o Google não devolve um novo', async () => {
       configureGoogleEnv();
-      const state = generateToken({
-        userId: 'admin-1', email: 'admin1@docsob.com', name: 'Admin Um', role: Role.ADMIN,
-      });
+      const state = signOAuthState('admin-1');
       (prisma.googleOAuthToken.findUnique as any).mockResolvedValue({
         id: 'token-1', userId: 'admin-1', accessToken: 'old-access', refreshToken: 'old-refresh', scope: 'old-scope',
       });
@@ -220,9 +229,7 @@ describe('Google Calendar OAuth - fluxo de conexão (DOC-28, subtarefa 2)', () =
 
     it('redireciona com erro quando a troca do code pelos tokens falha', async () => {
       configureGoogleEnv();
-      const state = generateToken({
-        userId: 'admin-1', email: 'admin1@docsob.com', name: 'Admin Um', role: Role.ADMIN,
-      });
+      const state = signOAuthState('admin-1');
       mockGetToken.mockRejectedValue(new Error('invalid_grant'));
 
       const res = await request(app)
