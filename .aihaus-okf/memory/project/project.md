@@ -2,7 +2,7 @@
 type: project
 owner: project
 status: active
-last_reviewed: 2026-08-29
+last_reviewed: 2026-08-30
 ---
 
 # Project — DocsOb
@@ -32,6 +32,7 @@ DocsOb is a web application designed to proactively track document expiration da
 
 ## Timeline
 
+- 2026-08-30 — DOC-28 shipped: Google Calendar sync is now real, not simulated. Per-user OAuth2 (ADR-009) replaces the `gcal-event-${id}` placeholder in `gcalService.ts`; documents auto-sync on create/edit/archive/delete (RN-007); UI/docs updated to match. 5 sequential PRs (#3-#7) merged to `main`; kanban cards `T-260830-6vz64a/bbinpu/hihhvj/4e2ce4/ka1az5` all in `done/`.
 - 2026-08-29 — Verified Phase 4 completion end to end: `main` clean and up to date with origin; commits `f74c83f`/`d13cb43`/`b0463ea` (2026-08-27) deliver full-stack integration, unified Docker Compose, and E2E scripts, with PRD/ARCHITECTURE updated to "Fases 1 a 4 Concluídas"; backend Vitest suite re-run and confirmed 140/140 passing; kanban board has all 15 tasks in `done/` with none pending. Corrects this page, which had been stale since 2026-08-24 (stuck describing Phase 3 as current).
 - 2026-08-26 — Completed Phase 3 Backend implementation (Passo 1 to Passo 9) with 140/140 automated Vitest tests covering Auth, Documents, Admin, Renewals, Audit, Notifications, Cron, Calendar, Dashboard, and Reports.
 - 2026-08-24 — Personalized aihaus-okf engine with real repository evidence from PRD v0.2.0 and Architecture v1.0.0.

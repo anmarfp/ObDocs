@@ -1,7 +1,7 @@
 ---
 id: T-260830-ka1az5
 title: "DOC-28 (5/5): remover banner de simulação, ajustar UI e atualizar PRD/ARCHITECTURE"
-status: doing
+status: done
 owner: "-"
 workflow: feature
 created: 2026-08-30
@@ -113,3 +113,6 @@ sincronização deixar de ser simulada de fato.
   - Não tocado: `gcalService.ts`, `documentController.ts`,
     `googleAuthController.ts`, `calendarRoutes.ts`, `SettingsPage.tsx`
     (fora de escopo desta subtarefa).
+- 2026-08-30 — Revisado (sem correções necessárias) e mesclado pelo orquestrador:
+  PR #7 mesclada em `main` (`5a494ff`), branch remota e worktree encerradas.
+  Fecha DOC-28 — as 5 subtarefas estão em `done/`.
