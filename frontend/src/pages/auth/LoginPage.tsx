@@ -59,11 +59,11 @@ export const LoginPage: React.FC = () => {
 
   const fillDemoCredentials = (role: 'admin' | 'operational') => {
     if (role === 'admin') {
-      setEmail('admin@docsob.com');
-      setPassword('admin123');
+      setEmail('admin@docsob.com.br');
+      setPassword('Admin123!@#');
     } else {
-      setEmail('operacional@docsob.com');
-      setPassword('operacional123');
+      setEmail('operacional@docsob.com.br');
+      setPassword('Operacional123!@#');
     }
   };
 
