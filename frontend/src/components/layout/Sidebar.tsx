@@ -9,7 +9,6 @@ import {
   ShieldCheck,
   Users,
   Settings,
-  X,
   FileCheck2,
 } from 'lucide-react';
 
@@ -45,27 +44,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        {/* Sidebar Brand Header */}
-        <div className="h-16 px-5 flex items-center justify-between border-b border-navy-900/80">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 rounded-lg bg-navy-900 border border-navy-400/40 text-navy-100 flex items-center justify-center font-bold text-sm shadow-sm">
-              DO
-            </div>
-            <div>
-              <span className="text-sm font-bold text-white tracking-wide">DocsOb</span>
-              <span className="block text-[10px] text-navy-400 font-medium leading-none">Gestão de Documentos</span>
-            </div>
-          </div>
-
-          <button
-            onClick={onClose}
-            aria-label="Fechar menu"
-            className="p-1 rounded-lg text-slate-400 hover:text-white lg:hidden"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
         {/* Sidebar Navigation Links */}
         <nav className="flex-1 px-3 py-4 space-y-6 overflow-y-auto">
           {/* Main Navigation */}

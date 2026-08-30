@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import {
-  Menu,
   Bell,
   User as UserIcon,
   LogOut,
@@ -16,12 +15,7 @@ import { documentService } from '@/features/documents/services/documentService';
 import { Document } from '@/features/documents/types/document.types';
 import { formatDate } from '@/features/documents/utils/dateHelper';
 
-interface HeaderProps {
-  onToggleSidebar: () => void;
-  sidebarOpen: boolean;
-}
-
-export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
+export const Header: React.FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
@@ -89,16 +83,8 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
 
   return (
     <header className="h-16 bg-white border-b border-slate-200 sticky top-0 z-40 px-4 md:px-6 flex items-center justify-between shadow-sm">
-      {/* Left: Hamburger & Brand */}
+      {/* Left: Brand */}
       <div className="flex items-center space-x-3">
-        <button
-          onClick={onToggleSidebar}
-          aria-label="Alternar Menu"
-          className="p-2 rounded-lg text-slate-600 hover:text-navy-900 hover:bg-slate-100 transition focus:outline-none focus:ring-2 focus:ring-navy-600"
-        >
-          <Menu className="w-5 h-5" />
-        </button>
-
         <Link to="/" className="flex items-center space-x-3 group">
           <div className="w-9 h-9 rounded-xl bg-navy-950 flex items-center justify-center shadow text-navy-100 font-bold text-base transition-transform group-hover:scale-105">
             DO
