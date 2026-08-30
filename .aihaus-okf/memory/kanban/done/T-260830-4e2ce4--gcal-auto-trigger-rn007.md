@@ -1,7 +1,7 @@
 ---
 id: T-260830-4e2ce4
 title: "DOC-28 (4/5): gatilho automático de sync em criar/editar/excluir documento (RN-007)"
-status: doing
+status: done
 owner: "-"
 workflow: feature
 created: 2026-08-30
@@ -104,3 +104,7 @@ simulação.
     passa (185 testes, 11 novos), com a única falha pré-existente e já documentada
     em `notification-gcal.test.ts` › `cronService` › "recalcula documentos ativos..."
     (fixture de data hardcoded, não relacionada a este trabalho).
+- 2026-08-30 — Revisado (sem correções necessárias) e mesclado pelo orquestrador:
+  PR #6 mesclada em `main` (`f30506a`), branch remota e worktree encerradas.
+  `npm --prefix backend test` re-executado em `main` pós-merge: 184/185 (mesma
+  falha pré-existente). Container `backend` reconstruído.
