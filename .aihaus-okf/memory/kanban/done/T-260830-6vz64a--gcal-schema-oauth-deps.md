@@ -1,7 +1,7 @@
 ---
 id: T-260830-6vz64a
 title: "DOC-28 (1/5): dependência googleapis + schema GoogleOAuthToken + env vars"
-status: doing
+status: done
 owner: "-"
 workflow: feature
 created: 2026-08-30
@@ -85,3 +85,8 @@ ambiente/credenciais documentadas. Nenhum comportamento de sincronização muda 
   exatamente da mesma forma sem nenhuma das mudanças desta subtarefa — não é uma
   regressão introduzida aqui. Nenhum arquivo fora do escopo (`gcalService.ts`,
   `calendarController.ts`, frontend) foi tocado.
+- 2026-08-30 — Revisado pelo orquestrador: PR #3 aberta, mesclada em `main`
+  (`cde3303`), branch remota e worktree encerradas. `npm --prefix backend test`
+  re-executado em `main` pós-merge: 142/143 (mesma falha pré-existente e não
+  relacionada, documentada em `knowledge.md`). Container `backend` reconstruído
+  via `docker compose build backend && docker compose up -d backend`.
