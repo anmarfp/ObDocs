@@ -1,7 +1,7 @@
 ---
 id: T-260830-6vz64a
 title: "DOC-28 (1/5): dependência googleapis + schema GoogleOAuthToken + env vars"
-status: backlog
+status: doing
 owner: "-"
 workflow: feature
 created: 2026-08-30
@@ -56,13 +56,32 @@ ambiente/credenciais documentadas. Nenhum comportamento de sincronização muda 
 - Qualquer mudança em `gcalService.ts`, `calendarController.ts`, frontend.
 
 ## Checklist
-- [ ] `googleapis` adicionado a `backend/package.json`, `npm install` rodado
-- [ ] Migration Prisma criada para `GoogleOAuthToken` e aplicada localmente
-- [ ] `.env.example` e `backend/.env.example` atualizados com as 3 variáveis Google
-- [ ] `docker-compose.yml` (serviço `backend`) atualizado com as mesmas variáveis
-- [ ] `npm --prefix backend run build` (typecheck) passa
-- [ ] `npm --prefix backend test` (suíte existente, sem regressão) passa
-- [ ] Commit único e descritivo, sem push
+- [x] `googleapis` adicionado a `backend/package.json`, `npm install` rodado
+- [x] Migration Prisma criada para `GoogleOAuthToken` e aplicada localmente
+- [x] `.env.example` e `backend/.env.example` atualizados com as 3 variáveis Google
+- [x] `docker-compose.yml` (serviço `backend`) atualizado com as mesmas variáveis
+- [x] `npm --prefix backend run build` (typecheck) passa
+- [x] `npm --prefix backend test` (suíte existente, sem regressão) passa
+- [x] Commit único e descritivo, sem push
 
 ## Log
 - 2026-08-30 — criada a partir da decomposição de DOC-28 (ADR-009)
+- 2026-08-30 — Implementada a subtarefa 1/5: adicionado `googleapis@^176.0.0` a
+  `backend/package.json` (+ `npm install`, gera `package-lock.json`); novo model
+  Prisma `GoogleOAuthToken` (relação 1:1 com `User`, FK única `userId`, campos
+  `accessToken`/`refreshToken`/`expiryDate`/`scope`/`createdAt`/`updatedAt`) com
+  migration `20260830192802_add_google_oauth_token` aplicada com sucesso no
+  Postgres local (`prisma migrate status` confirma "up to date"); adicionadas
+  `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI` a `.env.example`,
+  `backend/.env.example` (placeholders `changeme_...`) e ao serviço `backend` em
+  `docker-compose.yml` (padrão `${VAR:-}`). `npm --prefix backend run build` passa
+  sem erros. `npm --prefix backend test`: 142/143 testes passam; a única falha
+  (`tests/notification-gcal.test.ts` › cronService › recalcula documentos ativos...)
+  é um bug pré-existente e não relacionado — o teste hardcoda
+  `expirationDate: 2026-08-30` sem congelar o relógio do sistema (sem
+  `vi.setSystemTime`), e a data real de hoje é 2026-08-30, então o documento que o
+  teste espera como CRITICAL já é calculado como EXPIRED. Confirmado via
+  `git stash` (reverte para o código antes desta subtarefa) que o mesmo teste falha
+  exatamente da mesma forma sem nenhuma das mudanças desta subtarefa — não é uma
+  regressão introduzida aqui. Nenhum arquivo fora do escopo (`gcalService.ts`,
+  `calendarController.ts`, frontend) foi tocado.

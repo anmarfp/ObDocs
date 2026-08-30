@@ -64,6 +64,7 @@ model User {
   renewedVersions  DocumentVersion[] @relation("VersionRenewer")
   auditLogs        AuditLog[]        @relation("UserAuditor")
   updatedConfigs   CompanyConfig[]   @relation("CompanyConfigUpdater")
+  googleOAuthToken GoogleOAuthToken?
 
   @@map("users")
 }
@@ -151,4 +152,18 @@ model GCalSyncLog {
   errorMessage String?    @map("error_message")
 
   @@map("gcal_sync_logs")
+}
+
+model GoogleOAuthToken {
+  id           String   @id @default(uuid())
+  userId       String   @unique @map("user_id")
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken  String   @map("access_token")
+  refreshToken String   @map("refresh_token")
+  expiryDate   DateTime @map("expiry_date")
+  scope        String
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("google_oauth_tokens")
 }
