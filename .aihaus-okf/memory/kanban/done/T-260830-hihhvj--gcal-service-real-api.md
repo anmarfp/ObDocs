@@ -1,7 +1,7 @@
 ---
 id: T-260830-hihhvj
 title: "DOC-28 (3/5): reescrever gcalService.ts para chamadas reais à Google Calendar API"
-status: doing
+status: done
 owner: "-"
 workflow: feature
 created: 2026-08-30
@@ -153,3 +153,6 @@ já mesclado em `main`.
   `deleteDocumentEvent` (nenhum teste cobria essa função nova). `npm --prefix
   backend test` após a correção: 173/174 (mesma falha pré-existente e não
   relacionada). PR aberta e mesclada em `main` em seguida.
+- 2026-08-30 — Mesclado (PR #5, `9646c98`), branch remota e worktree encerradas.
+  `npm --prefix backend test` re-executado em `main` pós-merge: 173/174 (mesma
+  falha pré-existente). Container `backend` reconstruído.
