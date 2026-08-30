@@ -57,14 +57,50 @@ simulação.
 - UI/banner (subtarefa 5).
 
 ## Checklist
-- [ ] `createDocument` dispara sync ao criar documento com vencimento
-- [ ] `updateDocument` dispara sync ao alterar a data de vencimento
-- [ ] Arquivar/excluir dispara remoção do evento correspondente
-- [ ] Falha de sync não bloqueia a resposta HTTP da operação principal
-- [ ] Testes cobrindo os 3 gatilhos (mock de `gcalService`, seguindo o padrão de
+- [x] `createDocument` dispara sync ao criar documento com vencimento
+- [x] `updateDocument` dispara sync ao alterar a data de vencimento
+- [x] Arquivar/excluir dispara remoção do evento correspondente
+- [x] Falha de sync não bloqueia a resposta HTTP da operação principal
+- [x] Testes cobrindo os 3 gatilhos (mock de `gcalService`, seguindo o padrão de
       `vi.mock` já usado em `backend/tests/notification-gcal.test.ts`)
-- [ ] `npm --prefix backend test` passa
-- [ ] Commit único e descritivo, sem push
+- [x] `npm --prefix backend test` passa
+- [x] Commit único e descritivo, sem push
 
 ## Log
 - 2026-08-30 — criada a partir da decomposição de DOC-28 (ADR-009)
+- 2026-08-30 — Implementação concluída em `backend/src/controllers/documentController.ts`
+  (+ novo `backend/tests/document-gcal-trigger.test.ts`, mockando `gcalService.js`
+  diretamente conforme instruído):
+  - **`createDocument`**: após o `AuditLog`, dispara `syncDocumentEvent(document, 'create')`
+    quando `document.expirationDate` existe. Sem gatilho quando não há vencimento.
+  - **`updateDocument`** (decisão de projeto, escopo deixado em aberto pela tarefa):
+    optei por restringir o gatilho a `diffData.expirationDate` presente (ou seja, só
+    quando a data de vencimento efetivamente mudou), em vez de disparar em qualquer
+    edição do documento. Justificativa: (1) é mais fiel à redação literal da RN-007
+    ("criação ou alteração da **data de vencimento**"); (2) evita chamadas de rede
+    reais à API do Google a cada edição de campo não relacionado (ex.: notas,
+    responsável), o que seria desperdício de quota e I/O numa ação que hoje é
+    síncrona com a resposta HTTP. Trade-off aceito: um título alterado sem mexer no
+    vencimento deixa o `summary` do evento existente desatualizado até a próxima
+    alteração de data — considerado aceitável porque RN-007 fala especificamente de
+    data de vencimento, não do título.
+  - **`toggleArchive`**: ao arquivar (`newIsArchived === true`), chama
+    `deleteDocumentEvent(document)` (usa o `document` do `findUnique`, antes do
+    update). Ao desarquivar, **decidi também chamar** `syncDocumentEvent(updatedDocument, 'update')`
+    quando `updatedDocument.expirationDate` existe — não era exigido explicitamente
+    pela tarefa (que só menciona remoção ao arquivar/excluir), mas evita deixar um
+    documento reativo sem evento no Google Agenda até a próxima edição manual,
+    mantendo o estado do calendário consistente com o ciclo de vida do documento.
+  - **`deleteDocument`** (hard delete): confirmado e testado (`callOrder` em teste
+    dedicado) que `deleteDocumentEvent(document)` é chamado **antes** de
+    `prisma.document.delete(...)`, usando o `document` buscado no início da função
+    (antes de qualquer mutação) — necessário porque `GCalSyncLog.onDelete: Cascade`
+    apagaria o histórico de sync junto com o documento, e depois disso
+    `deleteDocumentEvent` não encontraria mais nada para remover.
+  - Todos os 4 pontos envolvem `try/catch` com `console.error` — falha/rejeição do
+    `gcalService` nunca vira resposta não-2xx (testado explicitamente com
+    `mockRejectedValue` nos 4 handlers).
+  - Validação: `npm --prefix backend run build` passa; `npm --prefix backend test`
+    passa (185 testes, 11 novos), com a única falha pré-existente e já documentada
+    em `notification-gcal.test.ts` › `cronService` › "recalcula documentos ativos..."
+    (fixture de data hardcoded, não relacionada a este trabalho).
