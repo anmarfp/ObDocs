@@ -264,7 +264,7 @@ export const DocumentFormModal: React.FC<DocumentFormModalProps> = ({
                 placeholder="Ex: Alvará de Funcionamento 2026"
                 disabled={isSubmitting}
                 {...register('title')}
-                className={`w-full px-3.5 py-2 bg-slate-50 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-navy-600 focus:bg-white transition ${
+                className={`w-full px-3.5 py-2 bg-white border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-navy-600 transition ${
                   errors.title ? 'border-red-300 ring-1 ring-red-300' : 'border-slate-200'
                 }`}
               />
@@ -283,7 +283,7 @@ export const DocumentFormModal: React.FC<DocumentFormModalProps> = ({
                   id="doc-category"
                   disabled={isSubmitting}
                   {...register('categoryId')}
-                  className={`w-full px-3.5 py-2 bg-slate-50 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-navy-600 focus:bg-white transition ${
+                  className={`w-full px-3.5 py-2 bg-white border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-navy-600 transition ${
                     errors.categoryId ? 'border-red-300 ring-1 ring-red-300' : 'border-slate-200'
                   }`}
                 >
@@ -311,7 +311,7 @@ export const DocumentFormModal: React.FC<DocumentFormModalProps> = ({
                   placeholder="Ex: Prefeitura Municipal, Receita Federal"
                   disabled={isSubmitting}
                   {...register('issuingBody')}
-                  className={`w-full px-3.5 py-2 bg-slate-50 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-navy-600 focus:bg-white transition ${
+                  className={`w-full px-3.5 py-2 bg-white border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-navy-600 transition ${
                     errors.issuingBody ? 'border-red-300 ring-1 ring-red-300' : 'border-slate-200'
                   }`}
                 />
@@ -332,7 +332,7 @@ export const DocumentFormModal: React.FC<DocumentFormModalProps> = ({
                   type="date"
                   disabled={isSubmitting}
                   {...register('issueDate')}
-                  className={`w-full px-3.5 py-2 bg-slate-50 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-navy-600 focus:bg-white transition ${
+                  className={`w-full px-3.5 py-2 bg-white border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-navy-600 transition ${
                     errors.issueDate ? 'border-red-300 ring-1 ring-red-300' : 'border-slate-200'
                   }`}
                 />
@@ -350,7 +350,7 @@ export const DocumentFormModal: React.FC<DocumentFormModalProps> = ({
                   type="date"
                   disabled={isSubmitting}
                   {...register('expirationDate')}
-                  className={`w-full px-3.5 py-2 bg-slate-50 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-navy-600 focus:bg-white transition ${
+                  className={`w-full px-3.5 py-2 bg-white border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-navy-600 transition ${
                     errors.expirationDate ? 'border-red-300 ring-1 ring-red-300' : 'border-slate-200'
                   }`}
                 />
@@ -370,7 +370,7 @@ export const DocumentFormModal: React.FC<DocumentFormModalProps> = ({
                   min={1}
                   disabled={isSubmitting}
                   {...register('alertLeadDays', { valueAsNumber: true })}
-                  className={`w-full px-3.5 py-2 bg-slate-50 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-navy-600 focus:bg-white transition ${
+                  className={`w-full px-3.5 py-2 bg-white border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-navy-600 transition ${
                     errors.alertLeadDays ? 'border-red-300 ring-1 ring-red-300' : 'border-slate-200'
                   }`}
                 />
@@ -467,7 +467,7 @@ export const DocumentFormModal: React.FC<DocumentFormModalProps> = ({
                 placeholder="Informações sobre protocolo, condicionantes ou exigências..."
                 disabled={isSubmitting}
                 {...register('notes')}
-                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-navy-600 focus:bg-white transition"
+                className="w-full px-3.5 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-navy-600 transition"
               />
             </div>
 

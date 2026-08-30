@@ -214,7 +214,7 @@ export const ReportExportModal: React.FC<ReportExportModalProps> = ({
                 <select
                   value={status}
                   onChange={(e) => setStatus(e.target.value as DocumentStatus | '')}
-                  className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-navy-600 focus:bg-white transition"
+                  className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-navy-600 transition"
                 >
                   <option value="">Todos os Status</option>
                   {Object.entries(STATUS_CONFIG).map(([key, item]) => (
@@ -230,7 +230,7 @@ export const ReportExportModal: React.FC<ReportExportModalProps> = ({
                 <select
                   value={categoryId}
                   onChange={(e) => setCategoryId(e.target.value)}
-                  className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-navy-600 focus:bg-white transition"
+                  className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-navy-600 transition"
                 >
                   <option value="">Todas as Categorias</option>
                   {categories.map((cat) => (
@@ -251,7 +251,7 @@ export const ReportExportModal: React.FC<ReportExportModalProps> = ({
                   type="date"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
-                  className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-navy-600 focus:bg-white transition"
+                  className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-navy-600 transition"
                 />
               </div>
 
@@ -263,7 +263,7 @@ export const ReportExportModal: React.FC<ReportExportModalProps> = ({
                   type="date"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                  className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-navy-600 focus:bg-white transition"
+                  className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-navy-600 transition"
                 />
               </div>
             </div>

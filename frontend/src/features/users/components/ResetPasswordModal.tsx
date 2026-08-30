@@ -118,7 +118,7 @@ export const ResetPasswordModal: React.FC<ResetPasswordModalProps> = ({
               placeholder="Mínimo de 6 caracteres"
               disabled={isSubmitting}
               {...register('password')}
-              className={`w-full px-3.5 py-2 bg-slate-50 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-navy-600 focus:bg-white transition ${
+              className={`w-full px-3.5 py-2 bg-white border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-navy-600 transition ${
                 errors.password ? 'border-red-300 ring-1 ring-red-300' : 'border-slate-200'
               }`}
             />
@@ -136,7 +136,7 @@ export const ResetPasswordModal: React.FC<ResetPasswordModalProps> = ({
               placeholder="Repita a nova senha"
               disabled={isSubmitting}
               {...register('confirmPassword')}
-              className={`w-full px-3.5 py-2 bg-slate-50 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-navy-600 focus:bg-white transition ${
+              className={`w-full px-3.5 py-2 bg-white border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-navy-600 transition ${
                 errors.confirmPassword ? 'border-red-300 ring-1 ring-red-300' : 'border-slate-200'
               }`}
             />

@@ -158,7 +158,7 @@ export const DocumentRenewModal: React.FC<DocumentRenewModalProps> = ({
                   type="date"
                   disabled={isSubmitting}
                   {...register('issueDate')}
-                  className={`w-full px-3.5 py-2 bg-slate-50 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-navy-600 focus:bg-white transition ${
+                  className={`w-full px-3.5 py-2 bg-white border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-navy-600 transition ${
                     errors.issueDate ? 'border-red-300 ring-1 ring-red-300' : 'border-slate-200'
                   }`}
                 />
@@ -176,7 +176,7 @@ export const DocumentRenewModal: React.FC<DocumentRenewModalProps> = ({
                   type="date"
                   disabled={isSubmitting}
                   {...register('expirationDate')}
-                  className={`w-full px-3.5 py-2 bg-slate-50 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-navy-600 focus:bg-white transition ${
+                  className={`w-full px-3.5 py-2 bg-white border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-navy-600 transition ${
                     errors.expirationDate ? 'border-red-300 ring-1 ring-red-300' : 'border-slate-200'
                   }`}
                 />
@@ -198,7 +198,7 @@ export const DocumentRenewModal: React.FC<DocumentRenewModalProps> = ({
                 placeholder="Ex: Renovação referente ao protocolo 2026/0998..."
                 disabled={isSubmitting}
                 {...register('notes')}
-                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-navy-600 focus:bg-white transition"
+                className="w-full px-3.5 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-navy-600 transition"
               />
             </div>
 

@@ -174,7 +174,7 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
               placeholder="Ex: Carlos Silva"
               disabled={isSubmitting}
               {...register('name')}
-              className={`w-full px-3.5 py-2 bg-slate-50 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-navy-600 focus:bg-white transition ${
+              className={`w-full px-3.5 py-2 bg-white border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-navy-600 transition ${
                 errors.name ? 'border-red-300 ring-1 ring-red-300' : 'border-slate-200'
               }`}
             />
@@ -192,7 +192,7 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
               placeholder="Ex: carlos.silva@empresa.com"
               disabled={isSubmitting}
               {...register('email')}
-              className={`w-full px-3.5 py-2 bg-slate-50 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-navy-600 focus:bg-white transition ${
+              className={`w-full px-3.5 py-2 bg-white border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-navy-600 transition ${
                 errors.email ? 'border-red-300 ring-1 ring-red-300' : 'border-slate-200'
               }`}
             />
@@ -211,7 +211,7 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
                 placeholder="Mínimo de 6 caracteres"
                 disabled={isSubmitting}
                 {...register('password')}
-                className={`w-full px-3.5 py-2 bg-slate-50 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-navy-600 focus:bg-white transition ${
+                className={`w-full px-3.5 py-2 bg-white border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-navy-600 transition ${
                   errors.password || validationError ? 'border-red-300 ring-1 ring-red-300' : 'border-slate-200'
                 }`}
               />
@@ -230,7 +230,7 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
             <select
               disabled={isSubmitting}
               {...register('role')}
-              className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-navy-600 focus:bg-white transition text-slate-700"
+              className="w-full px-3.5 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-navy-600 transition text-slate-700"
             >
               <option value="OPERATIONAL">OPERACIONAL (Visualiza e renova documentos)</option>
               <option value="ADMIN">ADMINISTRADOR (Acesso irrestrito a configurações, usuários e auditoria)</option>

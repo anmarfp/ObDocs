@@ -62,7 +62,7 @@ export const DocumentFilters: React.FC<DocumentFiltersProps> = ({
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Buscar por título, órgão emissor, responsável..."
-            className="w-full pl-10 pr-10 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-navy-600 focus:bg-white transition"
+            className="w-full pl-10 pr-10 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-navy-600 transition"
           />
           {searchInput && (
             <button
@@ -84,7 +84,7 @@ export const DocumentFilters: React.FC<DocumentFiltersProps> = ({
           <select
             value={categoryId}
             onChange={(e) => onCategoryChange(e.target.value)}
-            className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-navy-600 focus:bg-white transition text-slate-700"
+            className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-navy-600 transition text-slate-700"
           >
             <option value="">Todas as Categorias</option>
             {categories.map((cat) => (
@@ -100,7 +100,7 @@ export const DocumentFilters: React.FC<DocumentFiltersProps> = ({
           <select
             value={status}
             onChange={(e) => onStatusChange(e.target.value as DocumentStatus | '')}
-            className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-navy-600 focus:bg-white transition text-slate-700"
+            className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-navy-600 transition text-slate-700"
           >
             <option value="">Todos os Status</option>
             {Object.entries(STATUS_CONFIG).map(([key, item]) => (

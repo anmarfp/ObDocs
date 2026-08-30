@@ -124,7 +124,7 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
               placeholder="Ex: Licenças Ambientais"
               disabled={isSubmitting}
               {...register('name')}
-              className={`w-full px-3.5 py-2 bg-slate-50 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-navy-600 focus:bg-white transition ${
+              className={`w-full px-3.5 py-2 bg-white border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-navy-600 transition ${
                 errors.name ? 'border-red-300 ring-1 ring-red-300' : 'border-slate-200'
               }`}
             />
@@ -149,7 +149,7 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                 placeholder="#3b82f6"
                 disabled={isSubmitting}
                 {...register('colorHex')}
-                className={`flex-1 px-3.5 py-2 bg-slate-50 border rounded-xl text-sm font-mono focus:outline-none focus:ring-2 focus:ring-navy-600 focus:bg-white transition ${
+                className={`flex-1 px-3.5 py-2 bg-white border rounded-xl text-sm font-mono focus:outline-none focus:ring-2 focus:ring-navy-600 transition ${
                   errors.colorHex ? 'border-red-300 ring-1 ring-red-300' : 'border-slate-200'
                 }`}
               />
@@ -168,7 +168,7 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
               placeholder="Finalidade desta categoria de documentos..."
               disabled={isSubmitting}
               {...register('description')}
-              className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-navy-600 focus:bg-white transition"
+              className="w-full px-3.5 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-navy-600 transition"
             />
           </div>
 

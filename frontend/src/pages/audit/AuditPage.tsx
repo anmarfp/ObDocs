@@ -146,7 +146,7 @@ export const AuditPage: React.FC = () => {
               value={authorInput}
               onChange={(e) => setAuthorInput(e.target.value)}
               placeholder="Buscar por autor..."
-              className="w-full pl-9 pr-8 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-navy-600 focus:bg-white transition"
+              className="w-full pl-9 pr-8 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-navy-600 transition"
             />
             {authorInput && (
               <button
@@ -167,7 +167,7 @@ export const AuditPage: React.FC = () => {
                 setAction(e.target.value as AuditAction | '');
                 setPage(1);
               }}
-              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-navy-600 focus:bg-white transition text-slate-700"
+              className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-navy-600 transition text-slate-700"
             >
               <option value="">Todas as Ações</option>
               {AUDIT_ACTIONS.map((act) => (
@@ -187,7 +187,7 @@ export const AuditPage: React.FC = () => {
                 setStartDate(e.target.value);
                 setPage(1);
               }}
-              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-navy-600 focus:bg-white transition"
+              className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-navy-600 transition"
               title="Data inicial"
             />
           </div>
@@ -201,7 +201,7 @@ export const AuditPage: React.FC = () => {
                 setEndDate(e.target.value);
                 setPage(1);
               }}
-              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-navy-600 focus:bg-white transition"
+              className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-navy-600 transition"
               title="Data final"
             />
           </div>
