@@ -7,6 +7,7 @@ import {
   Send,
   Plus,
   Trash2,
+  Edit2,
   Tag,
   Users,
   UserCheck,
@@ -21,6 +22,7 @@ import {
   DEFAULT_CATEGORY_NAME,
 } from '@/features/documents/types/document.types';
 import { CategoryFormModal } from '@/features/company/components/CategoryFormModal';
+import { DeleteCategoryModal } from '@/features/company/components/DeleteCategoryModal';
 import { ToastContainer } from '@/features/documents/components/Toast';
 import { useToast } from '@/features/documents/hooks/useToast';
 
@@ -40,7 +42,8 @@ export const SettingsPage: React.FC = () => {
   const [categories, setCategories] = useState<DocumentCategory[]>([]);
   const [isLoadingCategories, setIsLoadingCategories] = useState<boolean>(true);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState<boolean>(false);
-  const [deletingCategoryId, setDeletingCategoryId] = useState<string | null>(null);
+  const [categoryToEdit, setCategoryToEdit] = useState<DocumentCategory | null>(null);
+  const [categoryToDelete, setCategoryToDelete] = useState<DocumentCategory | null>(null);
   const manageableCategories = categories.filter((cat) => cat.name !== DEFAULT_CATEGORY_NAME);
 
   // Load configuration
@@ -138,25 +141,6 @@ export const SettingsPage: React.FC = () => {
       toastError('Falha no Envio', 'Não foi possível disparar o Daily Digest.');
     } finally {
       setIsTriggeringDigest(false);
-    }
-  };
-
-  // Delete Category
-  const handleDeleteCategory = async (cat: DocumentCategory) => {
-    if (!window.confirm(`Deseja excluir a categoria "${cat.name}"?`)) {
-      return;
-    }
-
-    setDeletingCategoryId(cat.id);
-    try {
-      await categoryService.deleteCategory(cat.id);
-      toastSuccess('Categoria Excluída', `A categoria "${cat.name}" foi removida com sucesso.`);
-      fetchCategories();
-    } catch (err: any) {
-      const errMsg = err.response?.data?.message || 'Não foi possível excluir a categoria.';
-      toastError('Falha ao Excluir Categoria', errMsg);
-    } finally {
-      setDeletingCategoryId(null);
     }
   };
 
@@ -382,7 +366,10 @@ export const SettingsPage: React.FC = () => {
 
             <button
               type="button"
-              onClick={() => setIsCategoryModalOpen(true)}
+              onClick={() => {
+                setCategoryToEdit(null);
+                setIsCategoryModalOpen(true);
+              }}
               className="btn-primary text-xs w-full"
             >
               <Plus className="w-4 h-4 mr-1.5" />
@@ -422,20 +409,29 @@ export const SettingsPage: React.FC = () => {
                       </div>
                     </div>
 
-                    <button
-                      type="button"
-                      disabled={deletingCategoryId === cat.id}
-                      onClick={() => handleDeleteCategory(cat)}
-                      className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
-                      title="Excluir categoria"
-                      aria-label={`Excluir categoria ${cat.name}`}
-                    >
-                      {deletingCategoryId === cat.id ? (
-                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      ) : (
+                    <div className="flex items-center space-x-1 flex-shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setCategoryToEdit(cat);
+                          setIsCategoryModalOpen(true);
+                        }}
+                        className="p-1.5 text-slate-400 hover:text-navy-900 hover:bg-slate-100 rounded-lg transition"
+                        title="Editar categoria"
+                        aria-label={`Editar categoria ${cat.name}`}
+                      >
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setCategoryToDelete(cat)}
+                        className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
+                        title="Excluir categoria"
+                        aria-label={`Excluir categoria ${cat.name}`}
+                      >
                         <Trash2 className="w-3.5 h-3.5" />
-                      )}
-                    </button>
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -444,12 +440,28 @@ export const SettingsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Category Create Modal */}
+      {/* Category Create/Edit Modal */}
       <CategoryFormModal
         isOpen={isCategoryModalOpen}
-        onClose={() => setIsCategoryModalOpen(false)}
+        categoryToEdit={categoryToEdit}
+        onClose={() => {
+          setIsCategoryModalOpen(false);
+          setCategoryToEdit(null);
+        }}
         onSuccess={(msg) => {
           toastSuccess('Sucesso', msg);
+          fetchCategories();
+        }}
+        onError={toastError}
+      />
+
+      {/* Category Delete Modal */}
+      <DeleteCategoryModal
+        isOpen={!!categoryToDelete}
+        category={categoryToDelete}
+        onClose={() => setCategoryToDelete(null)}
+        onSuccess={(msg) => {
+          toastSuccess('Categoria Excluída', msg);
           fetchCategories();
         }}
         onError={toastError}

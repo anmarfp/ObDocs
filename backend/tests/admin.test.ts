@@ -20,8 +20,13 @@ vi.mock('../src/lib/prisma.js', () => ({
       findMany: vi.fn(),
       findUnique: vi.fn(),
       create: vi.fn(),
+      update: vi.fn(),
       delete: vi.fn(),
     },
+    document: {
+      updateMany: vi.fn(),
+    },
+    $transaction: vi.fn(),
   },
 }));
 
@@ -69,6 +74,7 @@ describe('Passo 6 - Administração: usuários, configuração e categorias', ()
 
   beforeEach(() => {
     vi.clearAllMocks();
+    (prisma.$transaction as any).mockImplementation((ops: Promise<unknown>[]) => Promise.all(ops));
   });
 
   describe('Gestão de usuários', () => {
@@ -269,6 +275,7 @@ describe('Passo 6 - Administração: usuários, configuração e categorias', ()
   });
 
   describe('Categorias de documentos', () => {
+    const defaultCategoryId = 'category-uuid-default';
     const category = {
       id: categoryId,
       name: 'Fiscal',
@@ -276,6 +283,14 @@ describe('Passo 6 - Administração: usuários, configuração e categorias', ()
       description: 'Documentos fiscais',
       createdAt: new Date('2026-08-01T10:00:00.000Z'),
       documents: [{ id: 'document-1' }],
+    };
+    const defaultCategory = {
+      id: defaultCategoryId,
+      name: 'Sem Categoria',
+      colorHex: '#94a3b8',
+      description: 'Categoria padrão',
+      createdAt: new Date('2026-08-01T10:00:00.000Z'),
+      documents: [],
     };
 
     it('lista categorias para OPERATIONAL, incluindo a quantidade de documentos associados', async () => {
@@ -324,16 +339,89 @@ describe('Passo 6 - Administração: usuários, configuração e categorias', ()
       expect(prisma.documentCategory.create).not.toHaveBeenCalled();
     });
 
-    it('impede exclusão de categoria que possui documentos associados', async () => {
-      (prisma.documentCategory.findUnique as any).mockResolvedValue(category);
+    it('ao excluir categoria com documentos associados, reatribui os documentos para "Sem Categoria" em vez de bloquear', async () => {
+      (prisma.documentCategory.findUnique as any).mockImplementation(({ where }: any) => {
+        if (where.id === categoryId) return Promise.resolve(category);
+        if (where.name === 'Sem Categoria') return Promise.resolve(defaultCategory);
+        return Promise.resolve(null);
+      });
+      (prisma.document.updateMany as any).mockResolvedValue({ count: 1 });
+      (prisma.documentCategory.delete as any).mockResolvedValue(category);
 
       const res = await request(app)
         .delete(`/api/v1/categories/${categoryId}`)
         .set('Authorization', `Bearer ${adminToken}`);
 
-      expect(res.status).toBe(400);
-      expect(res.body.error).toBe('CATEGORY_IN_USE');
+      expect(res.status).toBe(200);
+      expect(res.body.message).toContain('1 documento(s)');
+      expect(prisma.document.updateMany).toHaveBeenCalledWith({
+        where: { categoryId },
+        data: { categoryId: defaultCategoryId },
+      });
+      expect(prisma.documentCategory.delete).toHaveBeenCalledWith({ where: { id: categoryId } });
+    });
+
+    it('impede exclusão e edição da categoria padrão "Sem Categoria"', async () => {
+      (prisma.documentCategory.findUnique as any).mockResolvedValue(defaultCategory);
+
+      const deleteRes = await request(app)
+        .delete(`/api/v1/categories/${defaultCategoryId}`)
+        .set('Authorization', `Bearer ${adminToken}`);
+      const updateRes = await request(app)
+        .put(`/api/v1/categories/${defaultCategoryId}`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ name: 'Outro Nome', colorHex: '#000000' });
+
+      expect(deleteRes.status).toBe(400);
+      expect(deleteRes.body.error).toBe('DEFAULT_CATEGORY_PROTECTED');
+      expect(updateRes.status).toBe(400);
+      expect(updateRes.body.error).toBe('DEFAULT_CATEGORY_PROTECTED');
       expect(prisma.documentCategory.delete).not.toHaveBeenCalled();
+      expect(prisma.documentCategory.update).not.toHaveBeenCalled();
+    });
+
+    it('impede criar ou renomear categoria para o nome reservado "Sem Categoria"', async () => {
+      (prisma.documentCategory.findUnique as any).mockResolvedValue(category);
+
+      const createRes = await request(app)
+        .post('/api/v1/categories')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ name: 'Sem Categoria' });
+      const updateRes = await request(app)
+        .put(`/api/v1/categories/${categoryId}`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ name: 'Sem Categoria', colorHex: '#3b82f6' });
+
+      expect(createRes.status).toBe(400);
+      expect(createRes.body.error).toBe('RESERVED_CATEGORY_NAME');
+      expect(updateRes.status).toBe(400);
+      expect(updateRes.body.error).toBe('RESERVED_CATEGORY_NAME');
+      expect(prisma.documentCategory.create).not.toHaveBeenCalled();
+      expect(prisma.documentCategory.update).not.toHaveBeenCalled();
+    });
+
+    it('atualiza nome, cor e descrição de uma categoria para ADMIN e bloqueia OPERATIONAL', async () => {
+      (prisma.documentCategory.findUnique as any).mockImplementation(({ where }: any) => {
+        if (where.id === categoryId) return Promise.resolve(category);
+        return Promise.resolve(null);
+      });
+      (prisma.documentCategory.update as any).mockImplementation(({ data }: any) => ({
+        ...category,
+        ...data,
+      }));
+
+      const res = await request(app)
+        .put(`/api/v1/categories/${categoryId}`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ name: '  Fiscal e Tributário  ', colorHex: '#111111', description: ' Atualizado ' });
+      const forbidden = await request(app)
+        .put(`/api/v1/categories/${categoryId}`)
+        .set('Authorization', `Bearer ${operationalToken}`)
+        .send({ name: 'Fiscal', colorHex: '#3b82f6' });
+
+      expect(res.status).toBe(200);
+      expect(res.body.category).toMatchObject({ name: 'Fiscal e Tributário', colorHex: '#111111', description: 'Atualizado' });
+      expect(forbidden.status).toBe(403);
     });
 
     it('exclui categoria sem documentos e bloqueia OPERATIONAL de criar ou excluir', async () => {

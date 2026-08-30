@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { X, Loader2, Tag } from 'lucide-react';
+import { X, Loader2, Tag, Edit2 } from 'lucide-react';
 import { AxiosError } from 'axios';
 import { categoryService } from '@/features/documents/services/categoryService';
+import { DocumentCategory } from '@/features/documents/types/document.types';
 
 const categorySchema = z.object({
   name: z.string().trim().min(2, 'O nome deve ter pelo menos 2 caracteres.'),
@@ -24,6 +25,7 @@ type CategoryFormValues = {
 
 interface CategoryFormModalProps {
   isOpen: boolean;
+  categoryToEdit?: DocumentCategory | null;
   onClose: () => void;
   onSuccess: (message: string) => void;
   onError: (title: string, message?: string) => void;
@@ -31,10 +33,12 @@ interface CategoryFormModalProps {
 
 export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
   isOpen,
+  categoryToEdit,
   onClose,
   onSuccess,
   onError,
 }) => {
+  const isEdit = !!categoryToEdit;
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const {
@@ -51,6 +55,20 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
     },
   });
 
+  useEffect(() => {
+    if (isOpen) {
+      if (categoryToEdit) {
+        reset({
+          name: categoryToEdit.name,
+          colorHex: categoryToEdit.colorHex || '#3b82f6',
+          description: categoryToEdit.description || '',
+        });
+      } else {
+        reset({ name: '', colorHex: '#3b82f6', description: '' });
+      }
+    }
+  }, [isOpen, categoryToEdit, reset]);
+
   if (!isOpen) return null;
 
   const handleClose = () => {
@@ -61,12 +79,19 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
   const onSubmit = async (values: CategoryFormValues) => {
     setIsSubmitting(true);
     try {
-      await categoryService.createCategory({
+      const payload = {
         name: values.name,
         colorHex: values.colorHex,
         description: values.description || undefined,
-      });
-      onSuccess('Categoria criada com sucesso.');
+      };
+
+      if (isEdit && categoryToEdit) {
+        await categoryService.updateCategory(categoryToEdit.id, payload);
+        onSuccess('Categoria atualizada com sucesso.');
+      } else {
+        await categoryService.createCategory(payload);
+        onSuccess('Categoria criada com sucesso.');
+      }
       handleClose();
     } catch (error) {
       const axiosError = error as AxiosError<{ error?: string; message?: string }>;
@@ -74,10 +99,14 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
 
       if (errorData?.error === 'CATEGORY_ALREADY_EXISTS') {
         onError('Nome Duplicado', 'Já existe uma categoria cadastrada com este nome.');
+      } else if (errorData?.error === 'RESERVED_CATEGORY_NAME') {
+        onError('Nome Reservado', 'Este nome é reservado para a categoria padrão do sistema.');
+      } else if (errorData?.error === 'DEFAULT_CATEGORY_PROTECTED') {
+        onError('Categoria Protegida', 'A categoria padrão "Sem Categoria" não pode ser editada.');
       } else {
         onError(
-          'Falha ao Criar Categoria',
-          errorData?.message || 'Não foi possível cadastrar a nova categoria.'
+          isEdit ? 'Falha ao Atualizar Categoria' : 'Falha ao Criar Categoria',
+          errorData?.message || 'Não foi possível salvar a categoria.'
         );
       }
     } finally {
@@ -96,11 +125,11 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
         <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
           <div className="flex items-center space-x-2.5">
             <div className="w-8 h-8 rounded-lg bg-navy-100 text-navy-800 flex items-center justify-center">
-              <Tag className="w-4 h-4" />
+              {isEdit ? <Edit2 className="w-4 h-4" /> : <Tag className="w-4 h-4" />}
             </div>
             <div>
               <h2 id="category-modal-title" className="text-lg font-bold text-navy-950">
-                Nova Categoria
+                {isEdit ? 'Editar Categoria' : 'Nova Categoria'}
               </h2>
               <p className="text-xs text-slate-500">Classificação para agrupamento de documentos.</p>
             </div>
@@ -192,6 +221,8 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                   <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
                   Salvando...
                 </>
+              ) : isEdit ? (
+                'Salvar Alterações'
               ) : (
                 'Criar Categoria'
               )}

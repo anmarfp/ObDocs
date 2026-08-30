@@ -26,6 +26,20 @@ export const categoryService = {
   },
 
   /**
+   * Update an existing category by ID (Admin only).
+   */
+  updateCategory: async (
+    id: string,
+    data: { name: string; colorHex?: string; description?: string }
+  ): Promise<DocumentCategory> => {
+    const response = await api.put<{ message: string; category: DocumentCategory }>(
+      `/categories/${id}`,
+      data
+    );
+    return response.data.category;
+  },
+
+  /**
    * Delete a category by ID (Admin only).
    */
   deleteCategory: async (id: string): Promise<{ message: string }> => {
