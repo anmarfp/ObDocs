@@ -49,7 +49,8 @@ async function main() {
   });
 
   if (!adminUser) {
-    const adminPasswordHash = await bcrypt.hash('Admin123!@#', 10);
+    const adminPassword = process.env.ADMIN_SEED_PASSWORD || 'Admin123!@#';
+    const adminPasswordHash = await bcrypt.hash(adminPassword, 10);
     adminUser = await prisma.user.create({
       data: {
         name: 'Administrador do Sistema',
@@ -69,7 +70,8 @@ async function main() {
   });
 
   if (!existingOp) {
-    const opPasswordHash = await bcrypt.hash('Operacional123!@#', 10);
+    const opPassword = process.env.OPERATIONAL_SEED_PASSWORD || 'Operacional123!@#';
+    const opPasswordHash = await bcrypt.hash(opPassword, 10);
     await prisma.user.create({
       data: {
         name: 'Analista Operacional',
@@ -122,7 +124,8 @@ async function main() {
       const email = `${emailLocal}@docsob.com.br`;
       // No máximo 1 dos 5 é ADMIN, mantendo o perfil Operacional como maioria (RN-009).
       const role = i === 0 ? Role.ADMIN : Role.OPERATIONAL;
-      const passwordHash = await bcrypt.hash('Seed123!@#', 10);
+      const demoPassword = process.env.DEMO_SEED_PASSWORD || 'Seed123!@#';
+      const passwordHash = await bcrypt.hash(demoPassword, 10);
 
       const user = await prisma.user.upsert({
         where: { email },
