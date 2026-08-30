@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   Bell,
   Save,
@@ -11,10 +12,14 @@ import {
   Tag,
   Users,
   UserCheck,
+  Calendar,
+  Link2,
+  Unlink,
 } from 'lucide-react';
 import { companyService } from '@/features/documents/services/companyService';
 import { categoryService } from '@/features/documents/services/categoryService';
 import { notificationAdminService } from '@/features/notifications/services/notificationAdminService';
+import { googleAuthService, navigateToGoogleConsent } from '@/features/calendar/services/googleAuthService';
 import {
   CompanyConfig,
   DocumentCategory,
@@ -28,6 +33,7 @@ import { useToast } from '@/features/documents/hooks/useToast';
 
 export const SettingsPage: React.FC = () => {
   const { toasts, removeToast, toastSuccess, toastError } = useToast();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [config, setConfig] = useState<CompanyConfig | null>(null);
   const [selectedMode, setSelectedMode] = useState<NotificationMode>('ALL_ADMINS');
@@ -37,6 +43,12 @@ export const SettingsPage: React.FC = () => {
   // System Action states
   const [isRecalculating, setIsRecalculating] = useState<boolean>(false);
   const [isTriggeringDigest, setIsTriggeringDigest] = useState<boolean>(false);
+
+  // Google Calendar connection states (DOC-28)
+  const [isGoogleConnected, setIsGoogleConnected] = useState<boolean>(false);
+  const [isLoadingGoogleStatus, setIsLoadingGoogleStatus] = useState<boolean>(true);
+  const [isConnectingGoogle, setIsConnectingGoogle] = useState<boolean>(false);
+  const [isDisconnectingGoogle, setIsDisconnectingGoogle] = useState<boolean>(false);
 
   // Categories state
   const [categories, setCategories] = useState<DocumentCategory[]>([]);
@@ -75,10 +87,45 @@ export const SettingsPage: React.FC = () => {
     }
   }, [toastError]);
 
+  // Load Google Calendar connection status (DOC-28)
+  const fetchGoogleStatus = useCallback(async () => {
+    setIsLoadingGoogleStatus(true);
+    try {
+      const data = await googleAuthService.getStatus();
+      setIsGoogleConnected(data.connected);
+    } catch (err: any) {
+      console.error('Falha ao consultar status da conexão com o Google Agenda:', err);
+      toastError('Erro de Integração', 'Não foi possível consultar o status da conexão com o Google Agenda.');
+    } finally {
+      setIsLoadingGoogleStatus(false);
+    }
+  }, [toastError]);
+
   useEffect(() => {
     fetchConfig();
     fetchCategories();
-  }, [fetchConfig, fetchCategories]);
+    fetchGoogleStatus();
+  }, [fetchConfig, fetchCategories, fetchGoogleStatus]);
+
+  // Handle the ?google=connected / ?google=error redirect from GET /calendar/google/callback
+  useEffect(() => {
+    const googleStatusParam = searchParams.get('google');
+    if (!googleStatusParam) {
+      return;
+    }
+
+    if (googleStatusParam === 'connected') {
+      toastSuccess('Google Agenda Conectado', 'Sua conta Google foi conectada com sucesso.');
+      fetchGoogleStatus();
+    } else if (googleStatusParam === 'error') {
+      toastError('Falha na Conexão', 'Não foi possível concluir a conexão com o Google Agenda. Tente novamente.');
+    }
+
+    const nextParams = new URLSearchParams(searchParams);
+    nextParams.delete('google');
+    setSearchParams(nextParams, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   // Save Notification Mode
   const handleSaveConfig = async () => {
@@ -141,6 +188,43 @@ export const SettingsPage: React.FC = () => {
       toastError('Falha no Envio', 'Não foi possível disparar o Daily Digest.');
     } finally {
       setIsTriggeringDigest(false);
+    }
+  };
+
+  // Connect Google Calendar (DOC-28): fetches the signed consent URL via an
+  // authenticated call, then does a full-page browser navigation to Google —
+  // not an XHR, since the consent screen must be rendered by the browser itself.
+  const handleConnectGoogle = async () => {
+    setIsConnectingGoogle(true);
+    try {
+      const url = await googleAuthService.getConnectUrl();
+      navigateToGoogleConsent(url);
+    } catch (err: any) {
+      console.error('Erro ao gerar URL de conexão com o Google Agenda:', err);
+      const message = err?.response?.data?.error === 'GOOGLE_OAUTH_NOT_CONFIGURED'
+        ? 'A integração com o Google Agenda ainda não foi configurada neste ambiente.'
+        : 'Não foi possível iniciar a conexão com o Google Agenda.';
+      toastError('Falha ao Conectar', message);
+      setIsConnectingGoogle(false);
+    }
+  };
+
+  // Disconnect Google Calendar (DOC-28)
+  const handleDisconnectGoogle = async () => {
+    if (!window.confirm('Deseja desconectar sua conta Google do DocsOb? A sincronização de vencimentos com o Google Agenda deixará de funcionar até uma nova conexão.')) {
+      return;
+    }
+
+    setIsDisconnectingGoogle(true);
+    try {
+      await googleAuthService.disconnect();
+      setIsGoogleConnected(false);
+      toastSuccess('Google Agenda Desconectado', 'Sua conta Google foi desconectada do DocsOb.');
+    } catch (err: any) {
+      console.error('Erro ao desconectar do Google Agenda:', err);
+      toastError('Falha ao Desconectar', 'Não foi possível desconectar sua conta Google.');
+    } finally {
+      setIsDisconnectingGoogle(false);
     }
   };
 
@@ -346,6 +430,90 @@ export const SettingsPage: React.FC = () => {
                 </button>
               </div>
             </div>
+          </div>
+
+          {/* Section 3: Google Calendar Connection (DOC-28 / ADR-009) */}
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-card p-6 space-y-4">
+            <div className="pb-3 border-b border-slate-100">
+              <h2 className="text-base font-bold text-navy-950 flex items-center">
+                <Calendar className="w-4 h-4 text-navy-600 mr-2" />
+                Conectar Google Agenda
+              </h2>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Conecte sua conta Google para sincronizar os vencimentos de documentos com o seu Google Agenda pessoal (RF-005).
+              </p>
+            </div>
+
+            {isLoadingGoogleStatus ? (
+              <div className="py-6 text-center text-xs text-slate-400">
+                <RefreshCw className="w-5 h-5 animate-spin mx-auto text-navy-600 mb-1" />
+                Verificando conexão...
+              </div>
+            ) : isGoogleConnected ? (
+              <div className="p-4 rounded-xl border border-emerald-200 bg-emerald-50/50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="flex items-center space-x-2.5">
+                  <span className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center flex-shrink-0">
+                    <Link2 className="w-4 h-4" />
+                  </span>
+                  <div>
+                    <h3 className="text-sm font-bold text-emerald-900">Conta Google conectada</h3>
+                    <p className="text-xs text-emerald-700/80 mt-0.5">
+                      Sua conta está conectada e pronta para sincronizar vencimentos.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleDisconnectGoogle}
+                  disabled={isDisconnectingGoogle}
+                  className="btn-secondary text-xs w-full sm:w-auto flex-shrink-0"
+                >
+                  {isDisconnectingGoogle ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                      Desconectando...
+                    </>
+                  ) : (
+                    <>
+                      <Unlink className="w-3.5 h-3.5 mr-1.5" />
+                      Desconectar
+                    </>
+                  )}
+                </button>
+              </div>
+            ) : (
+              <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="flex items-center space-x-2.5">
+                  <span className="w-8 h-8 rounded-lg bg-navy-100 text-navy-800 flex items-center justify-center flex-shrink-0">
+                    <Calendar className="w-4 h-4" />
+                  </span>
+                  <div>
+                    <h3 className="text-sm font-bold text-navy-950">Nenhuma conta conectada</h3>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      Conecte sua conta Google para habilitar a sincronização automática de vencimentos.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleConnectGoogle}
+                  disabled={isConnectingGoogle}
+                  className="btn-primary text-xs w-full sm:w-auto flex-shrink-0"
+                >
+                  {isConnectingGoogle ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                      Redirecionando...
+                    </>
+                  ) : (
+                    <>
+                      <Link2 className="w-3.5 h-3.5 mr-1.5" />
+                      Conectar Google Agenda
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
