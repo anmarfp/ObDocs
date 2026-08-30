@@ -1,7 +1,7 @@
 ---
 id: T-260830-4e2ce4
 title: "DOC-28 (4/5): gatilho automático de sync em criar/editar/excluir documento (RN-007)"
-status: backlog
+status: doing
 owner: "-"
 workflow: feature
 created: 2026-08-30
