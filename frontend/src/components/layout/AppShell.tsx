@@ -7,7 +7,7 @@ export const AppShell: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col antialiased">
+    <div className="h-screen bg-slate-50 flex flex-col antialiased">
       <Header />
 
       <div className="flex-1 flex overflow-hidden">
