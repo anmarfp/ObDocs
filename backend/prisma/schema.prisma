@@ -38,6 +38,7 @@ enum AuditAction {
 enum SyncStatus {
   SYNCED
   ERROR
+  DELETED
 }
 
 model CompanyConfig {

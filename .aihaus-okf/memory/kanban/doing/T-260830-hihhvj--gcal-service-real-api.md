@@ -77,12 +77,65 @@ já mesclado em `main`.
       expirado, falha de rede)
 
 ## Checklist
-- [ ] `gcalService.ts` reescrito para chamadas reais (insert/update), sem strings fake
-- [ ] Renovação de token via refresh persistida
-- [ ] `backend/tests/notification-gcal.test.ts` (describe `gcalService`) atualizado
+- [x] `gcalService.ts` reescrito para chamadas reais (insert/update), sem strings fake
+- [x] Renovação de token via refresh persistida
+- [x] `backend/tests/notification-gcal.test.ts` (describe `gcalService`) atualizado
       com mocks da lib do Google cobrindo sucesso/token expirado/falha de rede
-- [ ] `npm --prefix backend test` passa
-- [ ] Commit único e descritivo, sem push
+- [x] `npm --prefix backend test` passa
+- [x] Commit único e descritivo, sem push
 
 ## Log
 - 2026-08-30 — criada a partir da decomposição de DOC-28 (ADR-009)
+- 2026-08-30 — subtarefa 3 implementada (`backend/src/services/gcalService.ts`
+  reescrito). Resumo:
+  - **De quem é o token**: confirmado `document.createdById` (o usuário que
+    cadastrou o documento) como já sugerido no Context/Escopo — `Document` não tem
+    campo de "dono da agenda" separado. Sem `GoogleOAuthToken` para esse usuário →
+    `SyncStatus.ERROR` com mensagem "Usuário não conectou o Google Agenda." antes de
+    qualquer chamada de rede.
+  - **Corpo do evento enviado ao Google**: evento de dia inteiro (`start.date` /
+    `end.date`, sem `dateTime`) no dia do vencimento — `summary: doc.title`,
+    `start: { date: 'YYYY-MM-DD' }` (o `expirationDate`), `end: { date: 'YYYY-MM-DD' }`
+    (dia seguinte, pois a API do Google usa fim exclusivo em eventos de dia
+    inteiro). `calendarId: 'primary'` (agenda pessoal do usuário, conforme ADR-009).
+  - **Sem duplicar evento**: antes de decidir insert vs update, busca o
+    `GCalSyncLog` mais recente do documento com `status: SYNCED` e `gcalEventId`
+    não nulo (`findMany` com `orderBy: lastSyncedAt desc, take: 1`); se existir,
+    chama `calendar.events.update({ calendarId: 'primary', eventId: <id salvo>,
+    requestBody })`; senão, `calendar.events.insert(...)`. O id real retornado por
+    `response.data.id` é sempre o gravado no novo `GCalSyncLog`.
+  - **Renovação de token**: `oauth2Client.on('tokens', (tokens) => ...)` persiste
+    `accessToken`/`expiryDate`/(`refreshToken`, se vier um novo) via
+    `prisma.googleOAuthToken.update` assim que a lib `googleapis` renova
+    automaticamente — testado disparando manualmente o listener capturado pelo
+    mock e verificando o `update`.
+  - **Enum `SyncStatus`**: adicionado um terceiro valor `DELETED` (migration
+    `20260830203917_add_sync_status_deleted`, `ALTER TYPE "SyncStatus" ADD VALUE
+    'DELETED'`, aplicada no Postgres local) em vez de reaproveitar `SYNCED` com
+    `gcalEventId: null` — mais claro para quem lê `gcal_sync_logs` depois. Nova
+    função exportada `deleteDocumentEvent(doc: { id, createdById })` usa o mesmo
+    critério de busca do último evento sincronizado; se não houver evento real
+    para remover, não chama a API nem grava log (nada mudou); se houver, chama
+    `calendar.events.delete({ calendarId: 'primary', eventId })` e grava
+    `DELETED` (sucesso) ou `ERROR` (falha). Ainda não é chamada por ninguém —
+    fica para a subtarefa 4 decidir quando disparar.
+  - **Erros reais cobertos** (todos resolvem `SyncDocumentEventResult`, nunca
+    lançam exceção não tratada, e sempre gravam `GCalSyncLog`): usuário nunca
+    conectou (mensagem própria antes de qualquer chamada); token
+    rejeitado/revogado pelo Google (`invalid_grant`/401 → mensagem pedindo para
+    reconectar); falha de rede (`ENOTFOUND`/`ECONNREFUSED`/`ECONNRESET`/
+    `ETIMEDOUT`/`EAI_AGAIN` ou mensagem contendo "network" → mensagem de falha de
+    rede); rate limit/quota (`429`, ou `403` com `reason` em
+    `rateLimitExceeded`/`userRateLimitExceeded`/`quotaExceeded`/
+    `dailyLimitExceeded` → mensagem de limite de requisições); e o caso já
+    existente de documento sem `expirationDate`.
+  - Testes: `describe('gcalService')` em `backend/tests/notification-gcal.test.ts`
+    reescrito cobrindo insert sem log anterior, update reaproveitando
+    `gcalEventId` (sem duplicar), usuário não conectado, `invalid_grant`, falha de
+    rede, rate limit/quota, persistência da renovação de token, e
+    `syncAllDocuments` agregando totais (inclusive com falha parcial).
+    `npm --prefix backend run build` passa; `npm --prefix backend test`: 166/167
+    passam — a única falha é a pré-existente e já documentada
+    (`cronService` › "recalcula documentos ativos..." — fixture com data
+    hardcoded colidindo com a data real de hoje), não relacionada a esta
+    subtarefa.
