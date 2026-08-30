@@ -25,7 +25,7 @@ export const calendarService = {
   },
 
   /**
-   * Trigger manual calendar sync with Google Agenda (local/simulated) from POST /calendar/sync
+   * Trigger manual calendar sync with Google Agenda from POST /calendar/sync
    */
   syncCalendar: async (): Promise<CalendarSyncResult> => {
     const response = await api.post<CalendarSyncResult>('/calendar/sync');

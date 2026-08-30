@@ -67,7 +67,13 @@ O sistema **DocsOb** é uma plataforma web moderna, responsiva e Local-First, fo
   - ⚪ **Indeterminado (`INDETERMINATE`)**: Documentos sem data de vencimento (validade permanente).
 - **[RF-005] Calendário e Sincronização de Agenda**:
   - Visualização mensal/semanal de eventos com filtros por período.
-  - Disparo de sincronização (modo de simulação local-first com logging detalhado).
+  - Sincronização real com o Google Agenda pessoal de cada usuário, via conexão
+    OAuth2 individual (modelo de conta por usuário — ADR-009): cada Administrador
+    ou Operacional conecta sua própria conta Google em Configurações antes de
+    sincronizar.
+  - Disparo automático de sincronização na criação, edição, arquivamento e
+    exclusão de documentos com vencimento (RN-007), além do disparo manual pelo
+    botão "Sincronizar com Agenda".
   - Consulta de logs de sincronização (`gcal_sync_logs`) restrita a `ADMIN`.
 - **[RF-006] Busca Avançada e Filtros**: Filtragem em tempo real por termo de busca, categoria, responsável, status visual e alternância para inclusão de arquivados.
 

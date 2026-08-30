@@ -204,7 +204,7 @@ Todas as rotas da API são prefixadas com `/api/v1`:
 
 ### Calendário & Sincronização
 - `GET /api/v1/calendar/events` — Prazos e eventos filtrados por mês e ano
-- `POST /api/v1/calendar/sync` — Sincronização manual com Google Agenda (simulação local)
+- `POST /api/v1/calendar/sync` — Sincronização manual com Google Agenda (OAuth por usuário)
 - `GET /api/v1/calendar/sync-logs` — Logs de sincronização da agenda (Admin only)
 
 ### Trilha de Auditoria & Administração (Admin Exclusivo)
