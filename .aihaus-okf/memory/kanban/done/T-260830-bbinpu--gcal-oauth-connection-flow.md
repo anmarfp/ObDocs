@@ -1,7 +1,7 @@
 ---
 id: T-260830-bbinpu
 title: "DOC-28 (2/5): fluxo de conexão OAuth (endpoints + botão no frontend)"
-status: doing
+status: done
 owner: "-"
 workflow: feature
 created: 2026-08-30
@@ -157,3 +157,18 @@ env vars) já mesclado em `main`.
     OK; `npm --prefix frontend test` → 28/28 passando.
   - Não tocado: `gcalService.ts`, `documentController.ts`, banner de simulação em
     `CalendarPage.tsx` (fora de escopo desta subtarefa).
+- 2026-08-30 — Revisão do orquestrador antes do merge: o `state` OAuth estava
+  sendo assinado com `generateToken` (o mesmo gerador do token de login
+  completo, válido por `JWT_EXPIRES_IN`/7 dias, com email/role/name). Como
+  `state` trafega em canais baseados em URL (query string, logs de acesso do
+  Google e do próprio servidor, histórico do navegador) muito mais expostos
+  que um header `Authorization`, isso tornava um `state` vazado equivalente a
+  um token de API totalmente privilegiado por dias. Corrigido com
+  `signOAuthState`/`verifyOAuthState` dedicados em `backend/src/utils/jwt.ts`
+  (payload reduzido a `{userId, purpose}`, expira em 10 minutos). Testes
+  atualizados para usar as novas funções + novo teste provando que um token de
+  login normal é rejeitado como `state`. `npm --prefix backend test`: 159/160
+  (mesma falha pré-existente e não relacionada de `notification-gcal.test.ts`).
+- 2026-08-30 — Revisado e mesclado pelo orquestrador: PR #4 mesclada em `main`
+  (`d054163`), branch remota e worktree encerradas. `npm --prefix backend test`
+  re-executado em `main` pós-merge: 159/160 (mesma falha pré-existente).
