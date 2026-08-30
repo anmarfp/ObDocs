@@ -106,7 +106,7 @@ describe('Calendário — serviços, mês/ano e sync', () => {
     });
   });
 
-  it('renderiza o evento pela data textual, comunica sync simulado e abre logs somente para ADMIN', async () => {
+  it('renderiza o evento pela data textual, comunica sincronização real com o Google Agenda e abre logs somente para ADMIN', async () => {
     vi.useFakeTimers({ toFake: ['Date'] });
     vi.setSystemTime(new Date('2026-08-27T12:00:00.000Z'));
     const getEvents = vi.spyOn(calendarService, 'getEvents').mockResolvedValue([event]);
@@ -132,10 +132,9 @@ describe('Calendário — serviços, mês/ano e sync', () => {
     renderWithAuth(<CalendarPage />);
     await waitFor(() => expect(getEvents).toHaveBeenCalledWith(2026, 8));
     expect(await screen.findByText('Licença Ambiental')).toBeInTheDocument();
-    expect(screen.getByText(/Sincronização Simulada \/ Local/i)).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: /Sincronizar com Agenda/i }));
-    expect(await screen.findByText(/3 de 4 documento\(s\).*simulado\/local/i)).toBeInTheDocument();
+    expect(await screen.findByText(/3 de 4 documento\(s\).*Google Agenda/i)).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: /Logs de Sync/i }));
     await waitFor(() => expect(getSyncLogs).toHaveBeenCalledWith(1, 10));

@@ -535,7 +535,7 @@ export const DashboardPage: React.FC = () => {
             <div className="p-3 bg-slate-50 rounded-xl flex items-center justify-between">
               <span className="text-slate-600">Sincronização Google:</span>
               <span className="font-semibold text-sky-700 flex items-center">
-                <CalendarIcon className="w-3.5 h-3.5 mr-1" /> Simulado / Local
+                <CalendarIcon className="w-3.5 h-3.5 mr-1" /> Real via OAuth
               </span>
             </div>
           </div>

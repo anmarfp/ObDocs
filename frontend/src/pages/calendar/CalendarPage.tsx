@@ -7,7 +7,6 @@ import {
   ChevronRight,
   RefreshCw,
   Clock,
-  Info,
   FileText,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -100,7 +99,7 @@ export const CalendarPage: React.FC = () => {
       const res = await calendarService.syncCalendar();
       toastSuccess(
         'Sincronização Concluída',
-        `${res.synced} de ${res.total} documento(s) com vencimento sincronizados (modo simulado/local).`
+        `${res.synced} de ${res.total} documento(s) com vencimento sincronizados com o Google Agenda.`
       );
       fetchEvents();
     } catch (err: any) {
@@ -212,14 +211,6 @@ export const CalendarPage: React.FC = () => {
             <RefreshCw className={`w-4 h-4 mr-1.5 ${isSyncing ? 'animate-spin' : ''}`} />
             {isSyncing ? 'Sincronizando...' : 'Sincronizar com Agenda'}
           </button>
-        </div>
-      </div>
-
-      {/* Simulated Sync Notice Banner */}
-      <div className="p-3 bg-sky-50/70 border border-sky-200 rounded-xl flex items-start space-x-2 text-xs text-sky-950">
-        <Info className="w-4 h-4 text-sky-600 flex-shrink-0 mt-0.5" />
-        <div>
-          <span className="font-semibold">Sincronização Simulada / Local:</span> O sistema gera identificadores locais e armazena os registros de sincronização no banco de dados.
         </div>
       </div>
 

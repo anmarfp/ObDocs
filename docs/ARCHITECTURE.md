@@ -143,15 +143,27 @@ erDiagram
         uuid id PK
         uuid document_id FK
         string gcal_event_id
-        string status "SYNCED | ERROR"
+        string status "SYNCED | ERROR | DELETED"
         datetime last_synced_at
         text error_message
+    }
+
+    GOOGLE_OAUTH_TOKEN {
+        uuid id PK
+        uuid user_id FK UK
+        string access_token
+        string refresh_token
+        datetime expiry_date
+        string scope
+        datetime created_at
+        datetime updated_at
     }
 
     USER ||--o{ DOCUMENT : "cadastrou"
     USER ||--o{ DOCUMENT_VERSION : "renovou"
     USER ||--o{ AUDIT_LOG : "executou_acao"
     USER ||--o{ COMPANY_CONFIG : "alterou_configuracao"
+    USER ||--o| GOOGLE_OAUTH_TOKEN : "conectou"
     DOCUMENT_CATEGORY ||--o{ DOCUMENT : "classifica"
     DOCUMENT ||--o{ DOCUMENT_VERSION : "possui_versoes"
     DOCUMENT ||--o{ AUDIT_LOG : "registra_alteracoes"
@@ -241,10 +253,23 @@ erDiagram
 ### 3.7 Tabela: `gcal_sync_logs` (Logs de Sincronização de Calendário)
 - `id` (UUID, PK): Identificador do log de sincronização.
 - `document_id` (UUID, FK -> `documents.id`, NULLABLE): Documento associado ao evento.
-- `gcal_event_id` (VARCHAR(255), NULLABLE): Identificador do evento gerado.
-- `status` (VARCHAR(30), NOT NULL): `'SYNCED'` ou `'ERROR'`.
+- `gcal_event_id` (VARCHAR(255), NULLABLE): Identificador real do evento retornado pela Google Calendar API.
+- `status` (VARCHAR(30), NOT NULL):
+  - `'SYNCED'`: Evento criado ou atualizado com sucesso no Google Agenda do usuário.
+  - `'ERROR'`: Falha na sincronização (token ausente/revogado, sem rede, quota excedida, etc. — `error_message` traz o detalhe).
+  - `'DELETED'`: Evento removido/cancelado no Google Agenda após arquivamento ou exclusão do documento.
 - `last_synced_at` (TIMESTAMP, DEFAULT NOW()): Data e hora da sincronização.
 - `error_message` (TEXT, NULLABLE): Detalhes de eventuais falhas.
+
+### 3.8 Tabela: `google_oauth_tokens` (Credenciais OAuth2 do Google Agenda por Usuário — ADR-009)
+- `id` (UUID, PK): Identificador do registro de credencial.
+- `user_id` (UUID, FK -> `users.id`, UNIQUE, NOT NULL): Usuário dono da conexão (uma única conta Google conectada por usuário).
+- `access_token` (VARCHAR, NOT NULL): Token de acesso de curta duração usado nas chamadas à Google Calendar API.
+- `refresh_token` (VARCHAR, NOT NULL): Token de longa duração usado para renovar o `access_token` automaticamente quando expira, sem exigir nova autorização do usuário.
+- `expiry_date` (TIMESTAMP, NOT NULL): Momento de expiração do `access_token` vigente.
+- `scope` (VARCHAR, NOT NULL): Escopo OAuth concedido pelo usuário (`https://www.googleapis.com/auth/calendar.events`).
+- `created_at` (TIMESTAMP, DEFAULT NOW()): Data da primeira conexão.
+- `updated_at` (TIMESTAMP, DEFAULT NOW()): Data da última renovação/atualização do token.
 
 ---
 
@@ -346,6 +371,57 @@ sequenceDiagram
     API-->>UI: Retorna documento atualizado com versão incrementada
     UI-->>User: Atualiza visual com badge de versão e disponibiliza aba de histórico
 ```
+
+### 6.3 Sincronização Real com Google Agenda via OAuth (RF-005 / RN-007 / ADR-009)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Usuário (Admin / Operacional)
+    participant UI as Frontend React (Configurações / Documentos)
+    participant API as Backend Express API
+    participant Google as Google OAuth2 & Calendar API
+    participant DB as PostgreSQL 16
+
+    Note over User,DB: Conexão da conta (uma vez por usuário)
+    User->>UI: Clica "Conectar Google Agenda" em Configurações
+    UI->>API: GET /calendar/google/connect (Bearer JWT)
+    API-->>UI: { url } com state assinado (expira em 10 min)
+    UI->>Google: window.location.href = url (navegação de página inteira)
+    User->>Google: Autoriza o escopo calendar.events na tela de consentimento
+    Google->>API: GET /calendar/google/callback?code&state (rota pública)
+    API->>API: Verifica assinatura do state e troca code por access/refresh token
+    API->>DB: Upsert em google_oauth_tokens (por user_id)
+    API-->>UI: Redirect /configuracoes?google=connected
+
+    Note over User,DB: Gatilho automático (RN-007)
+    User->>UI: Cria, edita (vencimento), arquiva/desarquiva ou exclui um documento
+    UI->>API: POST/PUT/PATCH/DELETE /api/v1/documents/...
+    API->>DB: Persiste o documento e o audit_log da operação (fluxo normal)
+    API->>API: Chama gcalService (create/update/delete) de forma não bloqueante
+    API->>DB: Busca google_oauth_tokens pelo created_by_id do documento
+    alt Usuário não conectou o Google Agenda
+        API->>DB: INSERT gcal_sync_logs (status: ERROR, mensagem explicativa)
+    else Conta conectada
+        API->>DB: Busca o gcal_sync_logs mais recente com status SYNCED do documento
+        alt Já existe gcalEventId registrado (edição/arquivamento/exclusão)
+            API->>Google: calendar.events.update ou calendar.events.delete (mesmo eventId, agenda "primary")
+        else Nenhum evento anterior (criação)
+            API->>Google: calendar.events.insert (evento de dia inteiro na data de vencimento)
+        end
+        Google-->>API: Confirma e retorna o id real do evento (ou renova o access_token via refresh_token, se expirado)
+        API->>DB: Atualiza access/refresh token renovados (se houve renovação) e grava gcal_sync_logs (SYNCED ou DELETED) com o gcal_event_id real
+    end
+    API-->>UI: Responde a operação no documento normalmente (falha de sync nunca bloqueia a resposta)
+```
+
+O evento nunca é duplicado entre edições: `gcalService.ts` sempre reutiliza o
+mesmo `gcalEventId` já registrado em `gcal_sync_logs` para aquele documento,
+optando por `update`/`delete` sobre ele em vez de criar um novo evento a cada
+sincronização; um `insert` só ocorre quando o documento ainda não possui nenhum
+log `SYNCED` anterior. Ver ADR-009 (`.aihaus-okf/memory/project/decisions.md`)
+para a decisão de modelo de conta (OAuth por usuário vs. conta de serviço
+compartilhada) e suas consequências.
 
 ---
 
