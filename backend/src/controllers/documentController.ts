@@ -5,6 +5,7 @@ import { prisma } from '../lib/prisma.js';
 import { AuthenticatedRequest } from '../types/index.js';
 import { calculateDocumentStatus } from '../services/statusService.js';
 import { deleteUploadedFile } from '../services/storageService.js';
+import { syncDocumentEvent, deleteDocumentEvent } from '../services/gcalService.js';
 
 // Schema de validação para criação de documento
 const createDocumentSchema = z.object({
@@ -235,6 +236,18 @@ export async function createDocument(
         },
       },
     });
+
+    // Dispara a sincronização automática com o Google Agenda (RN-007). Nunca deve
+    // impedir a resposta de sucesso da criação do documento: o próprio
+    // `syncDocumentEvent` já trata falhas internamente e grava `GCalSyncLog` com
+    // `ERROR`, mas o try/catch aqui é defensivo contra qualquer exceção inesperada.
+    if (document.expirationDate) {
+      try {
+        await syncDocumentEvent(document, 'create');
+      } catch (error) {
+        console.error('Falha ao sincronizar evento no Google Agenda ao criar documento:', error);
+      }
+    }
 
     res.status(201).json({
       message: 'Documento cadastrado com sucesso.',
@@ -580,6 +593,21 @@ export async function updateDocument(
       });
     }
 
+    // Dispara a sincronização automática com o Google Agenda (RN-007). Escolha de
+    // gatilho: restrito a quando a data de vencimento efetivamente mudou
+    // (`diffData.expirationDate` presente), em vez de sincronizar em qualquer
+    // edição do documento — mais fiel à redação literal da RN-007 ("criação ou
+    // alteração da data de vencimento") e evita chamadas de rede desnecessárias à
+    // API do Google a cada edição de campos não relacionados (ex.: notas). Mesma
+    // regra de não-bloqueio de `createDocument`.
+    if (diffData.expirationDate && updatedDocument.expirationDate) {
+      try {
+        await syncDocumentEvent(updatedDocument, 'update');
+      } catch (error) {
+        console.error('Falha ao sincronizar evento no Google Agenda ao atualizar documento:', error);
+      }
+    }
+
     res.status(200).json({
       message: 'Documento atualizado com sucesso.',
       document: updatedDocument,
@@ -656,6 +684,23 @@ export async function toggleArchive(
       },
     });
 
+    // Reflete o (des)arquivamento no Google Agenda (DOC-28, escopo do ticket:
+    // "Arquivar/excluir um documento remove ou cancela o evento correspondente").
+    // Ao arquivar, remove o evento existente. Ao desarquivar, opcionalmente
+    // recria o evento (não exigido explicitamente pela tarefa, mas mantém o
+    // Google Agenda consistente com o estado do documento em vez de deixá-lo sem
+    // evento até a próxima edição). Mesma regra de não-bloqueio: falha aqui nunca
+    // deve impedir a resposta de sucesso do (des)arquivamento.
+    try {
+      if (newIsArchived) {
+        await deleteDocumentEvent(document);
+      } else if (updatedDocument.expirationDate) {
+        await syncDocumentEvent(updatedDocument, 'update');
+      }
+    } catch (error) {
+      console.error('Falha ao sincronizar Google Agenda ao alternar arquivamento do documento:', error);
+    }
+
     res.status(200).json({
       message: newIsArchived ? 'Documento arquivado com sucesso.' : 'Documento desarquivado com sucesso.',
       document: updatedDocument,
@@ -711,6 +756,16 @@ export async function deleteDocument(
         },
       },
     });
+
+    // Remove/cancela o evento no Google Agenda ANTES do hard delete: `GCalSyncLog`
+    // tem `onDelete: Cascade` para `Document`, então depois de `prisma.document.delete`
+    // o histórico de sincronização já não existe mais e `deleteDocumentEvent` não
+    // encontraria nada para remover. Falha aqui não deve impedir a exclusão.
+    try {
+      await deleteDocumentEvent(document);
+    } catch (error) {
+      console.error('Falha ao remover evento no Google Agenda antes de excluir documento:', error);
+    }
 
     // Hard delete no banco de dados (cascateia versions e gcal logs)
     await prisma.document.delete({
