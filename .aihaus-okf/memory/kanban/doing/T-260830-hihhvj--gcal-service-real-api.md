@@ -1,7 +1,7 @@
 ---
 id: T-260830-hihhvj
 title: "DOC-28 (3/5): reescrever gcalService.ts para chamadas reais à Google Calendar API"
-status: backlog
+status: doing
 owner: "-"
 workflow: feature
 created: 2026-08-30
