@@ -8,6 +8,7 @@ import AppShell from './components/layout/AppShell';
 import LoginPage from './pages/auth/LoginPage';
 import DashboardPage from './pages/dashboard/DashboardPage';
 import DocumentsPage from './pages/documents/DocumentsPage';
+import DocumentDetailPage from './pages/documents/DocumentDetailPage';
 import CalendarPage from './pages/calendar/CalendarPage';
 import NotificationsPage from './pages/notifications/NotificationsPage';
 import AuditPage from './pages/audit/AuditPage';
@@ -29,6 +30,7 @@ export const App: React.FC = () => {
             <Route element={<AppShell />}>
               <Route index element={<DashboardPage />} />
               <Route path="documentos" element={<DocumentsPage />} />
+              <Route path="documentos/:id" element={<DocumentDetailPage />} />
               <Route path="calendario" element={<CalendarPage />} />
               <Route path="notificacoes" element={<NotificationsPage />} />
               <Route path="perfil" element={<ProfilePage />} />

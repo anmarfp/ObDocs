@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Plus, RefreshCw, AlertTriangle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Document, DocumentCategory, DocumentStatus } from '@/features/documents/types/document.types';
@@ -8,7 +9,6 @@ import { DocumentFilters } from '@/features/documents/components/DocumentFilters
 import { DocumentTable } from '@/features/documents/components/DocumentTable';
 import { DocumentFormModal } from '@/features/documents/components/DocumentFormModal';
 import { DocumentRenewModal } from '@/features/documents/components/DocumentRenewModal';
-import { DocumentDetailModal } from '@/features/documents/components/DocumentDetailModal';
 import { DeleteConfirmModal } from '@/features/documents/components/DeleteConfirmModal';
 import { ToastContainer } from '@/features/documents/components/Toast';
 import { useToast } from '@/features/documents/hooks/useToast';
@@ -16,6 +16,7 @@ import { useToast } from '@/features/documents/hooks/useToast';
 export const DocumentsPage: React.FC = () => {
   const { user } = useAuth();
   const isAdmin = user?.role === 'ADMIN';
+  const navigate = useNavigate();
 
   const { toasts, removeToast, toastSuccess, toastError } = useToast();
 
@@ -36,7 +37,6 @@ export const DocumentsPage: React.FC = () => {
   const [isCreateOpen, setIsCreateOpen] = useState<boolean>(false);
   const [documentToEdit, setDocumentToEdit] = useState<Document | null>(null);
   const [documentToRenew, setDocumentToRenew] = useState<Document | null>(null);
-  const [documentToViewId, setDocumentToViewId] = useState<string | null>(null);
   const [documentToDelete, setDocumentToDelete] = useState<Document | null>(null);
 
   // Fetch Categories
@@ -97,7 +97,7 @@ export const DocumentsPage: React.FC = () => {
   };
 
   const handleOpenView = (doc: Document) => {
-    setDocumentToViewId(doc.id);
+    navigate(`/documentos/${doc.id}`);
   };
 
   const handleOpenDelete = (doc: Document) => {
@@ -244,26 +244,6 @@ export const DocumentsPage: React.FC = () => {
         }}
         onError={toastError}
         document={documentToRenew}
-      />
-
-      {/* View Document Details Modal */}
-      <DocumentDetailModal
-        isOpen={!!documentToViewId}
-        documentId={documentToViewId}
-        onClose={() => setDocumentToViewId(null)}
-        onEdit={(doc) => {
-          handleOpenEdit(doc);
-        }}
-        onRenew={(doc) => {
-          handleOpenRenew(doc);
-        }}
-        onToggleArchive={(doc) => {
-          handleToggleArchive(doc);
-        }}
-        onDelete={(doc) => {
-          handleOpenDelete(doc);
-        }}
-        onError={toastError}
       />
 
       {/* Admin Delete Confirm Modal */}
