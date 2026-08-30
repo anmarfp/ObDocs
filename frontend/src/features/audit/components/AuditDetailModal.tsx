@@ -1,4 +1,5 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { X, ShieldCheck, User, Calendar, FileText } from 'lucide-react';
 import { AuditLogItem } from '../types/audit.types';
 import { formatDateTime } from '@/features/documents/utils/dateHelper';
@@ -24,7 +25,7 @@ export const AuditDetailModal: React.FC<AuditDetailModalProps> = ({ isOpen, log,
 
   const badgeStyle = actionBadges[log.action] || { bg: 'bg-slate-100', text: 'text-slate-800' };
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4"
       role="dialog"
@@ -109,7 +110,8 @@ export const AuditDetailModal: React.FC<AuditDetailModalProps> = ({ isOpen, log,
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

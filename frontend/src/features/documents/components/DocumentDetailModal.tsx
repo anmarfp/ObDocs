@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import {
   X,
   Loader2,
@@ -146,7 +147,7 @@ export const DocumentDetailModal: React.FC<DocumentDetailModalProps> = ({
 
   const isAdmin = user?.role === 'ADMIN';
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4"
       role="dialog"
@@ -607,7 +608,8 @@ export const DocumentDetailModal: React.FC<DocumentDetailModalProps> = ({
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

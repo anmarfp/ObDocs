@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { AlertTriangle, Loader2, X } from 'lucide-react';
 import { AxiosError } from 'axios';
 import { Document } from '../types/document.types';
@@ -40,7 +41,7 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
     }
   };
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4"
       role="dialog"
@@ -109,7 +110,8 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    window.document.body
   );
 };
 

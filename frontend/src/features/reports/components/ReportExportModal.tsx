@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import {
   X,
   Download,
@@ -122,7 +123,7 @@ export const ReportExportModal: React.FC<ReportExportModalProps> = ({
     }
   };
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4"
       role="dialog"
@@ -348,7 +349,8 @@ export const ReportExportModal: React.FC<ReportExportModalProps> = ({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

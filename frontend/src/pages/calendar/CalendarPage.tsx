@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import {
   Calendar as CalendarIcon,
@@ -339,7 +340,7 @@ export const CalendarPage: React.FC = () => {
       </div>
 
       {/* Selected Event Details Modal */}
-      {selectedEvent && (
+      {selectedEvent && createPortal(
         <div
           className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4"
           role="dialog"
@@ -389,7 +390,8 @@ export const CalendarPage: React.FC = () => {
               </Link>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Sync Logs Modal for Admin */}
