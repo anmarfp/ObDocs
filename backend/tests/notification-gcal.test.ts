@@ -292,6 +292,41 @@ describe('Passo 8 - Notificações, cron e Google Calendar', () => {
       }));
     });
 
+    it('cria um evento novo (insert) em vez de reaproveitar um gcalEventId cujo registro mais recente é DELETED', async () => {
+      // Regressão: se o evento foi removido (ex.: documento arquivado) depois do
+      // último SYNCED, a próxima sincronização não pode tentar "update" num
+      // evento que não existe mais no Google Agenda.
+      (prisma.gCalSyncLog.findMany as any).mockResolvedValue([
+        { id: 'log-2', documentId: documentFixture.id, gcalEventId: null, status: SyncStatus.DELETED, lastSyncedAt: today },
+      ]);
+      mockEventsInsert.mockResolvedValue({ data: { id: 'gcal-real-event-novo' } });
+
+      const result = await gcalService.syncDocumentEvent(documentFixture as any, 'update');
+
+      expect(mockEventsUpdate).not.toHaveBeenCalled();
+      expect(mockEventsInsert).toHaveBeenCalled();
+      expect(result).toEqual(expect.objectContaining({ gcalEventId: 'gcal-real-event-novo', status: SyncStatus.SYNCED }));
+    });
+
+    it('busca o último evento ignorando tentativas ERROR na query (uma falha transitória não deve "esquecer" o evento real)', async () => {
+      // A consulta filtra status SYNCED/DELETED — uma linha ERROR (falha de rede,
+      // rate limit etc. após um SYNCED bem-sucedido) nunca chega a ser candidata,
+      // então a próxima sincronização continua enxergando o último evento real em
+      // vez de criar um duplicado via insert.
+      (prisma.gCalSyncLog.findMany as any).mockResolvedValue([
+        { id: 'log-1', documentId: documentFixture.id, gcalEventId: 'gcal-real-event-1', status: SyncStatus.SYNCED, lastSyncedAt: today },
+      ]);
+      mockEventsUpdate.mockResolvedValue({ data: { id: 'gcal-real-event-1' } });
+
+      await gcalService.syncDocumentEvent(documentFixture as any, 'update');
+
+      expect(prisma.gCalSyncLog.findMany).toHaveBeenCalledWith(expect.objectContaining({
+        where: expect.objectContaining({ status: { in: [SyncStatus.SYNCED, SyncStatus.DELETED] } }),
+      }));
+      expect(mockEventsInsert).not.toHaveBeenCalled();
+      expect(mockEventsUpdate).toHaveBeenCalledWith(expect.objectContaining({ eventId: 'gcal-real-event-1' }));
+    });
+
     it('registra ERROR no log quando o documento não tem data de vencimento (sem tentar chamar a API)', async () => {
       const result = await gcalService.syncDocumentEvent({ ...documentFixture, expirationDate: null } as any, 'update');
 
@@ -401,6 +436,69 @@ describe('Passo 8 - Notificações, cron e Google Calendar', () => {
       const result = await gcalService.syncAllDocuments();
 
       expect(result).toEqual({ total: 2, synced: 1 });
+    });
+
+    describe('deleteDocumentEvent', () => {
+      it('remove o evento no Google Agenda e grava DELETED quando há um evento sincronizado', async () => {
+        (prisma.gCalSyncLog.findMany as any).mockResolvedValue([
+          { id: 'log-1', documentId: documentFixture.id, gcalEventId: 'gcal-real-event-1', status: SyncStatus.SYNCED, lastSyncedAt: today },
+        ]);
+        mockEventsDelete.mockResolvedValue({});
+
+        const result = await gcalService.deleteDocumentEvent(documentFixture as any);
+
+        expect(mockEventsDelete).toHaveBeenCalledWith(expect.objectContaining({
+          calendarId: 'primary', eventId: 'gcal-real-event-1',
+        }));
+        expect(result).toEqual({ documentId: documentFixture.id, status: SyncStatus.DELETED });
+        expect(prisma.gCalSyncLog.create).toHaveBeenCalledWith(expect.objectContaining({
+          data: expect.objectContaining({ documentId: documentFixture.id, gcalEventId: null, status: SyncStatus.DELETED }),
+        }));
+      });
+
+      it('não chama a API nem grava log quando não há nenhum evento sincronizado para remover', async () => {
+        const result = await gcalService.deleteDocumentEvent(documentFixture as any);
+
+        expect(mockEventsDelete).not.toHaveBeenCalled();
+        expect(prisma.gCalSyncLog.create).not.toHaveBeenCalled();
+        expect(result).toEqual({ documentId: documentFixture.id, status: SyncStatus.DELETED });
+      });
+
+      it('não tenta remover de novo um evento cujo registro mais recente já é DELETED', async () => {
+        (prisma.gCalSyncLog.findMany as any).mockResolvedValue([
+          { id: 'log-2', documentId: documentFixture.id, gcalEventId: null, status: SyncStatus.DELETED, lastSyncedAt: today },
+        ]);
+
+        const result = await gcalService.deleteDocumentEvent(documentFixture as any);
+
+        expect(mockEventsDelete).not.toHaveBeenCalled();
+        expect(result).toEqual({ documentId: documentFixture.id, status: SyncStatus.DELETED });
+      });
+
+      it('grava ERROR quando o usuário nunca conectou o Google Agenda', async () => {
+        (prisma.gCalSyncLog.findMany as any).mockResolvedValue([
+          { id: 'log-1', documentId: documentFixture.id, gcalEventId: 'gcal-real-event-1', status: SyncStatus.SYNCED, lastSyncedAt: today },
+        ]);
+        (prisma.googleOAuthToken.findUnique as any).mockResolvedValue(null);
+
+        const result = await gcalService.deleteDocumentEvent(documentFixture as any);
+
+        expect(mockEventsDelete).not.toHaveBeenCalled();
+        expect(result).toEqual(expect.objectContaining({ status: SyncStatus.ERROR, errorMessage: expect.stringMatching(/não conectou/i) }));
+      });
+
+      it('grava ERROR com mensagem específica quando a chamada de remoção falha', async () => {
+        (prisma.gCalSyncLog.findMany as any).mockResolvedValue([
+          { id: 'log-1', documentId: documentFixture.id, gcalEventId: 'gcal-real-event-1', status: SyncStatus.SYNCED, lastSyncedAt: today },
+        ]);
+        mockEventsDelete.mockRejectedValue(
+          Object.assign(new Error('getaddrinfo ENOTFOUND www.googleapis.com'), { code: 'ENOTFOUND' })
+        );
+
+        const result = await gcalService.deleteDocumentEvent(documentFixture as any);
+
+        expect(result).toEqual(expect.objectContaining({ status: SyncStatus.ERROR, errorMessage: expect.stringMatching(/rede/i) }));
+      });
     });
   });
 

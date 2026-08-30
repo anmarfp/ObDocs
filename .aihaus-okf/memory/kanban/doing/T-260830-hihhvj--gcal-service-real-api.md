@@ -139,3 +139,17 @@ já mesclado em `main`.
     (`cronService` › "recalcula documentos ativos..." — fixture com data
     hardcoded colidindo com a data real de hoje), não relacionada a esta
     subtarefa.
+- 2026-08-30 — Revisão do orquestrador antes do merge: encontrado um bug real na
+  busca do "último evento" (`findLastSyncedEvent`, agora `findCurrentGcalEventId`).
+  A busca filtrava só `status: SYNCED`, ignorando qualquer `DELETED` posterior —
+  então, depois de um documento ser arquivado/excluído (removendo o evento via
+  `deleteDocumentEvent`, que esta mesma subtarefa introduziu) e depois reativado
+  com nova data de vencimento, a próxima sincronização tentaria `events.update`
+  num evento que não existe mais no Google (404), em vez de criar um novo. Corrigido
+  para buscar o registro `SYNCED`/`DELETED` mais recente (ignorando `ERROR`, que
+  nunca deveria "esquecer" um evento real por causa de uma falha transitória) e
+  tratar `DELETED` como "sem evento atual" → insert. Adicionados 2 testes de
+  regressão (insert após DELETED; a query exclui ERROR) e uma suíte completa para
+  `deleteDocumentEvent` (nenhum teste cobria essa função nova). `npm --prefix
+  backend test` após a correção: 173/174 (mesma falha pré-existente e não
+  relacionada). PR aberta e mesclada em `main` em seguida.

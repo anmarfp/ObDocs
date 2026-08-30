@@ -156,15 +156,27 @@ function classifyGoogleError(error: unknown): string {
   return `Erro ao sincronizar com a API do Google Agenda: ${message || 'erro desconhecido'}.`;
 }
 
-/** Busca o registro mais recente de sincronização bem-sucedida (com evento real) de um documento. */
-async function findLastSyncedEvent(documentId: string) {
-  const [lastSynced] = await prisma.gCalSyncLog.findMany({
-    where: { documentId, status: SyncStatus.SYNCED, gcalEventId: { not: null } },
+/**
+ * Resolve o evento atualmente ativo no Google Agenda para um documento, olhando
+ * apenas o registro `SYNCED`/`DELETED` mais recente (registros `ERROR` são
+ * ignorados aqui: uma falha transitória não muda se o evento existe ou não).
+ * Isso evita dois bugs opostos: (a) reaproveitar um evento já removido por um
+ * `deleteDocumentEvent` posterior (causaria "update" num evento inexistente), e
+ * (b) esquecer um evento que segue existindo só porque a tentativa mais recente
+ * falhou (causaria "insert" duplicado numa próxima sincronização bem-sucedida).
+ */
+async function findCurrentGcalEventId(documentId: string): Promise<string | null> {
+  const [mostRecent] = await prisma.gCalSyncLog.findMany({
+    where: { documentId, status: { in: [SyncStatus.SYNCED, SyncStatus.DELETED] } },
     orderBy: { lastSyncedAt: 'desc' },
     take: 1,
   });
 
-  return lastSynced ?? null;
+  if (!mostRecent || mostRecent.status === SyncStatus.DELETED) {
+    return null;
+  }
+
+  return mostRecent.gcalEventId ?? null;
 }
 
 /**
@@ -222,18 +234,18 @@ export async function syncDocumentEvent(
     end: { date: endDate },
   };
 
-  const lastSynced = await findLastSyncedEvent(doc.id);
+  const currentEventId = await findCurrentGcalEventId(doc.id);
 
   try {
     let gcalEventId: string | null | undefined;
 
-    if (lastSynced?.gcalEventId) {
+    if (currentEventId) {
       const response = await calendar.events.update({
         calendarId: CALENDAR_ID,
-        eventId: lastSynced.gcalEventId,
+        eventId: currentEventId,
         requestBody,
       });
-      gcalEventId = response.data.id ?? lastSynced.gcalEventId;
+      gcalEventId = response.data.id ?? currentEventId;
     } else {
       const response = await calendar.events.insert({
         calendarId: CALENDAR_ID,
@@ -293,9 +305,9 @@ export async function syncDocumentEvent(
 export async function deleteDocumentEvent(
   doc: { id: string; createdById: string }
 ): Promise<SyncDocumentEventResult> {
-  const lastSynced = await findLastSyncedEvent(doc.id);
+  const currentEventId = await findCurrentGcalEventId(doc.id);
 
-  if (!lastSynced?.gcalEventId) {
+  if (!currentEventId) {
     return {
       documentId: doc.id,
       status: SyncStatus.DELETED,
@@ -326,7 +338,7 @@ export async function deleteDocumentEvent(
   try {
     await calendar.events.delete({
       calendarId: CALENDAR_ID,
-      eventId: lastSynced.gcalEventId,
+      eventId: currentEventId,
     });
 
     await prisma.gCalSyncLog.create({
