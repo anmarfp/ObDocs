@@ -11,6 +11,7 @@ import { userService } from '@/features/users/services/userService';
 import { companyService } from '@/features/documents/services/companyService';
 import { categoryService } from '@/features/documents/services/categoryService';
 import { notificationAdminService } from '@/features/notifications/services/notificationAdminService';
+import { googleAuthService } from '@/features/calendar/services/googleAuthService';
 import { UsersPage } from '@/pages/users/UsersPage';
 import { UserFormModal } from '@/features/users/components/UserFormModal';
 import { SettingsPage } from '@/pages/settings/SettingsPage';
@@ -244,8 +245,9 @@ describe('Configurações — RN-004 e gatilhos administrativos', () => {
       sentAt: '2026-08-27T12:00:00.000Z',
     });
     vi.spyOn(window, 'confirm').mockReturnValue(true);
+    vi.spyOn(googleAuthService, 'getStatus').mockResolvedValue({ connected: false });
 
-    render(<SettingsPage />);
+    render(<MemoryRouter><SettingsPage /></MemoryRouter>);
     await screen.findByText(/Todos os Administradores/i);
     fireEvent.click(screen.getAllByRole('radio')[1]);
     fireEvent.click(screen.getByRole('button', { name: /Salvar Política/i }));

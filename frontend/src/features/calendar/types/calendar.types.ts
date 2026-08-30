@@ -45,3 +45,11 @@ export interface SyncLogsResponse {
   totalPages: number;
   logs: SyncLogItem[];
 }
+
+/**
+ * Status da conexão OAuth por usuário com o Google Agenda (DOC-28, subtarefa 2).
+ * Nunca carrega os valores dos tokens — apenas se existe uma conexão ativa.
+ */
+export interface GoogleConnectionStatus {
+  connected: boolean;
+}
