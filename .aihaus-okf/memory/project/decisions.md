@@ -2,7 +2,7 @@
 type: decision
 owner: architecture
 status: active
-last_reviewed: 2026-08-27
+last_reviewed: 2026-08-30
 ---
 
 # Decisions — ADR Ledger
@@ -12,6 +12,13 @@ last_reviewed: 2026-08-27
 ## Current truth
 
 Key architectural decisions are recorded in `docs/ARCHITECTURE.md` and `docs/PRD.md`.
+
+### 2026-08-30 — Modelo de Conta OAuth por Usuário para Sincronização Real com Google Agenda (ADR-009)
+- **Context:** DOC-28 pede substituir a simulação de sincronização com o Google Agenda (`backend/src/services/gcalService.ts:41` gera apenas `gcal-event-${doc.id}` local, sem OAuth/rede) por uma integração real via Google Calendar API. O ticket identificou uma decisão pendente que bloqueava o início da implementação: qual modelo de conta usar — (A) OAuth por usuário (cada administrador conecta sua própria agenda pessoal) ou (B) conta de serviço única/agenda corporativa compartilhada.
+- **Decision:** Adotar o modelo **(A) OAuth por usuário**. Cada administrador conecta sua própria conta Google via fluxo OAuth2 (authorization code), com access/refresh token persistidos por usuário em nova tabela Prisma `GoogleOAuthToken`. É o modelo que RN-007 e os ADR-003/ADR-006 já pressupunham ("evento no Google Agenda do administrador" = agenda pessoal, não uma agenda corporativa única).
+- **Consequências:** Nova migration Prisma para a tabela de tokens; novos endpoints de conexão OAuth (redirect + callback) em `calendarRoutes.ts`/`calendarController.ts`; UI "Conectar Google Agenda" com status de conexão; `gcalService.ts` precisa resolver de qual usuário buscar o token (dono/criador do documento) e tratar ausência de conexão como `SyncStatus.ERROR` com mensagem própria. Implementação quebrada em 5 subtarefas sequenciais no kanban: (1) dependência `googleapis` + schema/migration + env vars, (2) fluxo de conexão OAuth (endpoints + botão UI), (3) reescrita de `gcalService.ts` para chamadas reais, (4) gatilho automático em create/update de documento (RN-007), (5) remoção do banner de simulação + atualização de `docs/PRD.md`/`docs/ARCHITECTURE.md`.
+- **Status:** Accepted
+- **Links:** DOC-28 (Linear), `business-rules.md` RN-007, ADR-003, ADR-006, `backend/src/services/gcalService.ts`, `backend/prisma/schema.prisma:144`
 
 ### 2026-08-27 — Pipeline Multiagente Especializado via Orca CLI e Stack do Frontend (ADR-008)
 - **Context:** Decisão de desenvolver o front-end em **React + TypeScript (Vite)** com componentização moderna, exigindo planejamento rigoroso, auditoria prévia de regras e testes automatizados contínuos.
