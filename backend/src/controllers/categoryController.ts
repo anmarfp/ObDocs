@@ -3,6 +3,8 @@ import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
 import { AuthenticatedRequest } from '../types/index.js';
 
+export const DEFAULT_CATEGORY_NAME = 'Sem Categoria';
+
 const createCategorySchema = z.object({
   name: z.string().min(2, 'O nome da categoria deve ter pelo menos 2 caracteres.'),
   colorHex: z.string().regex(/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/, 'Cor inválida (formato hex #RGB ou #RRGGBB).').optional(),
@@ -85,6 +87,14 @@ export async function deleteCategory(req: AuthenticatedRequest, res: Response, n
       res.status(404).json({
         error: 'CATEGORY_NOT_FOUND',
         message: 'Categoria não encontrada.',
+      });
+      return;
+    }
+
+    if (category.name === DEFAULT_CATEGORY_NAME) {
+      res.status(400).json({
+        error: 'DEFAULT_CATEGORY_PROTECTED',
+        message: 'A categoria padrão "Sem Categoria" não pode ser excluída.',
       });
       return;
     }

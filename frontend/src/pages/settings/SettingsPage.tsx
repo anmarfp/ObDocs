@@ -18,6 +18,7 @@ import {
   CompanyConfig,
   DocumentCategory,
   NotificationMode,
+  DEFAULT_CATEGORY_NAME,
 } from '@/features/documents/types/document.types';
 import { CategoryFormModal } from '@/features/company/components/CategoryFormModal';
 import { ToastContainer } from '@/features/documents/components/Toast';
@@ -40,6 +41,7 @@ export const SettingsPage: React.FC = () => {
   const [isLoadingCategories, setIsLoadingCategories] = useState<boolean>(true);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState<boolean>(false);
   const [deletingCategoryId, setDeletingCategoryId] = useState<string | null>(null);
+  const manageableCategories = categories.filter((cat) => cat.name !== DEFAULT_CATEGORY_NAME);
 
   // Load configuration
   const fetchConfig = useCallback(async () => {
@@ -388,18 +390,19 @@ export const SettingsPage: React.FC = () => {
             </button>
 
             {/* Categories List */}
+            {/* "Sem Categoria" é a categoria padrão do sistema e não é gerenciável aqui. */}
             {isLoadingCategories ? (
               <div className="py-6 text-center text-xs text-slate-400">
                 <RefreshCw className="w-4 h-4 animate-spin mx-auto text-navy-600 mb-1" />
                 Carregando categorias...
               </div>
-            ) : categories.length === 0 ? (
+            ) : manageableCategories.length === 0 ? (
               <div className="py-6 text-center text-xs text-slate-400">
                 Nenhuma categoria cadastrada.
               </div>
             ) : (
               <div className="divide-y divide-slate-100 max-h-96 overflow-y-auto pr-1">
-                {categories.map((cat) => (
+                {manageableCategories.map((cat) => (
                   <div key={cat.id} className="py-3 flex items-center justify-between gap-2">
                     <div className="flex items-center space-x-2.5 min-w-0">
                       <span

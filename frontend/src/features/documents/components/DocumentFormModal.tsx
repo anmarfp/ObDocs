@@ -9,6 +9,7 @@ import {
   DocumentCategory,
   CompanyConfig,
   NotificationMode,
+  DEFAULT_CATEGORY_NAME,
 } from '../types/document.types';
 import { documentService } from '../services/documentService';
 import { companyService } from '../services/companyService';
@@ -107,9 +108,10 @@ export const DocumentFormModal: React.FC<DocumentFormModalProps> = ({
           isRenewalInProgress: documentToEdit.status === 'RENEWAL_IN_PROGRESS',
         });
       } else {
+        const defaultCategory = categories.find((cat) => cat.name === DEFAULT_CATEGORY_NAME);
         reset({
           title: '',
-          categoryId: categories.length > 0 ? categories[0].id : '',
+          categoryId: defaultCategory?.id ?? (categories.length > 0 ? categories[0].id : ''),
           issuingBody: '',
           issueDate: toInputDateFormat(new Date()),
           expirationDate: '',

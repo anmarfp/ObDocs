@@ -41,6 +41,9 @@ export interface DocumentCategory {
   documentCount?: number;
 }
 
+/** Categoria padrão do sistema, atribuída a documentos sem categoria específica. Nunca é exibida na gestão de categorias (Configurações) nem pode ser excluída. */
+export const DEFAULT_CATEGORY_NAME = 'Sem Categoria';
+
 export interface DocumentVersion {
   id: string;
   documentId: string;

@@ -86,6 +86,7 @@ async function main() {
 
   // 4. Categorias Padrão de Documentos
   const defaultCategories = [
+    { name: 'Sem Categoria', colorHex: '#94a3b8', description: 'Categoria padrão atribuída a documentos sem uma categoria específica definida.' },
     { name: 'Fiscal', colorHex: '#3b82f6', description: 'Certidões negativas, guias de impostos, cadastros fiscais e declarações' },
     { name: 'Trabalhista & Previdenciário', colorHex: '#10b981', description: 'FGTS, CNDT, PCMSO, PGR, PPRA e obrigações trabalhistas' },
     { name: 'Licenças e Alvarás', colorHex: '#f59e0b', description: 'Alvarás de funcionamento, vigilância sanitária, corpo de bombeiros e meio ambiente' },
