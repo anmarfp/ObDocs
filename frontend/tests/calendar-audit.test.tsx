@@ -8,6 +8,7 @@ import type { AuthContextType, Role, User } from '@/types/auth';
 import type { AuditLogItem, AuditLogsResponse } from '@/features/audit/types/audit.types';
 import type { CalendarEventItem } from '@/features/calendar/types/calendar.types';
 import { calendarService } from '@/features/calendar/services/calendarService';
+import { googleAuthService } from '@/features/calendar/services/googleAuthService';
 import { auditService } from '@/features/audit/services/auditService';
 import { CalendarPage } from '@/pages/calendar/CalendarPage';
 import { AuditPage } from '@/pages/audit/AuditPage';
@@ -110,6 +111,7 @@ describe('Calendário — serviços, mês/ano e sync', () => {
     vi.useFakeTimers({ toFake: ['Date'] });
     vi.setSystemTime(new Date('2026-08-27T12:00:00.000Z'));
     const getEvents = vi.spyOn(calendarService, 'getEvents').mockResolvedValue([event]);
+    vi.spyOn(googleAuthService, 'getStatus').mockResolvedValue({ connected: true });
     vi.spyOn(calendarService, 'syncCalendar').mockResolvedValue({ total: 4, synced: 3 });
     const getSyncLogs = vi.spyOn(calendarService, 'getSyncLogs').mockResolvedValue({
       total: 1,
@@ -132,6 +134,7 @@ describe('Calendário — serviços, mês/ano e sync', () => {
     renderWithAuth(<CalendarPage />);
     await waitFor(() => expect(getEvents).toHaveBeenCalledWith(2026, 8));
     expect(await screen.findByText('Licença Ambiental')).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: /Sincronizar com Agenda/i })).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: /Sincronizar com Agenda/i }));
     expect(await screen.findByText(/3 de 4 documento\(s\).*Google Agenda/i)).toBeInTheDocument();
@@ -143,10 +146,21 @@ describe('Calendário — serviços, mês/ano e sync', () => {
 
   it('oculta o modal de logs para OPERATIONAL', async () => {
     vi.spyOn(calendarService, 'getEvents').mockResolvedValue([]);
+    vi.spyOn(googleAuthService, 'getStatus').mockResolvedValue({ connected: true });
     renderWithAuth(<CalendarPage />, 'OPERATIONAL');
     await waitFor(() => expect(calendarService.getEvents).toHaveBeenCalled());
     expect(screen.queryByRole('button', { name: /Logs de Sync/i })).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Sincronizar com Agenda/i })).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: /Sincronizar com Agenda/i })).toBeInTheDocument();
+  });
+
+  it('mostra "Conectar Google Agenda" em vez de "Sincronizar com Agenda" quando o usuário não conectou sua conta (DOC-28 QA)', async () => {
+    vi.spyOn(calendarService, 'getEvents').mockResolvedValue([]);
+    vi.spyOn(googleAuthService, 'getStatus').mockResolvedValue({ connected: false });
+    renderWithAuth(<CalendarPage />);
+
+    await waitFor(() => expect(calendarService.getEvents).toHaveBeenCalled());
+    expect(await screen.findByRole('button', { name: /Conectar Google Agenda/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Sincronizar com Agenda/i })).not.toBeInTheDocument();
   });
 });
 

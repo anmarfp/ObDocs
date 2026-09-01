@@ -8,9 +8,12 @@ import {
   RefreshCw,
   Clock,
   FileText,
+  Link2,
+  Loader2,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { calendarService } from '@/features/calendar/services/calendarService';
+import { googleAuthService, navigateToGoogleConsent } from '@/features/calendar/services/googleAuthService';
 import { CalendarEventItem } from '@/features/calendar/types/calendar.types';
 import { SyncLogsModal } from '@/features/calendar/components/SyncLogsModal';
 import { ToastContainer } from '@/features/documents/components/Toast';
@@ -49,6 +52,8 @@ export const CalendarPage: React.FC = () => {
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
   const [syncLogsOpen, setSyncLogsOpen] = useState<boolean>(false);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEventItem | null>(null);
+  const [isGoogleConnected, setIsGoogleConnected] = useState<boolean | null>(null);
+  const [isConnectingGoogle, setIsConnectingGoogle] = useState<boolean>(false);
 
   // Fetch events from GET /calendar/events?year=YYYY&month=M
   const fetchEvents = useCallback(async () => {
@@ -67,6 +72,22 @@ export const CalendarPage: React.FC = () => {
   useEffect(() => {
     fetchEvents();
   }, [fetchEvents]);
+
+  // Check Google Calendar connection status (DOC-28 QA follow-up): the sync
+  // button only makes sense once the user has connected their Google Agenda.
+  const fetchGoogleStatus = useCallback(async () => {
+    try {
+      const data = await googleAuthService.getStatus();
+      setIsGoogleConnected(data.connected);
+    } catch (err: any) {
+      console.error('Falha ao consultar status da conexão com o Google Agenda:', err);
+      setIsGoogleConnected(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchGoogleStatus();
+  }, [fetchGoogleStatus]);
 
   // Navigate months
   const handlePrevMonth = () => {
@@ -107,6 +128,26 @@ export const CalendarPage: React.FC = () => {
       toastError('Falha na Sincronização', 'Não foi possível concluir a sincronização da agenda.');
     } finally {
       setIsSyncing(false);
+    }
+  };
+
+  // Connect Google Calendar from the Calendar page (DOC-28 QA follow-up):
+  // same flow as SettingsPage.tsx's handleConnectGoogle — fetch the signed
+  // consent URL via an authenticated call, then do a full-page browser
+  // navigation to Google (not an XHR, since the consent screen must be
+  // rendered by the browser itself).
+  const handleConnectGoogle = async () => {
+    setIsConnectingGoogle(true);
+    try {
+      const url = await googleAuthService.getConnectUrl();
+      navigateToGoogleConsent(url);
+    } catch (err: any) {
+      console.error('Erro ao gerar URL de conexão com o Google Agenda:', err);
+      const message = err?.response?.data?.error === 'GOOGLE_OAUTH_NOT_CONFIGURED'
+        ? 'A integração com o Google Agenda ainda não foi configurada neste ambiente.'
+        : 'Não foi possível iniciar a conexão com o Google Agenda.';
+      toastError('Falha ao Conectar', message);
+      setIsConnectingGoogle(false);
     }
   };
 
@@ -201,16 +242,38 @@ export const CalendarPage: React.FC = () => {
             </button>
           )}
 
-          <button
-            type="button"
-            onClick={handleSync}
-            disabled={isSyncing}
-            className="btn-primary text-xs"
-            title="Sincronizar documentos ativos com a agenda"
-          >
-            <RefreshCw className={`w-4 h-4 mr-1.5 ${isSyncing ? 'animate-spin' : ''}`} />
-            {isSyncing ? 'Sincronizando...' : 'Sincronizar com Agenda'}
-          </button>
+          {isGoogleConnected === false ? (
+            <button
+              type="button"
+              onClick={handleConnectGoogle}
+              disabled={isConnectingGoogle}
+              className="btn-primary text-xs"
+              title="Conectar sua conta Google para sincronizar os vencimentos"
+            >
+              {isConnectingGoogle ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
+                  Redirecionando...
+                </>
+              ) : (
+                <>
+                  <Link2 className="w-4 h-4 mr-1.5" />
+                  Conectar Google Agenda
+                </>
+              )}
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleSync}
+              disabled={isSyncing}
+              className="btn-primary text-xs"
+              title="Sincronizar documentos ativos com a agenda"
+            >
+              <RefreshCw className={`w-4 h-4 mr-1.5 ${isSyncing ? 'animate-spin' : ''}`} />
+              {isSyncing ? 'Sincronizando...' : 'Sincronizar com Agenda'}
+            </button>
+          )}
         </div>
       </div>
 

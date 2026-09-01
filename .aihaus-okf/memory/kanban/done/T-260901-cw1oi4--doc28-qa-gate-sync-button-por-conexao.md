@@ -1,7 +1,7 @@
 ---
 id: T-260901-cw1oi4
 title: "DOC-28 (retorno de QA): gatilho do botao de sync no Calendario deve depender do status de conexao Google"
-status: doing
+status: done
 owner: "-"
 workflow: bugfix
 created: 2026-09-01
@@ -59,10 +59,20 @@ conexão, e só mostrar "Sincronizar com Agenda" quando houver.
   regressão (28/28 hoje).
 
 ## Checklist
-- [ ] Status de conexão buscado ao montar CalendarPage
-- [ ] Botão condicional implementado (Conectar vs Sincronizar)
-- [ ] Build e testes de frontend sem regressão
-- [ ] Commit único e descritivo
+- [x] Status de conexão buscado ao montar CalendarPage
+- [x] Botão condicional implementado (Conectar vs Sincronizar)
+- [x] Build e testes de frontend sem regressão
+- [x] Commit único e descritivo
 
 ## Log
 - 2026-09-01 — criada a partir do retorno de QA em DOC-28
+- 2026-09-01 — Implementado diretamente pelo orquestrador (a pedido do
+  usuário, sem delegar a agente Codex): `CalendarPage.tsx` agora busca
+  `googleAuthService.getStatus()` ao montar e renderiza condicionalmente
+  "Conectar Google Agenda" (quando `isGoogleConnected === false`, mesmo
+  fluxo/handler de `SettingsPage.tsx`) ou "Sincronizar com Agenda" (caso
+  contrário). Atualizados 2 testes existentes em
+  `frontend/tests/calendar-audit.test.tsx` que assumiam o botão de sync
+  sempre visível (mockando `googleAuthService.getStatus`) e adicionado 1
+  teste novo cobrindo o estado desconectado. `npm --prefix frontend run
+  build` e `npm --prefix frontend test` (29/29) passam.
