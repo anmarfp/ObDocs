@@ -5,8 +5,6 @@ import {
   Clock,
   CheckCircle2,
   HelpCircle,
-  Plus,
-  Download,
   Calendar as CalendarIcon,
   Shield,
   ArrowRight,
@@ -32,7 +30,6 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { dashboardService } from '@/features/dashboard/services/dashboardService';
 import { DashboardMetrics } from '@/features/dashboard/types/dashboard.types';
-import { ReportExportModal } from '@/features/reports/components/ReportExportModal';
 import { ToastContainer } from '@/features/documents/components/Toast';
 import { useToast } from '@/features/documents/hooks/useToast';
 import { formatDate } from '@/features/documents/utils/dateHelper';
@@ -41,12 +38,11 @@ import DocumentStatusBadge from '@/features/documents/components/DocumentStatusB
 export const DashboardPage: React.FC = () => {
   const { user } = useAuth();
   const isAdmin = user?.role === 'ADMIN';
-  const { toasts, removeToast, toastSuccess, toastError } = useToast();
+  const { toasts, removeToast, toastError } = useToast();
 
   const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [exportModalOpen, setExportModalOpen] = useState<boolean>(false);
 
   const fetchMetrics = useCallback(async () => {
     setIsLoading(true);
@@ -177,18 +173,6 @@ export const DashboardPage: React.FC = () => {
             <RefreshCw className={`w-4 h-4 mr-2 text-slate-500 ${isLoading ? 'animate-spin' : ''}`} />
             Atualizar
           </button>
-          <button
-            type="button"
-            onClick={() => setExportModalOpen(true)}
-            className="btn-secondary"
-          >
-            <Download className="w-4 h-4 mr-2 text-slate-500" />
-            Exportar Relatório
-          </button>
-          <Link to="/documentos" className="btn-primary">
-            <Plus className="w-4 h-4 mr-2" />
-            Gerenciar Documentos
-          </Link>
         </div>
       </div>
 
@@ -551,14 +535,6 @@ export const DashboardPage: React.FC = () => {
           </div>
         </div>
       </div>
-
-      {/* Report Export Modal */}
-      <ReportExportModal
-        isOpen={exportModalOpen}
-        onClose={() => setExportModalOpen(false)}
-        onError={toastError}
-        onSuccess={toastSuccess}
-      />
     </div>
   );
 };
