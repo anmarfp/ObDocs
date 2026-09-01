@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, RefreshCw, AlertTriangle } from 'lucide-react';
+import { Plus, RefreshCw, AlertTriangle, Download } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Document, DocumentCategory, DocumentStatus } from '@/features/documents/types/document.types';
 import { documentService } from '@/features/documents/services/documentService';
@@ -12,6 +12,7 @@ import { DocumentRenewModal } from '@/features/documents/components/DocumentRene
 import { DeleteConfirmModal } from '@/features/documents/components/DeleteConfirmModal';
 import { ToastContainer } from '@/features/documents/components/Toast';
 import { useToast } from '@/features/documents/hooks/useToast';
+import { ReportExportModal } from '@/features/reports/components/ReportExportModal';
 
 export const DocumentsPage: React.FC = () => {
   const { user } = useAuth();
@@ -38,6 +39,7 @@ export const DocumentsPage: React.FC = () => {
   const [documentToEdit, setDocumentToEdit] = useState<Document | null>(null);
   const [documentToRenew, setDocumentToRenew] = useState<Document | null>(null);
   const [documentToDelete, setDocumentToDelete] = useState<Document | null>(null);
+  const [exportModalOpen, setExportModalOpen] = useState<boolean>(false);
 
   // Fetch Categories
   const fetchCategories = useCallback(async () => {
@@ -163,6 +165,15 @@ export const DocumentsPage: React.FC = () => {
 
           <button
             type="button"
+            onClick={() => setExportModalOpen(true)}
+            className="btn-secondary"
+          >
+            <Download className="w-4 h-4 mr-2 text-slate-500" />
+            Exportar Relatório
+          </button>
+
+          <button
+            type="button"
             onClick={handleOpenCreate}
             className="btn-primary"
           >
@@ -257,6 +268,14 @@ export const DocumentsPage: React.FC = () => {
           fetchCategories();
         }}
         onError={toastError}
+      />
+
+      {/* Report Export Modal */}
+      <ReportExportModal
+        isOpen={exportModalOpen}
+        onClose={() => setExportModalOpen(false)}
+        onError={toastError}
+        onSuccess={toastSuccess}
       />
     </div>
   );
