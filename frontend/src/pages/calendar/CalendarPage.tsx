@@ -373,7 +373,7 @@ export const CalendarPage: React.FC = () => {
                 Fechar
               </button>
               <Link
-                to="/documentos"
+                to={`/documentos/${selectedEvent.id}`}
                 className="btn-primary text-xs"
               >
                 <FileText className="w-3.5 h-3.5 mr-1" />
