@@ -37,5 +37,5 @@ else
   echo "ℹ️ [Entrypoint] RUN_SEED não habilitado. Pulando etapa de seed."
 fi
 
-echo "🚀 [Entrypoint] Iniciando servidor DocsOb na porta ${PORT:-3001}..."
+echo "🚀 [Entrypoint] Iniciando servidor DocsObs na porta ${PORT:-3001}..."
 exec "$@"

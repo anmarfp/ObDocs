@@ -5,7 +5,7 @@ status: active
 last_reviewed: 2026-08-24
 ---
 
-# Deployment — DocsOb
+# Deployment — DocsObs
 
 > Release, environment provisioning, and deployment guidelines.
 

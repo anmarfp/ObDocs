@@ -1,9 +1,9 @@
 # PRD - Documento de Requisitos do Produto
-## Sistema de Gestão e Acompanhamento de Vencimento de Documentos (DocsOb)
+## Sistema de Gestão e Acompanhamento de Vencimento de Documentos (DocsObs)
 
 | Informação | Detalhe |
 | :--- | :--- |
-| **Projeto** | DocsOb - Gestão de Vencimento de Documentos |
+| **Projeto** | DocsObs - Gestão de Vencimento de Documentos |
 | **Fase Atual** | Concluído / Em Produção (Fases 1 a 4 Concluídas) |
 | **Status** | Aprovado, Implementado e Validado |
 | **Versão** | 1.0.0 |
@@ -18,7 +18,7 @@
 Na administração diária de empresas, o acompanhamento manual de datas de vencimento de documentos (como certidões negativas, licenças de operação, contratos de fornecedores, obrigações trabalhistas, apólices de seguro, licenças sanitárias/ambientais, entre outros) através de planilhas desatualizadas ou e-mails causa retrabalho e riscos operacionais graves. A perda de prazos resulta em multas, suspensão de alvarás, bloqueios contratuais e impedimento de participação em licitações.
 
 ### 1.2 Solução Entregue
-O sistema **DocsOb** é uma plataforma web moderna, responsiva e Local-First, focada na visualização rápida e proativa do status de vencimento dos documentos da empresa, com sistema visual por matriz de cores, alertas automáticos multicanal, sincronização com calendário, trilha de auditoria imutável (com visualização de diff) e controle rigoroso de acessos baseado em perfis (RBAC).
+O sistema **DocsObs** é uma plataforma web moderna, responsiva e Local-First, focada na visualização rápida e proativa do status de vencimento dos documentos da empresa, com sistema visual por matriz de cores, alertas automáticos multicanal, sincronização com calendário, trilha de auditoria imutável (com visualização de diff) e controle rigoroso de acessos baseado em perfis (RBAC).
 
 ---
 
@@ -143,8 +143,8 @@ O sistema **DocsOb** é uma plataforma web moderna, responsiva e Local-First, fo
 
 | Perfil | E-mail de Acesso | Senha Padrão | Escopo de Acesso |
 | :--- | :--- | :--- | :--- |
-| **Administrador** | `admin@docsob.com.br` | `Admin123!@#` | Acesso Irrestrito (Gestão, Auditoria, Configurações, Documentos, Relatórios) |
-| **Operacional** | `operacional@docsob.com.br` | `Operacional123!@#` | Acesso Operacional (Documentos, Renovações, Calendário, Dashboard) |
+| **Administrador** | `admin@docsobs.com.br` | `Admin123!@#` | Acesso Irrestrito (Gestão, Auditoria, Configurações, Documentos, Relatórios) |
+| **Operacional** | `operacional@docsobs.com.br` | `Operacional123!@#` | Acesso Operacional (Documentos, Renovações, Calendário, Dashboard) |
 
 ---
 

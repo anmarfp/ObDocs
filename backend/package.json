@@ -1,7 +1,7 @@
 {
-  "name": "docsob-backend",
+  "name": "docsobs-backend",
   "version": "1.0.0",
-  "description": "Backend API para o sistema DocsOb de Gestão de Vencimento de Documentos",
+  "description": "Backend API para o sistema DocsObs de Gestão de Vencimento de Documentos",
   "main": "dist/src/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
@@ -19,13 +19,13 @@
     "test:watch": "vitest"
   },
   "keywords": [
-    "docsob",
+    "docsobs",
     "document-management",
     "prisma",
     "postgresql",
     "express"
   ],
-  "author": "DocsOb",
+  "author": "DocsObs",
   "license": "ISC",
   "dependencies": {
     "@prisma/client": "^6.4.1",

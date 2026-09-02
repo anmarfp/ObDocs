@@ -48,7 +48,7 @@ import { generateToken } from '../src/utils/jwt.js';
 describe('DOC-28 (4/5) - Gatilho automático de sincronização com o Google Agenda (RN-007)', () => {
   const adminToken = generateToken({
     userId: 'admin-uuid-1',
-    email: 'admin@docsob.com.br',
+    email: 'admin@docsobs.com.br',
     name: 'Admin Teste',
     role: Role.ADMIN,
   });
@@ -76,7 +76,7 @@ describe('DOC-28 (4/5) - Gatilho automático de sincronização com o Google Age
     createdAt: new Date(),
     updatedAt: new Date(),
     category: { id: validCategoryId, name: 'Fiscal', colorHex: '#3b82f6' },
-    createdBy: { id: 'admin-uuid-1', name: 'Admin Teste', email: 'admin@docsob.com.br', role: Role.ADMIN },
+    createdBy: { id: 'admin-uuid-1', name: 'Admin Teste', email: 'admin@docsobs.com.br', role: Role.ADMIN },
   };
 
   const syncedResult = { documentId: sampleDoc.id, gcalEventId: 'gcal-event-1', status: SyncStatus.SYNCED };

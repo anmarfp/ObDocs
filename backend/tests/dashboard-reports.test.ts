@@ -27,14 +27,14 @@ vi.mock('../src/lib/prisma.js', () => ({
 
 const adminToken = generateToken({
   userId: 'admin-uuid-1',
-  email: 'admin@docsob.com.br',
+  email: 'admin@docsobs.com.br',
   name: 'Admin Master',
   role: Role.ADMIN,
 });
 
 const operationalToken = generateToken({
   userId: 'operational-uuid-1',
-  email: 'operacional@docsob.com.br',
+  email: 'operacional@docsobs.com.br',
   name: 'Operador User',
   role: Role.OPERATIONAL,
 });

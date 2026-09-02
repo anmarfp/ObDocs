@@ -46,7 +46,7 @@ const apiGet = vi.mocked(api.get);
 const admin: User = {
   id: 'admin-1',
   name: 'Ana Admin',
-  email: 'ana@docsob.test',
+  email: 'ana@docsobs.test',
   role: 'ADMIN',
   isActive: true,
 };

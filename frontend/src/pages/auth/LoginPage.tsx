@@ -59,10 +59,10 @@ export const LoginPage: React.FC = () => {
 
   const fillDemoCredentials = (role: 'admin' | 'operational') => {
     if (role === 'admin') {
-      setEmail('admin@docsob.com.br');
+      setEmail('admin@docsobs.com.br');
       setPassword('Admin123!@#');
     } else {
-      setEmail('operacional@docsob.com.br');
+      setEmail('operacional@docsobs.com.br');
       setPassword('Operacional123!@#');
     }
   };
@@ -79,7 +79,7 @@ export const LoginPage: React.FC = () => {
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-navy-900 border border-navy-400/40 shadow-glow text-navy-100 font-black text-2xl tracking-wider mb-2">
             DO
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">DocsOb</h1>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">DocsObs</h1>
           <p className="text-sm text-navy-300">
             Gestão Proativa de Vencimento e Renovação de Documentos
           </p>
@@ -215,7 +215,7 @@ export const LoginPage: React.FC = () => {
 
         {/* Footer info */}
         <div className="text-center text-xs text-navy-400">
-          DocsOb &copy; {new Date().getFullYear()} — Todos os direitos reservados.
+          DocsObs &copy; {new Date().getFullYear()} — Todos os direitos reservados.
         </div>
       </div>
     </div>

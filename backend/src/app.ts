@@ -26,7 +26,7 @@ app.get('/api/v1/health', (req, res) => {
   res.status(200).json({
     status: 'ok',
     timestamp: new Date().toISOString(),
-    service: 'docsob-backend',
+    service: 'docsobs-backend',
   });
 });
 

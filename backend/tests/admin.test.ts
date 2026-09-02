@@ -42,21 +42,21 @@ describe('Passo 6 - Administração: usuários, configuração e categorias', ()
 
   const adminToken = generateToken({
     userId: adminId,
-    email: 'admin@docsob.com',
-    name: 'Admin DocsOb',
+    email: 'admin@docsobs.com',
+    name: 'Admin DocsObs',
     role: Role.ADMIN,
   });
   const operationalToken = generateToken({
     userId: operationalId,
-    email: 'operacional@docsob.com',
-    name: 'Operacional DocsOb',
+    email: 'operacional@docsobs.com',
+    name: 'Operacional DocsObs',
     role: Role.OPERATIONAL,
   });
 
   const managedUser = {
     id: userId,
     name: 'Usuário Gerenciado',
-    email: 'usuario@docsob.com',
+    email: 'usuario@docsobs.com',
     passwordHash: 'hash-secreto',
     role: Role.OPERATIONAL,
     isActive: true,
@@ -105,10 +105,10 @@ describe('Passo 6 - Administração: usuários, configuração e categorias', ()
       const res = await request(app)
         .post('/api/v1/users')
         .set('Authorization', `Bearer ${adminToken}`)
-        .send({ name: '  Nova Usuária  ', email: 'NOVA@DOCSOB.COM', password: 'segredo123' });
+        .send({ name: '  Nova Usuária  ', email: 'NOVA@DOCSOBS.COM', password: 'segredo123' });
 
       expect(res.status).toBe(201);
-      expect(res.body.user).toMatchObject({ name: 'Nova Usuária', email: 'nova@docsob.com', role: Role.OPERATIONAL });
+      expect(res.body.user).toMatchObject({ name: 'Nova Usuária', email: 'nova@docsobs.com', role: Role.OPERATIONAL });
       const createdData = (prisma.user.create as any).mock.calls[0][0].data;
       expect(createdData.passwordHash).not.toBe('segredo123');
       expect(await bcrypt.compare('segredo123', createdData.passwordHash)).toBe(true);
@@ -151,7 +151,7 @@ describe('Passo 6 - Administração: usuários, configuração e categorias', ()
       const res = await request(app)
         .put(`/api/v1/users/${userId}`)
         .set('Authorization', `Bearer ${adminToken}`)
-        .send({ email: 'outro@docsob.com' });
+        .send({ email: 'outro@docsobs.com' });
 
       expect(res.status).toBe(409);
       expect(res.body.error).toBe('EMAIL_ALREADY_EXISTS');
@@ -206,7 +206,7 @@ describe('Passo 6 - Administração: usuários, configuração e categorias', ()
       notificationMode: NotificationMode.ALL_ADMINS,
       updatedById: adminId,
       updatedAt: new Date('2026-08-26T10:00:00.000Z'),
-      updatedBy: { id: adminId, name: 'Admin DocsOb', email: 'admin@docsob.com' },
+      updatedBy: { id: adminId, name: 'Admin DocsObs', email: 'admin@docsobs.com' },
     };
 
     it('retorna a configuração para qualquer usuário autenticado', async () => {

@@ -72,7 +72,7 @@ Rebuildable cache, **git-ignored**: `index.sqlite` (sqlite-vec), `graph.json`. T
 `README.md` there is the access protocol. Never the source of truth — if it disagrees with
 the code or with `memory/project`, the code/markdown wins and the index is stale.
 
-## 7. Project-Specific Conventions (DocsOb)
+## 7. Project-Specific Conventions (DocsObs)
 
 - **Directory Structure:**
   - `docs/`: Product Requirements Document (`PRD.md`) and System Architecture Specification (`ARCHITECTURE.md`).

@@ -1,8 +1,8 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { AuthResponse, LoginCredentials, User } from '../types/auth';
 
-export const TOKEN_STORAGE_KEY = 'docsob_token';
-export const USER_STORAGE_KEY = 'docsob_user';
+export const TOKEN_STORAGE_KEY = 'docsobs_token';
+export const USER_STORAGE_KEY = 'docsobs_user';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api/v1';
 
@@ -35,7 +35,7 @@ api.interceptors.response.use(
       if (!isLoginEndpoint) {
         localStorage.removeItem(TOKEN_STORAGE_KEY);
         localStorage.removeItem(USER_STORAGE_KEY);
-        window.dispatchEvent(new CustomEvent('docsob:unauthorized'));
+        window.dispatchEvent(new CustomEvent('docsobs:unauthorized'));
       }
     }
     return Promise.reject(error);

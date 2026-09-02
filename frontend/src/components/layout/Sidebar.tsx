@@ -106,7 +106,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
               <FileCheck2 className="w-4 h-4 text-navy-100" />
             </div>
             <div className="text-[11px] overflow-hidden">
-              <p className="font-semibold text-white truncate">DocsOb v1.0</p>
+              <p className="font-semibold text-white truncate">DocsObs v1.0</p>
               <p className="text-[10px] text-navy-400">Status 100% Online</p>
             </div>
           </div>

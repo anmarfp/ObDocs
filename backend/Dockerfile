@@ -1,5 +1,5 @@
 # ==============================================================================
-# DOCSOB BACKEND — Dockerfile Multi-Stage (Node.js 20 Alpine)
+# DOCSOBS BACKEND — Dockerfile Multi-Stage (Node.js 20 Alpine)
 # ==============================================================================
 
 # ---- Stage 1: Build & Prisma Generate ----

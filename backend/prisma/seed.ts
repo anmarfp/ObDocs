@@ -29,7 +29,7 @@ function daysFromNow(days: number): Date {
 }
 
 async function main() {
-  console.log('🌱 Iniciando o seed do banco de dados DocsOb...');
+  console.log('🌱 Iniciando o seed do banco de dados DocsObs...');
 
   // 1. Configuração Padrão da Empresa (Single-Tenant no MVP)
   const existingConfig = await prisma.companyConfig.findFirst();
@@ -43,7 +43,7 @@ async function main() {
   }
 
   // 2. Usuário Administrador Padrão
-  const adminEmail = 'admin@docsob.com.br';
+  const adminEmail = 'admin@docsobs.com.br';
   let adminUser = await prisma.user.findUnique({
     where: { email: adminEmail },
   });
@@ -64,7 +64,7 @@ async function main() {
   }
 
   // 3. Usuário Operacional de Demonstração
-  const opEmail = 'operacional@docsob.com.br';
+  const opEmail = 'operacional@docsobs.com.br';
   const existingOp = await prisma.user.findUnique({
     where: { email: opEmail },
   });
@@ -122,7 +122,7 @@ async function main() {
         .toLowerCase()
         .normalize('NFD')
         .replace(/[̀-ͯ]/g, '');
-      const email = `${emailLocal}@docsob.com.br`;
+      const email = `${emailLocal}@docsobs.com.br`;
       // No máximo 1 dos 5 é ADMIN, mantendo o perfil Operacional como maioria (RN-009).
       const role = i === 0 ? Role.ADMIN : Role.OPERATIONAL;
       const demoPassword = process.env.DEMO_SEED_PASSWORD || 'Seed123!@#';

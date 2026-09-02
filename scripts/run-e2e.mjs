@@ -6,7 +6,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const projectName = `docsob-e2e-${process.pid}`.toLowerCase();
+const projectName = `docsobs-e2e-${process.pid}`.toLowerCase();
 const npmCli = process.env.npm_execpath;
 
 function validateBaseUrl(rawUrl) {
@@ -84,14 +84,14 @@ async function main() {
   ]);
   const composeEnv = {
     ...process.env,
-    POSTGRES_USER: 'docsob_e2e',
-    POSTGRES_PASSWORD: 'docsob_e2e_password',
-    POSTGRES_DB: 'docsob_e2e',
+    POSTGRES_USER: 'docsobs_e2e',
+    POSTGRES_PASSWORD: 'docsobs_e2e_password',
+    POSTGRES_DB: 'docsobs_e2e',
     POSTGRES_PORT: String(postgresPort),
     BACKEND_PORT: String(backendPort),
     FRONTEND_PORT: String(frontendPort),
     PORT: '3001',
-    JWT_SECRET: `docsob-e2e-${process.pid}-local-only`,
+    JWT_SECRET: `docsobs-e2e-${process.pid}-local-only`,
     RUN_SEED: 'true',
   };
   const compose = ['compose', '-p', projectName];

@@ -60,7 +60,7 @@ export const LoginPage: React.FC = () => {
           <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-tr from-navy-blue to-navy-light text-navy-main font-black text-2xl shadow-xl shadow-navy-blue/20 mb-4">
             DO
           </div>
-          <h2 className="text-3xl font-extrabold tracking-tight text-white">DocsOb</h2>
+          <h2 className="text-3xl font-extrabold tracking-tight text-white">DocsObs</h2>
           <p className="mt-2 text-sm text-slate-400">
             Gestão Inteligente e Controle de Vencimento de Documentos
           </p>
@@ -148,7 +148,7 @@ export const LoginPage: React.FC = () => {
 
           <div className="pt-2 text-center border-t border-navy-border/10">
             <p className="text-xs text-slate-500">
-              DocsOb &copy; {new Date().getFullYear()} &bull; Todos os direitos reservados
+              DocsObs &copy; {new Date().getFullYear()} &bull; Todos os direitos reservados
             </p>
           </div>
         </div>

@@ -62,9 +62,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       logout();
     };
 
-    window.addEventListener('docsob:unauthorized', handleUnauthorized);
+    window.addEventListener('docsobs:unauthorized', handleUnauthorized);
     return () => {
-      window.removeEventListener('docsob:unauthorized', handleUnauthorized);
+      window.removeEventListener('docsobs:unauthorized', handleUnauthorized);
     };
   }, [logout]);
 

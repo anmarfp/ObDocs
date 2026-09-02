@@ -1,5 +1,5 @@
 # ==============================================================================
-# DOCSOB FRONTEND — Dockerfile Multi-Stage (Vite Build → Nginx Alpine)
+# DOCSOBS FRONTEND — Dockerfile Multi-Stage (Vite Build → Nginx Alpine)
 # ==============================================================================
 
 # ---- Stage 1: Build de Produção com Vite ----

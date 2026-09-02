@@ -67,14 +67,14 @@ const documentFixture = {
   expirationDate: new Date('2026-08-30T00:00:00.000Z'),
   alertLeadDays: 10,
   status: DocumentStatus.REGULAR,
-  responsibleName: 'Responsável DocsOb',
-  responsibleEmail: 'responsavel@docsob.com',
+  responsibleName: 'Responsável DocsObs',
+  responsibleEmail: 'responsavel@docsobs.com',
   isArchived: false,
   createdById: 'admin-1',
 };
 const admins = [
-  { id: 'admin-1', name: 'Admin Um', email: 'admin1@docsob.com', role: Role.ADMIN, isActive: true },
-  { id: 'admin-2', name: 'Admin Dois', email: 'admin2@docsob.com', role: Role.ADMIN, isActive: true },
+  { id: 'admin-1', name: 'Admin Um', email: 'admin1@docsobs.com', role: Role.ADMIN, isActive: true },
+  { id: 'admin-2', name: 'Admin Dois', email: 'admin2@docsobs.com', role: Role.ADMIN, isActive: true },
 ];
 
 describe('Passo 8 - Notificações, cron e Google Calendar', () => {
@@ -82,7 +82,7 @@ describe('Passo 8 - Notificações, cron e Google Calendar', () => {
     userId: 'admin-1', email: admins[0].email, name: admins[0].name, role: Role.ADMIN,
   });
   const operationalToken = generateToken({
-    userId: 'operational-1', email: 'operational@docsob.com', name: 'Operacional', role: Role.OPERATIONAL,
+    userId: 'operational-1', email: 'operational@docsobs.com', name: 'Operacional', role: Role.OPERATIONAL,
   });
 
   beforeAll(() => {
@@ -115,7 +115,7 @@ describe('Passo 8 - Notificações, cron e Google Calendar', () => {
         admins as any,
       );
 
-      expect(recipients).toEqual(['admin1@docsob.com', 'admin2@docsob.com']);
+      expect(recipients).toEqual(['admin1@docsobs.com', 'admin2@docsobs.com']);
     });
 
     it('resolve somente o e-mail do responsável no modo ONLY_RESPONSIBLE', () => {
@@ -125,30 +125,30 @@ describe('Passo 8 - Notificações, cron e Google Calendar', () => {
         admins as any,
       );
 
-      expect(recipients).toEqual(['responsavel@docsob.com']);
+      expect(recipients).toEqual(['responsavel@docsobs.com']);
     });
 
     it('envia alerta crítico formatado com status CRITICAL e dados do documento', async () => {
       const result = await notificationService.sendExpirationAlert(
         { ...documentFixture, status: DocumentStatus.CRITICAL } as any,
-        ['admin1@docsob.com'],
+        ['admin1@docsobs.com'],
         true,
       );
 
       expect(result).toEqual(expect.objectContaining({ status: DocumentStatus.CRITICAL }));
-      expect(result).toEqual(expect.objectContaining({ recipients: ['admin1@docsob.com'] }));
+      expect(result).toEqual(expect.objectContaining({ recipients: ['admin1@docsobs.com'] }));
       expect(result).toEqual(expect.objectContaining({ subject: expect.stringContaining(documentFixture.title) }));
     });
 
     it('envia alerta vencido formatado com status EXPIRED', async () => {
       const result = await notificationService.sendExpirationAlert(
         { ...documentFixture, status: DocumentStatus.EXPIRED } as any,
-        ['responsavel@docsob.com'],
+        ['responsavel@docsobs.com'],
         false,
       );
 
       expect(result).toEqual(expect.objectContaining({ status: DocumentStatus.EXPIRED }));
-      expect(result).toEqual(expect.objectContaining({ recipients: ['responsavel@docsob.com'] }));
+      expect(result).toEqual(expect.objectContaining({ recipients: ['responsavel@docsobs.com'] }));
       expect(result).toEqual(expect.objectContaining({ subject: expect.stringMatching(/vencid/i) }));
     });
 

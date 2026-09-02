@@ -8,7 +8,7 @@ import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import { authService, TOKEN_STORAGE_KEY, USER_STORAGE_KEY } from '@/services/api';
 import type { AuthContextType, User } from '@/types/auth';
 
-const admin: User = { id: '1', name: 'Ana', email: 'ana@docsob.com', role: 'ADMIN', isActive: true };
+const admin: User = { id: '1', name: 'Ana', email: 'ana@docsobs.com', role: 'ADMIN', isActive: true };
 
 function Probe() {
   const auth = useAuth();

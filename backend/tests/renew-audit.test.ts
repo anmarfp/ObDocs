@@ -31,14 +31,14 @@ vi.mock('../src/lib/prisma.js', () => {
 describe('Passo 7 - Renovação de Documentos, Versões e Trilha Geral de Auditoria', () => {
   const adminToken = generateToken({
     userId: 'admin-uuid-1',
-    email: 'admin@docsob.com.br',
+    email: 'admin@docsobs.com.br',
     name: 'Admin Master',
     role: Role.ADMIN,
   });
 
   const opToken = generateToken({
     userId: 'op-uuid-2',
-    email: 'operador@docsob.com.br',
+    email: 'operador@docsobs.com.br',
     name: 'Operador User',
     role: Role.OPERATIONAL,
   });
@@ -204,7 +204,7 @@ describe('Passo 7 - Renovação de Documentos, Versões e Trilha Geral de Audito
           versionNumber: 2,
           issueDate: new Date('2025-01-10'),
           expirationDate: new Date('2026-01-10'),
-          renewedBy: { id: 'admin-uuid-1', name: 'Admin Master', email: 'admin@docsob.com.br' },
+          renewedBy: { id: 'admin-uuid-1', name: 'Admin Master', email: 'admin@docsobs.com.br' },
         },
         {
           id: 'ver-1',
@@ -212,7 +212,7 @@ describe('Passo 7 - Renovação de Documentos, Versões e Trilha Geral de Audito
           versionNumber: 1,
           issueDate: new Date('2024-01-10'),
           expirationDate: new Date('2025-01-10'),
-          renewedBy: { id: 'admin-uuid-1', name: 'Admin Master', email: 'admin@docsob.com.br' },
+          renewedBy: { id: 'admin-uuid-1', name: 'Admin Master', email: 'admin@docsobs.com.br' },
         },
       ];
       (prisma.documentVersion.findMany as any).mockResolvedValue(sampleVersions);
@@ -244,7 +244,7 @@ describe('Passo 7 - Renovação de Documentos, Versões e Trilha Geral de Audito
         diffData: { title: { old: null, new: sampleDoc.title } },
         timestamp: new Date('2026-08-26T10:00:00.000Z'),
         document: { id: sampleDoc.id, title: sampleDoc.title, isArchived: false },
-        user: { id: 'admin-uuid-1', name: 'Admin Master', email: 'admin@docsob.com.br', role: Role.ADMIN },
+        user: { id: 'admin-uuid-1', name: 'Admin Master', email: 'admin@docsobs.com.br', role: Role.ADMIN },
       },
       {
         id: 'audit-2',
@@ -255,7 +255,7 @@ describe('Passo 7 - Renovação de Documentos, Versões e Trilha Geral de Audito
         diffData: { archivedVersionNumber: { old: null, new: 1 } },
         timestamp: new Date('2026-08-26T11:00:00.000Z'),
         document: { id: sampleDoc.id, title: sampleDoc.title, isArchived: false },
-        user: { id: 'admin-uuid-1', name: 'Admin Master', email: 'admin@docsob.com.br', role: Role.ADMIN },
+        user: { id: 'admin-uuid-1', name: 'Admin Master', email: 'admin@docsobs.com.br', role: Role.ADMIN },
       },
     ];
 

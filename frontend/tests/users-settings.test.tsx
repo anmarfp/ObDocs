@@ -35,7 +35,7 @@ const apiDelete = vi.mocked(api.delete);
 const currentUser: User = {
   id: 'admin-1',
   name: 'Ana Admin',
-  email: 'ana@docsob.test',
+  email: 'ana@docsobs.test',
   role: 'ADMIN',
   isActive: true,
 };
@@ -43,7 +43,7 @@ const currentUser: User = {
 const otherUser: UserItem = {
   id: 'user-2',
   name: 'Bruno Operacional',
-  email: 'bruno@docsob.test',
+  email: 'bruno@docsobs.test',
   role: 'OPERATIONAL',
   isActive: true,
   createdAt: '2026-08-20T00:00:00.000Z',
@@ -164,7 +164,7 @@ describe('Usuários — contratos sem DELETE', () => {
 
     fireEvent.change(screen.getByPlaceholderText(/Carlos Silva/i), { target: { value: 'Carla Souza' } });
     fireEvent.change(screen.getByPlaceholderText(/carlos.silva@empresa.com/i), {
-      target: { value: 'carla@docsob.test' },
+      target: { value: 'carla@docsobs.test' },
     });
     fireEvent.change(screen.getByPlaceholderText(/Mínimo de 6 caracteres/i), {
       target: { value: '123' },
@@ -180,7 +180,7 @@ describe('Usuários — contratos sem DELETE', () => {
     await waitFor(() =>
       expect(createUser).toHaveBeenCalledWith({
         name: 'Carla Souza',
-        email: 'carla@docsob.test',
+        email: 'carla@docsobs.test',
         password: '123456',
         role: 'OPERATIONAL',
       })
@@ -198,7 +198,7 @@ describe('Configurações — RN-004 e gatilhos administrativos', () => {
       .mockResolvedValueOnce({
         data: {
           success: true,
-          recipients: ['admin@docsob.test'],
+          recipients: ['admin@docsobs.test'],
           subject: 'Resumo',
           total: 2,
           summary: { critical: [], expired: [], total: 2 },
@@ -216,7 +216,7 @@ describe('Configurações — RN-004 e gatilhos administrativos', () => {
     await expect(notificationAdminService.triggerDailyDigest()).resolves.toMatchObject({
       success: true,
       total: 2,
-      recipients: ['admin@docsob.test'],
+      recipients: ['admin@docsobs.test'],
     });
 
     expect(apiGet).toHaveBeenCalledWith('/company/config');
@@ -238,7 +238,7 @@ describe('Configurações — RN-004 e gatilhos administrativos', () => {
     });
     const digest = vi.spyOn(notificationAdminService, 'triggerDailyDigest').mockResolvedValue({
       success: true,
-      recipients: ['admin@docsob.test'],
+      recipients: ['admin@docsobs.test'],
       subject: 'Resumo',
       total: 2,
       summary: { critical: [], expired: [], total: 2 },

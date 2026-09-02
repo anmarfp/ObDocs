@@ -36,7 +36,7 @@ describe('Suíte de Testes - Módulo de Autenticação, Middlewares e Health Che
   describe('1. Utilitários JWT (src/utils/jwt.ts)', () => {
     const samplePayload: TokenPayload = {
       userId: 'user-uuid-123',
-      email: 'admin@docsob.com',
+      email: 'admin@docsobs.com',
       role: Role.ADMIN,
       name: 'Admin Teste',
     };
@@ -60,7 +60,7 @@ describe('Suíte de Testes - Módulo de Autenticação, Middlewares e Health Che
     });
 
     it('deve lançar TokenExpiredError ao verificar token JWT expirado', () => {
-      const secret = process.env.JWT_SECRET || 'docsob-fallback-secret-key-for-dev';
+      const secret = process.env.JWT_SECRET || 'docsobs-fallback-secret-key-for-dev';
       const expiredToken = jwt.sign(samplePayload, secret, { expiresIn: '-1s' });
 
       expect(() => {
@@ -132,7 +132,7 @@ describe('Suíte de Testes - Módulo de Autenticação, Middlewares e Health Che
       it('deve chamar next() e popular req.user quando o token JWT for válido', () => {
         const payload: TokenPayload = {
           userId: 'user-1',
-          email: 'user@docsob.com',
+          email: 'user@docsobs.com',
           role: Role.OPERATIONAL,
           name: 'Operador 1',
         };
@@ -169,7 +169,7 @@ describe('Suíte de Testes - Módulo de Autenticação, Middlewares e Health Che
       it('deve retornar 403 FORBIDDEN se a role do usuário não pertencer às permitidas', () => {
         mockReq.user = {
           userId: 'op-1',
-          email: 'op@docsob.com',
+          email: 'op@docsobs.com',
           role: Role.OPERATIONAL,
           name: 'Operador',
         };
@@ -189,7 +189,7 @@ describe('Suíte de Testes - Módulo de Autenticação, Middlewares e Health Che
       it('deve permitir a requisição chamando next() se a role do usuário for permitida', () => {
         mockReq.user = {
           userId: 'admin-1',
-          email: 'admin@docsob.com',
+          email: 'admin@docsobs.com',
           role: Role.ADMIN,
           name: 'Admin Master',
         };
@@ -278,7 +278,7 @@ describe('Suíte de Testes - Módulo de Autenticação, Middlewares e Health Che
 
       expect(res.status).toBe(200);
       expect(res.body).toHaveProperty('status', 'ok');
-      expect(res.body).toHaveProperty('service', 'docsob-backend');
+      expect(res.body).toHaveProperty('service', 'docsobs-backend');
       expect(res.body).toHaveProperty('timestamp');
       expect(new Date(res.body.timestamp).getTime()).not.toBeNaN();
     });
@@ -325,7 +325,7 @@ describe('Suíte de Testes - Módulo de Autenticação, Middlewares e Health Che
         const res = await request(app)
           .post('/api/v1/auth/login')
           .send({
-            email: 'admin@docsob.com',
+            email: 'admin@docsobs.com',
             password: '',
           });
 
@@ -347,7 +347,7 @@ describe('Suíte de Testes - Módulo de Autenticação, Middlewares e Health Che
         const res = await request(app)
           .post('/api/v1/auth/login')
           .send({
-            email: 'inexistente@docsob.com',
+            email: 'inexistente@docsobs.com',
             password: 'senha123',
           });
 
@@ -357,7 +357,7 @@ describe('Suíte de Testes - Módulo de Autenticação, Middlewares e Health Che
           message: 'E-mail ou senha incorretos, ou usuário inativo.',
         });
         expect(prisma.user.findUnique).toHaveBeenCalledWith({
-          where: { email: 'inexistente@docsob.com' },
+          where: { email: 'inexistente@docsobs.com' },
         });
       });
 
@@ -365,7 +365,7 @@ describe('Suíte de Testes - Módulo de Autenticação, Middlewares e Health Che
         (prisma.user.findUnique as any).mockResolvedValue({
           id: 'user-inativo-1',
           name: 'Usuário Inativo',
-          email: 'inativo@docsob.com',
+          email: 'inativo@docsobs.com',
           passwordHash: await bcrypt.hash('senha123', 10),
           role: Role.OPERATIONAL,
           isActive: false,
@@ -374,7 +374,7 @@ describe('Suíte de Testes - Módulo de Autenticação, Middlewares e Health Che
         const res = await request(app)
           .post('/api/v1/auth/login')
           .send({
-            email: 'inativo@docsob.com',
+            email: 'inativo@docsobs.com',
             password: 'senha123',
           });
 
@@ -390,7 +390,7 @@ describe('Suíte de Testes - Módulo de Autenticação, Middlewares e Health Che
         (prisma.user.findUnique as any).mockResolvedValue({
           id: 'user-1',
           name: 'Admin Teste',
-          email: 'admin@docsob.com',
+          email: 'admin@docsobs.com',
           passwordHash,
           role: Role.ADMIN,
           isActive: true,
@@ -399,7 +399,7 @@ describe('Suíte de Testes - Módulo de Autenticação, Middlewares e Health Che
         const res = await request(app)
           .post('/api/v1/auth/login')
           .send({
-            email: 'admin@docsob.com',
+            email: 'admin@docsobs.com',
             password: 'senhaErrada',
           });
 
@@ -416,7 +416,7 @@ describe('Suíte de Testes - Módulo de Autenticação, Middlewares e Health Che
         (prisma.user.findUnique as any).mockResolvedValue({
           id: 'user-uuid-999',
           name: 'Administrador Geral',
-          email: 'admin@docsob.com',
+          email: 'admin@docsobs.com',
           passwordHash,
           role: Role.ADMIN,
           isActive: true,
@@ -425,7 +425,7 @@ describe('Suíte de Testes - Módulo de Autenticação, Middlewares e Health Che
         const res = await request(app)
           .post('/api/v1/auth/login')
           .send({
-            email: 'ADMIN@DOCSOB.COM', // Valida normalização para lowercase
+            email: 'ADMIN@DOCSOBS.COM', // Valida normalização para lowercase
             password: plainPassword,
           });
 
@@ -435,7 +435,7 @@ describe('Suíte de Testes - Módulo de Autenticação, Middlewares e Health Che
         expect(res.body.user).toEqual({
           id: 'user-uuid-999',
           name: 'Administrador Geral',
-          email: 'admin@docsob.com',
+          email: 'admin@docsobs.com',
           role: 'ADMIN',
         });
         expect(res.body.user.passwordHash).toBeUndefined();
@@ -443,7 +443,7 @@ describe('Suíte de Testes - Módulo de Autenticação, Middlewares e Health Che
         // Valida payload do token gerado
         const decoded = verifyToken(res.body.token);
         expect(decoded.userId).toBe('user-uuid-999');
-        expect(decoded.email).toBe('admin@docsob.com');
+        expect(decoded.email).toBe('admin@docsobs.com');
         expect(decoded.role).toBe(Role.ADMIN);
         expect(decoded.name).toBe('Administrador Geral');
       });
@@ -454,7 +454,7 @@ describe('Suíte de Testes - Módulo de Autenticação, Middlewares e Health Che
         const res = await request(app)
           .post('/api/v1/auth/login')
           .send({
-            email: 'admin@docsob.com',
+            email: 'admin@docsobs.com',
             password: 'password123',
           });
 
@@ -486,7 +486,7 @@ describe('Suíte de Testes - Módulo de Autenticação, Middlewares e Health Che
       it('deve retornar 404 se o usuário do token não for encontrado no banco de dados', async () => {
         const token = generateToken({
           userId: 'user-inexistente',
-          email: 'inexistente@docsob.com',
+          email: 'inexistente@docsobs.com',
           role: Role.OPERATIONAL,
           name: 'Inexistente',
         });
@@ -507,7 +507,7 @@ describe('Suíte de Testes - Módulo de Autenticação, Middlewares e Health Che
       it('deve retornar 404 se o usuário estiver marcado como inativo no banco', async () => {
         const token = generateToken({
           userId: 'user-inativo',
-          email: 'inativo@docsob.com',
+          email: 'inativo@docsobs.com',
           role: Role.OPERATIONAL,
           name: 'Inativo',
         });
@@ -515,7 +515,7 @@ describe('Suíte de Testes - Módulo de Autenticação, Middlewares e Health Che
         (prisma.user.findUnique as any).mockResolvedValue({
           id: 'user-inativo',
           name: 'Inativo',
-          email: 'inativo@docsob.com',
+          email: 'inativo@docsobs.com',
           role: Role.OPERATIONAL,
           isActive: false,
           createdAt: new Date().toISOString(),
@@ -533,7 +533,7 @@ describe('Suíte de Testes - Módulo de Autenticação, Middlewares e Health Che
         const createdAt = new Date().toISOString();
         const token = generateToken({
           userId: 'user-valido',
-          email: 'valido@docsob.com',
+          email: 'valido@docsobs.com',
           role: Role.ADMIN,
           name: 'Usuario Valido',
         });
@@ -541,7 +541,7 @@ describe('Suíte de Testes - Módulo de Autenticação, Middlewares e Health Che
         (prisma.user.findUnique as any).mockResolvedValue({
           id: 'user-valido',
           name: 'Usuario Valido',
-          email: 'valido@docsob.com',
+          email: 'valido@docsobs.com',
           role: Role.ADMIN,
           isActive: true,
           createdAt,
@@ -556,7 +556,7 @@ describe('Suíte de Testes - Módulo de Autenticação, Middlewares e Health Che
           user: {
             id: 'user-valido',
             name: 'Usuario Valido',
-            email: 'valido@docsob.com',
+            email: 'valido@docsobs.com',
             role: 'ADMIN',
             isActive: true,
             createdAt,
@@ -578,7 +578,7 @@ describe('Suíte de Testes - Módulo de Autenticação, Middlewares e Health Che
       it('deve retornar 500 se ocorrer um erro inesperado ao buscar dados em /me', async () => {
         const token = generateToken({
           userId: 'user-db-err',
-          email: 'dberr@docsob.com',
+          email: 'dberr@docsobs.com',
           role: Role.ADMIN,
           name: 'DB Err User',
         });
@@ -636,7 +636,7 @@ describe('Suíte de Testes - Módulo de Autenticação, Middlewares e Health Che
       it('deve permitir acesso à rota exclusiva de ADMIN para usuário ADMIN', async () => {
         const adminToken = generateToken({
           userId: 'admin-1',
-          email: 'admin@docsob.com',
+          email: 'admin@docsobs.com',
           role: Role.ADMIN,
           name: 'Admin Master',
         });
@@ -652,7 +652,7 @@ describe('Suíte de Testes - Módulo de Autenticação, Middlewares e Health Che
       it('deve retornar 403 Forbidden para usuário OPERATIONAL em rota exclusiva de ADMIN', async () => {
         const opToken = generateToken({
           userId: 'op-1',
-          email: 'op@docsob.com',
+          email: 'op@docsobs.com',
           role: Role.OPERATIONAL,
           name: 'Operador',
         });
@@ -671,7 +671,7 @@ describe('Suíte de Testes - Módulo de Autenticação, Middlewares e Health Che
       it('deve permitir acesso à rota compartilhada para perfil OPERATIONAL', async () => {
         const opToken = generateToken({
           userId: 'op-1',
-          email: 'op@docsob.com',
+          email: 'op@docsobs.com',
           role: Role.OPERATIONAL,
           name: 'Operador',
         });

@@ -211,7 +211,7 @@ export const SettingsPage: React.FC = () => {
 
   // Disconnect Google Calendar (DOC-28)
   const handleDisconnectGoogle = async () => {
-    if (!window.confirm('Deseja desconectar sua conta Google do DocsOb? A sincronização de vencimentos com o Google Agenda deixará de funcionar até uma nova conexão.')) {
+    if (!window.confirm('Deseja desconectar sua conta Google do DocsObs? A sincronização de vencimentos com o Google Agenda deixará de funcionar até uma nova conexão.')) {
       return;
     }
 
@@ -219,7 +219,7 @@ export const SettingsPage: React.FC = () => {
     try {
       await googleAuthService.disconnect();
       setIsGoogleConnected(false);
-      toastSuccess('Google Agenda Desconectado', 'Sua conta Google foi desconectada do DocsOb.');
+      toastSuccess('Google Agenda Desconectado', 'Sua conta Google foi desconectada do DocsObs.');
     } catch (err: any) {
       console.error('Erro ao desconectar do Google Agenda:', err);
       toastError('Falha ao Desconectar', 'Não foi possível desconectar sua conta Google.');

@@ -80,7 +80,7 @@ export const ToggleStatusConfirmModal: React.FC<ToggleStatusConfirmModalProps> =
           </h3>
           <p className="text-xs text-slate-500 mt-1">
             {isActivating
-              ? `O usuário ${user.name} (${user.email}) poderá voltar a autenticar e utilizar o DocsOb.`
+              ? `O usuário ${user.name} (${user.email}) poderá voltar a autenticar e utilizar o DocsObs.`
               : `O usuário ${user.name} (${user.email}) não conseguirá mais realizar login no sistema até ser reativado.`}
           </p>
         </div>
