@@ -47,10 +47,10 @@ import { generateToken, signOAuthState, verifyOAuthState } from '../src/utils/jw
 
 describe('Google Calendar OAuth - fluxo de conexão (DOC-28, subtarefa 2)', () => {
   const adminToken = generateToken({
-    userId: 'admin-1', email: 'admin1@docsob.com', name: 'Admin Um', role: Role.ADMIN,
+    userId: 'admin-1', email: 'admin1@docsobs.com', name: 'Admin Um', role: Role.ADMIN,
   });
   const operationalToken = generateToken({
-    userId: 'operational-1', email: 'operational@docsob.com', name: 'Operacional', role: Role.OPERATIONAL,
+    userId: 'operational-1', email: 'operational@docsobs.com', name: 'Operacional', role: Role.OPERATIONAL,
   });
 
   const ORIGINAL_ENV = { ...process.env };

@@ -48,14 +48,14 @@ import { prisma } from '../src/lib/prisma.js';
 describe('Suíte de Testes Automatizados - Módulo de Documentos, Matriz de Cores, Storage e RBAC', () => {
   const adminToken = generateToken({
     userId: 'admin-uuid-1',
-    email: 'admin@docsob.com.br',
+    email: 'admin@docsobs.com.br',
     name: 'Admin Teste',
     role: Role.ADMIN,
   });
 
   const opToken = generateToken({
     userId: 'op-uuid-2',
-    email: 'operacional@docsob.com.br',
+    email: 'operacional@docsobs.com.br',
     name: 'Operacional Teste',
     role: Role.OPERATIONAL,
   });
@@ -83,7 +83,7 @@ describe('Suíte de Testes Automatizados - Módulo de Documentos, Matriz de Core
     createdAt: new Date(),
     updatedAt: new Date(),
     category: { id: validCategoryId, name: 'Fiscal', colorHex: '#3b82f6' },
-    createdBy: { id: 'admin-uuid-1', name: 'Admin Teste', email: 'admin@docsob.com.br', role: Role.ADMIN },
+    createdBy: { id: 'admin-uuid-1', name: 'Admin Teste', email: 'admin@docsobs.com.br', role: Role.ADMIN },
     versions: [],
     auditLogs: [],
     gcalSyncLogs: [],

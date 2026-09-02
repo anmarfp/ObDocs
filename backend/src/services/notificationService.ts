@@ -89,14 +89,14 @@ export async function sendExpirationAlert(
   const statusLabel = isExpired ? 'Vencido' : 'Crítico';
 
   const subject = isExpired
-    ? `[DocsOb] Documento Vencido: ${doc.title}`
-    : `[DocsOb] Alerta Crítico de Vencimento: ${doc.title}`;
+    ? `[DocsObs] Documento Vencido: ${doc.title}`
+    : `[DocsObs] Alerta Crítico de Vencimento: ${doc.title}`;
 
   const formattedDate = doc.expirationDate
     ? new Date(doc.expirationDate).toLocaleDateString('pt-BR')
     : 'Data não informada';
 
-  const body = `Olá,\n\nO documento "${doc.title}" está classificado com o status ${statusLabel.toUpperCase()} (Vencimento: ${formattedDate}).\nPor favor, tome as ações necessárias para regularização ou renovação no sistema DocsOb.`;
+  const body = `Olá,\n\nO documento "${doc.title}" está classificado com o status ${statusLabel.toUpperCase()} (Vencimento: ${formattedDate}).\nPor favor, tome as ações necessárias para regularização ou renovação no sistema DocsObs.`;
 
   return {
     success: true,
@@ -120,7 +120,7 @@ export async function sendDailyDigest(
     .filter((admin) => admin.isActive !== false && Boolean(admin.email))
     .map((admin) => admin.email.trim());
 
-  const subject = `[DocsOb] Resumo Diário de Vencimentos (Daily Digest) - ${summary.total} documento(s) pendente(s)`;
+  const subject = `[DocsObs] Resumo Diário de Vencimentos (Daily Digest) - ${summary.total} documento(s) pendente(s)`;
 
   return {
     success: true,

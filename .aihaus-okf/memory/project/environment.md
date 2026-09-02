@@ -5,7 +5,7 @@ status: active
 last_reviewed: 2026-08-24
 ---
 
-# Environment — DocsOb
+# Environment — DocsObs
 
 > Stack, services, tools, and local setup.
 

@@ -1,8 +1,8 @@
 {
-  "name": "docsob",
+  "name": "docsobs",
   "version": "1.0.0",
   "private": true,
-  "description": "DocsOb - Sistema de Gestão de Vencimento de Documentos",
+  "description": "DocsObs - Sistema de Gestão de Vencimento de Documentos",
   "scripts": {
     "dev": "npm --prefix backend run dev",
     "dev:frontend": "npm --prefix frontend run dev",
@@ -28,10 +28,10 @@
     "clean": "rimraf dist backend/dist frontend/dist backend/uploads/*"
   },
   "keywords": [
-    "docsob",
+    "docsobs",
     "document-management"
   ],
-  "author": "DocsOb",
+  "author": "DocsObs",
   "license": "ISC",
   "devDependencies": {
     "concurrently": "^9.1.2",

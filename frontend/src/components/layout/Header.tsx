@@ -90,7 +90,7 @@ export const Header: React.FC = () => {
             DO
           </div>
           <div className="hidden sm:flex flex-col">
-            <span className="text-base font-bold text-navy-950 leading-tight tracking-tight">DocsOb</span>
+            <span className="text-base font-bold text-navy-950 leading-tight tracking-tight">DocsObs</span>
             <span className="text-[11px] text-slate-400 font-medium leading-none">Gestão de Vencimentos</span>
           </div>
         </Link>

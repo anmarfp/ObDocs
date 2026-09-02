@@ -7,7 +7,7 @@ last_reviewed: 2026-08-30
 
 # Decisions — ADR Ledger
 
-> Decision record for DocsOb project. Newest entries on top.
+> Decision record for DocsObs project. Newest entries on top.
 
 ## Current truth
 
@@ -44,7 +44,7 @@ Key architectural decisions are recorded in `docs/ARCHITECTURE.md` and `docs/PRD
 - **Links:** `wireframes/perspective_dashboard/styles.css`
 
 ### 2026-08-07 — Arquitetura Desacoplada REST/SPA e Estratégia de Prototipagem da UI (ADR-006)
-- **Context:** Início da Fase 2 para definir a arquitetura técnica, o modelo de dados (ERD) e preparar a prototipagem de UI do DocsOb.
+- **Context:** Início da Fase 2 para definir a arquitetura técnica, o modelo de dados (ERD) e preparar a prototipagem de UI do DocsObs.
 - **Decision:** Adoção de arquitetura desacoplada (Frontend SPA Web + Backend RESTful API + Banco Relacional PostgreSQL com ORM Prisma + Storage S3/Supabase + Google Calendar API). Para o protótipo de UI, construir uma SPA Web interativa com design system rico em Vanilla CSS.
 - **Status:** Accepted
 - **Links:** `docs/ARCHITECTURE.md:340`

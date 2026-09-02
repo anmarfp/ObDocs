@@ -16,7 +16,7 @@ describe('TC-E2E-01: Autenticacao, JWT, /me e RBAC (RF-009 / RF-010)', () => {
   it('responde ao healthcheck da API atraves do proxy', async () => {
     const response = await req.get(getApiPath('/api/v1/health'));
     expect(response.status).toBe(200);
-    expect(response.body).toMatchObject({ status: 'ok', service: 'docsob-backend' });
+    expect(response.body).toMatchObject({ status: 'ok', service: 'docsobs-backend' });
   });
 
   it('autentica Admin e Operacional e valida seus JWTs em /me', async () => {
@@ -28,11 +28,11 @@ describe('TC-E2E-01: Autenticacao, JWT, /me e RBAC (RF-009 / RF-010)', () => {
     ]);
 
     expect(adminMe.status).toBe(200);
-    expect(adminMe.body.user).toMatchObject({ email: 'admin@docsob.com.br', role: 'ADMIN' });
+    expect(adminMe.body.user).toMatchObject({ email: 'admin@docsobs.com.br', role: 'ADMIN' });
     expect(adminMe.body.user).not.toHaveProperty('passwordHash');
     expect(operationalMe.status).toBe(200);
     expect(operationalMe.body.user).toMatchObject({
-      email: 'operacional@docsob.com.br',
+      email: 'operacional@docsobs.com.br',
       role: 'OPERATIONAL',
     });
   });
@@ -40,7 +40,7 @@ describe('TC-E2E-01: Autenticacao, JWT, /me e RBAC (RF-009 / RF-010)', () => {
   it('rejeita credenciais invalidas e JWT corrompido com 401', async () => {
     const invalidLogin = await req
       .post(getApiPath('/api/v1/auth/login'))
-      .send({ email: 'admin@docsob.com.br', password: 'SenhaErrada999!' });
+      .send({ email: 'admin@docsobs.com.br', password: 'SenhaErrada999!' });
     const invalidJwt = await req
       .get(getApiPath('/api/v1/auth/me'))
       .set('Authorization', 'Bearer jwt-corrompido');

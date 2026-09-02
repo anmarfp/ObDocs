@@ -7,7 +7,7 @@ last_reviewed: 2026-08-27
 
 # Procedures — How-Tos & Runbooks
 
-> Standard procedures for working in the DocsOb codebase.
+> Standard procedures for working in the DocsObs codebase.
 
 ## Current truth
 
@@ -19,7 +19,7 @@ node .aihaus-okf/tools/scan.mjs --json
 ```
 
 ### 2. Previewing the Wireframe Prototype
-Open `wireframes/perspective_dashboard/index.html` in any web browser to view and interact with the DocsOb prototype.
+Open `wireframes/perspective_dashboard/index.html` in any web browser to view and interact with the DocsObs prototype.
 
 ### 3. Linear Task Management (Orca CLI)
 - View current ticket details: `orca linear issue --current --full --json`

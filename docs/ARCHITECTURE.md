@@ -1,8 +1,8 @@
-# Especificação de Arquitetura do Sistema — DocsOb
+# Especificação de Arquitetura do Sistema — DocsObs
 
 | Informação | Detalhe |
 | :--- | :--- |
-| **Projeto** | DocsOb — Gestão de Vencimento de Documentos |
+| **Projeto** | DocsObs — Gestão de Vencimento de Documentos |
 | **Fase Atual** | Concluído e Validado (Fases 1 a 4 Concluídas) |
 | **Status** | Implementado, Validado e Operacional |
 | **Versão** | 1.1.0 |
@@ -13,7 +13,7 @@
 
 ## 1. Visão Geral da Arquitetura
 
-O sistema **DocsOb** é construído sob uma arquitetura desacoplada e conteinerizada (Client-Server / RESTful API / Local-First), projetada para responder com alta performance (tempo de resposta < 200ms), garantindo auditoria imutável, sincronização de prazos e controle estrito de acessos baseado em perfis (RBAC).
+O sistema **DocsObs** é construído sob uma arquitetura desacoplada e conteinerizada (Client-Server / RESTful API / Local-First), projetada para responder com alta performance (tempo de resposta < 200ms), garantindo auditoria imutável, sincronização de prazos e controle estrito de acessos baseado em perfis (RBAC).
 
 ```mermaid
 flowchart TD

@@ -5,7 +5,7 @@ status: active
 last_reviewed: 2026-08-24
 ---
 
-# Glossary — DocsOb
+# Glossary — DocsObs
 
 > Domain terms and project-specific nomenclature.
 
@@ -13,7 +13,7 @@ last_reviewed: 2026-08-24
 
 | Term | Definition |
 | --- | --- |
-| **DocsOb** | System name — Sistema de Gestão e Acompanhamento de Vencimento de Documentos. |
+| **DocsObs** | System name — Sistema de Gestão e Acompanhamento de Vencimento de Documentos. |
 | **Matriz de Cores** | Visual status system consisting of 🔴 Vencido, 🟡 Alerta Crítico, 🔵 Em Renovação, 🟢 Regular, ⚪ Indeterminado. |
 | **Antecedência do Alerta (Lead Time)** | Customizable advance notification threshold in days (e.g., 60, 30, 15, 7 days) before document expiration. |
 | **Soft Delete (Arquivamento)** | Archiving a document to hide it from general operational views without deleting the record (visible exclusively to Admins). |

@@ -54,7 +54,7 @@ export async function getAuthTokens(): Promise<AuthTokens> {
     const req = getRequest();
     const adminRes = await req
       .post(getApiPath('/api/v1/auth/login'))
-      .send({ email: 'admin@docsob.com.br', password: 'Admin123!@#' });
+      .send({ email: 'admin@docsobs.com.br', password: 'Admin123!@#' });
 
     if (adminRes.status !== 200 || !adminRes.body?.token) {
       throw new Error(`Falha no login Admin do seed: ${adminRes.status} ${JSON.stringify(adminRes.body)}`);
@@ -62,7 +62,7 @@ export async function getAuthTokens(): Promise<AuthTokens> {
 
     const operationalRes = await req
       .post(getApiPath('/api/v1/auth/login'))
-      .send({ email: 'operacional@docsob.com.br', password: 'Operacional123!@#' });
+      .send({ email: 'operacional@docsobs.com.br', password: 'Operacional123!@#' });
 
     if (operationalRes.status !== 200 || !operationalRes.body?.token) {
       throw new Error(

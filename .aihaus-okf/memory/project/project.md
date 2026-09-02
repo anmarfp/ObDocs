@@ -5,13 +5,13 @@ status: active
 last_reviewed: 2026-08-30
 ---
 
-# Project — DocsOb
+# Project — DocsObs
 
 > Document Expiration & Renewal Management System (Gestão de Vencimento de Documentos).
 
 ## Current truth
 
-DocsOb is a web application designed to proactively track document expiration dates (contracts, licenses, tax certificates, insurance policies, worker obligations) via color-coded status matrices, automated email alerts, Google Calendar synchronization, role-based access control (RBAC), and an immutable audit log. All 4 phases are complete and the system is marked "Concluído / Em Produção" in the PRD: Phase 1 PRD (`docs/PRD.md`), Phase 2 Architecture Specification (`docs/ARCHITECTURE.md`) and documents module, Phase 3 React/TypeScript frontend (dashboard, reports, calendar, audit, users, settings) plus the fully tested Node.js/TypeScript RESTful API backend (`backend/`), and Phase 4 full-stack integration with a unified `docker-compose.yml`, unified run/test scripts, and E2E tests (`scripts/run-e2e.mjs`).
+DocsObs is a web application designed to proactively track document expiration dates (contracts, licenses, tax certificates, insurance policies, worker obligations) via color-coded status matrices, automated email alerts, Google Calendar synchronization, role-based access control (RBAC), and an immutable audit log. All 4 phases are complete and the system is marked "Concluído / Em Produção" in the PRD: Phase 1 PRD (`docs/PRD.md`), Phase 2 Architecture Specification (`docs/ARCHITECTURE.md`) and documents module, Phase 3 React/TypeScript frontend (dashboard, reports, calendar, audit, users, settings) plus the fully tested Node.js/TypeScript RESTful API backend (`backend/`), and Phase 4 full-stack integration with a unified `docker-compose.yml`, unified run/test scripts, and E2E tests (`scripts/run-e2e.mjs`).
 
 ## Details
 

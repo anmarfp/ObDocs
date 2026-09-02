@@ -22,7 +22,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles, ch
           </div>
           <div className="flex items-center space-x-2 text-navy-100">
             <Loader2 className="w-5 h-5 animate-spin text-navy-400" />
-            <span className="text-sm font-medium tracking-wide">Carregando DocsOb...</span>
+            <span className="text-sm font-medium tracking-wide">Carregando DocsObs...</span>
           </div>
         </div>
       </div>

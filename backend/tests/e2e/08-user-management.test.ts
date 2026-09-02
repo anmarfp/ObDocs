@@ -6,7 +6,7 @@ describe('TC-E2E-08: Gestao Admin, reset, inativacao e bloqueio (RF-010 / RF-011
 
   it('executa o ciclo create, list/read, update, reset, login e inativacao', async () => {
     const { adminToken } = await getAuthTokens();
-    const email = `${uniqueValue('usuario').toLowerCase()}@docsob.test`;
+    const email = `${uniqueValue('usuario').toLowerCase()}@docsobs.test`;
     const initialPassword = 'SenhaOriginal123!';
     const updatedPassword = 'NovaSenhaAtualizada456!';
 

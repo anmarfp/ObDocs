@@ -30,7 +30,7 @@ const apiPost = vi.mocked(api.post);
 const user: User = {
   id: 'admin-1',
   name: 'Ana Admin',
-  email: 'ana@docsob.test',
+  email: 'ana@docsobs.test',
   role: 'ADMIN',
   isActive: true,
 };
@@ -73,7 +73,7 @@ const auditLog: AuditLogItem = {
   },
   timestamp: '2026-08-27T12:00:00.000Z',
   document: { id: 'doc-1', title: 'Licença Ambiental', isArchived: false },
-  user: { id: 'admin-1', name: 'Ana Admin', email: 'ana@docsob.test', role: 'ADMIN' },
+  user: { id: 'admin-1', name: 'Ana Admin', email: 'ana@docsobs.test', role: 'ADMIN' },
 };
 
 beforeEach(() => {

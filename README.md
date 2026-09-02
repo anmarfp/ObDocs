@@ -1,4 +1,4 @@
-# DocsOb — Sistema de Gestão de Vencimento de Documentos
+# DocsObs — Sistema de Gestão de Vencimento de Documentos
 
 > Plataforma web para controle, acompanhamento e renovação de documentos corporativos com Matriz Visual de Cores, alertas de prazos críticos, sincronização com calendário e trilha de auditoria imutável (RN-008).
 
@@ -20,7 +20,7 @@
 
 ## 🏛️ Arquitetura do Sistema
 
-O DocsOb é estruturado como um monorepo modular composto por frontend SPA em React e backend API RESTful em Node.js com persistência no PostgreSQL:
+O DocsObs é estruturado como um monorepo modular composto por frontend SPA em React e backend API RESTful em Node.js com persistência no PostgreSQL:
 
 ```mermaid
 flowchart TD
@@ -29,18 +29,18 @@ flowchart TD
     end
 
     subgraph Docker ["Ambiente Containerizado (Docker Compose)"]
-        subgraph FrontendContainer ["Container: docsob_frontend (:3000)"]
+        subgraph FrontendContainer ["Container: docsobs_frontend (:3000)"]
             Nginx["Nginx Alpine (Porta 80)"]
             SPA["React 18 SPA (Vite / Tailwind)"]
         end
 
-        subgraph BackendContainer ["Container: docsob_backend (:3001)"]
+        subgraph BackendContainer ["Container: docsobs_backend (:3001)"]
             Express["Express 4 REST API"]
             Prisma["Prisma ORM 6"]
             Uploads["Volume /app/uploads"]
         end
 
-        subgraph DBContainer ["Container: docsob_db (:5432)"]
+        subgraph DBContainer ["Container: docsobs_db (:5432)"]
             PostgreSQL["PostgreSQL 16"]
             PGData["Volume postgres_data"]
         end
@@ -86,7 +86,7 @@ docker compose up -d --build
 
 - 🌐 **Frontend (Aplicação Web):** [http://localhost:3000](http://localhost:3000)
 - 🔌 **Backend API:** [http://localhost:3001/api/v1/health](http://localhost:3001/api/v1/health)
-- 🗄️ **PostgreSQL:** `localhost:5432` (Usuário: `postgres`, Senha: `postgres`, Banco: `docsob`)
+- 🗄️ **PostgreSQL:** `localhost:5432` (Usuário: `postgres`, Senha: `postgres`, Banco: `docsobs`)
 
 ---
 
@@ -144,8 +144,8 @@ O seed inicial cria automaticamente dois perfis de usuário para testes:
 
 | Perfil | E-mail de Acesso | Senha Padrão | Permissões (RBAC) |
 | :--- | :--- | :--- | :--- |
-| **Administrador** | `admin@docsob.com.br` | `Admin123!@#` | Acesso total: Painel, Documentos, Calendário, Auditoria, Gestão de Usuários e Configurações |
-| **Operacional** | `operacional@docsob.com.br` | `Operacional123!@#` | Operações diárias: Painel, Cadastro de Documentos, Renovação e Calendário |
+| **Administrador** | `admin@docsobs.com.br` | `Admin123!@#` | Acesso total: Painel, Documentos, Calendário, Auditoria, Gestão de Usuários e Configurações |
+| **Operacional** | `operacional@docsobs.com.br` | `Operacional123!@#` | Operações diárias: Painel, Cadastro de Documentos, Renovação e Calendário |
 
 > ⚠️ **Aviso de Segurança:** As senhas acima destinam-se exclusivamente ao ambiente local e de demonstração. Em ambientes de produção, defina senhas fortes e altere a chave `JWT_SECRET`.
 

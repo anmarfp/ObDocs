@@ -11,7 +11,7 @@ export const NotFoundPage: React.FC = () => {
         </div>
         <h2 className="text-2xl font-bold text-navy-950">Página Não Encontrada (404)</h2>
         <p className="text-sm text-slate-500">
-          O endereço acessado não existe ou foi removido do sistema DocsOb.
+          O endereço acessado não existe ou foi removido do sistema DocsObs.
         </p>
         <div className="pt-2">
           <Link to="/" className="btn-primary">
